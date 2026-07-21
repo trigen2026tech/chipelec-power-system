@@ -1,0 +1,123 @@
+.topbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.search-box{
+
+    background:white;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    width:350px;
+
+    display:flex;
+
+    align-items:center;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+
+}
+
+.search-box input{
+
+    border:none;
+
+    outline:none;
+
+    margin-left:10px;
+
+    width:100%;
+
+    font-size:15px;
+
+}
+
+.topbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:25px;
+
+}
+
+.notification{
+
+    position:relative;
+
+    font-size:24px;
+
+    cursor:pointer;
+
+}
+
+.badge{
+
+    position:absolute;
+
+    top:-8px;
+
+    right:-10px;
+
+    background:red;
+
+    color:white;
+
+    border-radius:50%;
+
+    width:18px;
+
+    height:18px;
+
+    font-size:11px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.profile img{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+}
+
+.profile h4{
+
+    margin:0;
+
+}
+
+.profile small{
+
+    color:#666;
+
+}

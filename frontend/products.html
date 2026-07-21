@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products | Chipelec Admin</title>
+
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/modal.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>⚡ CHIPELEC</h2>
+
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="products.html">📦 Products</a>
+    <a href="brands.html">🏷 Brands</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="profile.html">👤 Profile</a>
+
+    <hr>
+
+    <a href="#" onclick="logout()">🚪 Logout</a>
+
+</div>
+
+<div class="content">
+
+    <h1>Products</h1>
+<div class="top-bar">
+
+    <input
+        type="text"
+        id="search"
+        placeholder="Search Product...">
+
+    <div>
+
+        <button onclick="showForm()">
+            + Add Product
+        </button>
+
+        <button onclick="loadProducts()">
+            Refresh
+        </button>
+
+    </div>
+
+</div>
+    <table>
+
+        <thead>
+
+         <tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Brand</th>
+    <th>Category</th>
+    <th>Price</th>
+    <th>Stock</th>
+    <th>Actions</th>
+</tr>
+
+        </thead>
+
+        <tbody id="productTable">
+
+        </tbody>
+
+    </table>
+</div>
+
+<div id="productModal" class="modal">
+
+    <div class="modal-content">
+
+        <span class="close" onclick="closeModal()">&times;</span>
+
+
+        <input id="product_name" placeholder="Product Name">
+
+        <input id="model_number" placeholder="Model Number">
+
+        <input id="capacity" placeholder="Capacity">
+
+        <input id="warranty" placeholder="Warranty">
+
+        <input id="price" type="number" placeholder="Price">
+
+        <input id="stock_quantity" type="number" placeholder="Stock">
+
+        <textarea id="description" placeholder="Description"></textarea>
+
+        <select id="brand_id">
+            <option value="">Select Brand</option>
+        </select>
+
+        <select id="category_id">
+            <option value="">Select Category</option>
+        </select>
+
+        <button id="saveBtn" onclick="saveProduct()">
+    Save Product
+</button>
+
+    </div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/products.js"></script>
+
+</body>
+
+</html>
