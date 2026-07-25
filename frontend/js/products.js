@@ -58,6 +58,64 @@ async function loadProducts() {
 
 }
 
+async function loadBrands() {
+
+    const response = await fetch(
+        "http://localhost:5000/api/brands",
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const result = await response.json();
+
+    const brand = document.getElementById("brand_id");
+
+    brand.innerHTML = '<option value="">Select Brand</option>';
+
+    result.data.forEach(item => {
+
+        brand.innerHTML += `
+            <option value="${item.id}">
+                ${item.brand_name}
+            </option>
+        `;
+
+    });
+
+}
+
+async function loadCategories() {
+
+    const response = await fetch(
+        "http://localhost:5000/api/categories",
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const result = await response.json();
+
+    const category = document.getElementById("category_id");
+
+    category.innerHTML = '<option value="">Select Category</option>';
+
+    result.data.forEach(item => {
+
+        category.innerHTML += `
+            <option value="${item.id}">
+                ${item.category_name}
+            </option>
+        `;
+
+    });
+
+}
+
 loadProducts();
 
 async function addProduct() {
@@ -230,6 +288,10 @@ async function editProduct(id) {
 
     const product = result.data;
 
+    // Load dropdowns before selecting values
+    await loadBrands();
+    await loadCategories();
+
     document.getElementById("product_name").value = product.product_name;
     document.getElementById("model_number").value = product.model_number;
     document.getElementById("capacity").value = product.capacity;
@@ -237,11 +299,11 @@ async function editProduct(id) {
     document.getElementById("price").value = product.price;
     document.getElementById("stock_quantity").value = product.stock_quantity;
     document.getElementById("description").value = product.description;
+
     document.getElementById("brand_id").value = product.brand_id;
     document.getElementById("category_id").value = product.category_id;
 
     showForm();
-    
 
 }
 async function saveProduct() {
@@ -273,6 +335,8 @@ async function updateProduct() {
         status: "Available"
 
     };
+    console.log("Editing Product ID:", editingProductId);
+    console.log("Product Data:", product);
 
     const response = await fetch(
         `http://localhost:5000/api/products/${editingProductId}`,
@@ -287,6 +351,7 @@ async function updateProduct() {
     );
 
     const result = await response.json();
+    console.log("Server Response:", result);
 
     alert(result.message);
 

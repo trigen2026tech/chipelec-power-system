@@ -80,6 +80,40 @@ router.post("/", (req, res) => {
 });
 
 // ======================
+// GET SINGLE CUSTOMER
+// ======================
+router.get("/:id", (req, res) => {
+
+    db.query(
+        "SELECT * FROM customers WHERE id = ?",
+        [req.params.id],
+        (err, results) => {
+
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: "Database Error"
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Customer not found"
+                });
+            }
+
+            res.json({
+                success: true,
+                data: results[0]
+            });
+
+        }
+    );
+
+});
+
+// ======================
 // UPDATE CUSTOMER
 // ======================
 router.put("/:id", (req, res) => {

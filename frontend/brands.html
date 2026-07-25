@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Brands</title>
+
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/topbar.css">
+<link rel="stylesheet" href="css/table.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+
+<body>
+
+<!-- Sidebar -->
+
+<div class="sidebar">
+
+    <h2>CHIPELEC</h2>
+
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="products.html">📦 Products</a>
+    <a href="brands.html" class="active">🏷 Brands</a>
+    <a href="categories.html">📂 Categories</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="sales.html">💰 Sales</a>
+    <a href="installations.html">🛠 Installations</a>
+    <a href="service-requests.html">📞 Service Requests</a>
+    <a href="maintenance.html">🔧 Maintenance</a>
+    <a href="reports.html">📈 Reports</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="#" onclick="logout()">🚪 Logout</a>
+
+</div>
+
+<!-- Content -->
+
+<div class="content">
+
+    <!-- Topbar -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="searchBrand"
+                placeholder="Search Brand..."
+                onkeyup="searchBrand()">
+
+        </div>
+
+        <div class="topbar-right">
+
+            <div class="profile">
+
+                <img src="https://i.pravatar.cc/40">
+
+                <div>
+
+                    <h4 id="adminName">Loading...</h4>
+                    <small id="adminRole">Admin</small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <h1>Brands</h1>
+
+    <button onclick="showForm()">
+        + New Brand
+    </button>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Brand Name</th>
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="brandTable">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- Modal -->
+
+<div class="modal" id="brandModal">
+
+    <div class="modal-content">
+
+        <h2>Brand</h2>
+
+        <input
+            type="text"
+            id="brand_name"
+            placeholder="Brand Name">
+
+        <br><br>
+
+        <button onclick="saveBrand()">
+
+            Save
+
+        </button>
+
+        <button onclick="closeModal()">
+
+            Cancel
+
+        </button>
+
+    </div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/brands.js"></script>
+
+</body>
+
+</html>

@@ -26,11 +26,17 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
     <h2>CHIPELEC</h2>
 
-    <a href="dashboard.html">Dashboard</a>
-    <a href="products.html">Products</a>
-    <a href="customers.html">Customers</a>
-    <a href="profile.html">Profile</a>
-    <a href="#" onclick="logout()">Logout</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="products.html">📦 Products</a>
+    <a href="brands.html">🏷 Brands</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="sales.html">💰 Sales</a>
+    <a href="installations.html">🛠 Installations</a>
+    <a href="service-requests.html">📞 Service Requests</a>
+    <a href="maintenance.html">🔧 Maintenance</a>
+    <a href="reports.html">📈 Reports</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="#" onclick="logout()">🚪 Logout</a>
 
 </div>
 
@@ -46,9 +52,9 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     <div class="topbar-right">
 
         <div class="notification">
-            <i class="bi bi-bell-fill"></i>
-            <span class="badge">3</span>
-        </div>
+    <i class="bi bi-bell-fill"></i>
+    <span class="badge">0</span>
+</div>
 <div class="profile">
 
     <img src="https://i.pravatar.cc/40" alt="Admin">
@@ -73,7 +79,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         <h3>Total Products</h3>
 
-        <h1 id="products">0</h1>
+        <h1 id="totalProducts">0</h1>
 
     </div>
 
@@ -83,7 +89,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         <h3>Total Customers</h3>
 
-        <h1 id="customers">0</h1>
+        <h1 id="totalCustomers">0</h1>
 
     </div>
 
@@ -91,9 +97,9 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         <i class="bi bi-check-circle-fill"></i>
 
-        <h3>Available Products</h3>
+        <h3>Total Brands</h3>
 
-        <h1 id="available">0</h1>
+        <h1 id="totalBrands">0</h1>
 
     </div>
 
@@ -101,9 +107,9 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         <i class="bi bi-exclamation-circle-fill"></i>
 
-        <h3>Out Of Stock</h3>
+        <h3>Total Installations</h3>
 
-        <h1 id="stock">0</h1>
+        <h1 id="totalInstallations">0</h1>
 
     </div>
 
@@ -122,21 +128,13 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
         <h2>Recent Activity</h2>
 
-        <ul id="activityList">
-
-            <li>Admin Logged In</li>
-            <li>Product Added</li>
-            <li>Customer Registered</li>
-
-        </ul>
+       <ul id="activityList"></ul>
 
     </div>
 
 </div>
 
-<script src="js/dashboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="js/auth.js"></script>
 <script src="js/dashboard.js"></script>
 

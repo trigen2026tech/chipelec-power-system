@@ -75,4 +75,120 @@ if (!isMatch) {
 
 });
 
+// ======================
+// UPDATE PROFILE
+// ======================
+
+router.put("/profile/:id", (req, res) => {
+
+    const { id } = req.params;
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide all required fields"
+        });
+    }
+
+    const sql = `
+        UPDATE admins
+        SET full_name = ?, email = ?
+        WHERE id = ?
+    `;
+
+    db.query(sql, [username, email, id], (err) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                success: false,
+                message: "Unable to update profile"
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Profile updated successfully"
+        });
+
+    });
+
+});
+
+// ======================
+// CHANGE PASSWORD
+// ======================
+
+router.put("/change-password/:id", (req, res) => {
+
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide all required fields"
+        });
+    }
+
+    // Get current admin
+    const sql = "SELECT * FROM admins WHERE id = ?";
+
+    db.query(sql, [id], (err, results) => {
+
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                success: false,
+                message: "Database error"
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Admin not found"
+            });
+        }
+
+        const admin = results[0];
+
+        // Check if current password is correct
+        const isMatch = bcrypt.compareSync(currentPassword, admin.password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Current password is incorrect"
+            });
+        }
+
+        // Hash new password
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+        // Update password
+        const updateSql = "UPDATE admins SET password = ? WHERE id = ?";
+
+        db.query(updateSql, [hashedPassword, id], (err) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    success: false,
+                    message: "Unable to change password"
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Password changed successfully"
+            });
+
+        });
+
+    });
+
+});
+
 module.exports = router;

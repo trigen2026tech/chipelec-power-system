@@ -1,30 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const authMiddleware = require("../middleware/authMiddleware");
 
+// ======================
+// GET ALL INSTALLATIONS
+// ======================
 
-// ===========================
-// GET ALL MAINTENANCE
-// ===========================
-router.get("/", (req, res) => {
+router.get("/", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT
-            m.*,
+            i.*,
             c.full_name AS customer_name,
             p.product_name
-        FROM maintenance m
-        JOIN customers c
-            ON m.customer_id = c.id
-        JOIN products p
-            ON m.product_id = p.id
-        ORDER BY m.id DESC
+        FROM installations i
+        JOIN customers c ON i.customer_id = c.id
+        JOIN products p ON i.product_id = p.id
+        ORDER BY i.id DESC
     `;
 
     db.query(sql, (err, results) => {
 
         if (err) {
             console.error(err);
+
             return res.status(500).json({
                 success: false,
                 message: "Database Error"
@@ -40,31 +40,33 @@ router.get("/", (req, res) => {
 
 });
 
+// ======================
+// ADD INSTALLATION
+// ======================
 
-// ===========================
-// ADD MAINTENANCE
-// ===========================
-router.post("/", (req, res) => {
+router.post("/", authMiddleware, (req, res) => {
 
     const {
+
         customer_id,
         product_id,
-        maintenance_date,
-        maintenance_type,
+        installation_date,
         technician_name,
-        status,
+        installation_address,
+        installation_status,
         remarks
+
     } = req.body;
 
     const sql = `
-        INSERT INTO maintenance
+        INSERT INTO installations
         (
             customer_id,
             product_id,
-            maintenance_date,
-            maintenance_type,
+            installation_date,
             technician_name,
-            status,
+            installation_address,
+            installation_status,
             remarks
         )
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -75,28 +77,26 @@ router.post("/", (req, res) => {
         [
             customer_id,
             product_id,
-            maintenance_date,
-            maintenance_type,
+            installation_date,
             technician_name,
-            status,
+            installation_address,
+            installation_status,
             remarks
         ],
         (err, result) => {
 
             if (err) {
-
                 console.error(err);
 
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to Save"
+                    message: "Unable to add installation"
                 });
-
             }
 
             res.json({
                 success: true,
-                message: "Maintenance Added Successfully"
+                message: "Installation Added Successfully"
             });
 
         }
@@ -104,14 +104,15 @@ router.post("/", (req, res) => {
 
 });
 
-// ===========================
-// GET SINGLE MAINTENANCE
-// ===========================
-router.get("/:id", (req, res) => {
+// ======================
+// GET SINGLE INSTALLATION
+// ======================
+
+router.get("/:id", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT *
-        FROM maintenance
+        FROM installations
         WHERE id = ?
     `;
 
@@ -128,7 +129,7 @@ router.get("/:id", (req, res) => {
         if (result.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Maintenance Not Found"
+                message: "Installation Not Found"
             });
         }
 
@@ -141,32 +142,33 @@ router.get("/:id", (req, res) => {
 
 });
 
-// ===========================
-// UPDATE MAINTENANCE
-// ===========================
-router.put("/:id", (req, res) => {
+// ======================
+// UPDATE INSTALLATION
+// ======================
+
+router.put("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
     const {
         customer_id,
         product_id,
-        maintenance_date,
-        maintenance_type,
+        installation_date,
         technician_name,
-        status,
+        installation_address,
+        installation_status,
         remarks
     } = req.body;
 
     const sql = `
-        UPDATE maintenance
+        UPDATE installations
         SET
             customer_id = ?,
             product_id = ?,
-            maintenance_date = ?,
-            maintenance_type = ?,
+            installation_date = ?,
             technician_name = ?,
-            status = ?,
+            installation_address = ?,
+            installation_status = ?,
             remarks = ?
         WHERE id = ?
     `;
@@ -176,10 +178,10 @@ router.put("/:id", (req, res) => {
         [
             customer_id,
             product_id,
-            maintenance_date,
-            maintenance_type,
+            installation_date,
             technician_name,
-            status,
+            installation_address,
+            installation_status,
             remarks,
             id
         ],
@@ -189,13 +191,13 @@ router.put("/:id", (req, res) => {
                 console.error(err);
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to update maintenance"
+                    message: "Unable to update installation"
                 });
             }
 
             res.json({
                 success: true,
-                message: "Maintenance Updated Successfully"
+                message: "Installation Updated Successfully"
             });
 
         }
@@ -203,14 +205,15 @@ router.put("/:id", (req, res) => {
 
 });
 
-// ===========================
-// DELETE MAINTENANCE
-// ===========================
-router.delete("/:id", (req, res) => {
+// ======================
+// DELETE INSTALLATION
+// ======================
+
+router.delete("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
-    const sql = "DELETE FROM maintenance WHERE id = ?";
+    const sql = "DELETE FROM installations WHERE id = ?";
 
     db.query(sql, [id], (err, result) => {
 
@@ -218,20 +221,20 @@ router.delete("/:id", (req, res) => {
             console.error(err);
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete maintenance"
+                message: "Unable to delete installation"
             });
         }
 
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Maintenance not found"
+                message: "Installation not found"
             });
         }
 
         res.json({
             success: true,
-            message: "Maintenance Deleted Successfully"
+            message: "Installation Deleted Successfully"
         });
 
     });

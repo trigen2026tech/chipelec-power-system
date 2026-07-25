@@ -1,24 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const authMiddleware = require("../middleware/authMiddleware");
 
-
-// ===========================
-// GET ALL MAINTENANCE
-// ===========================
-router.get("/", (req, res) => {
+// =====================
+// GET ALL SERVICE REQUESTS
+// =====================
+router.get("/", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT
-            m.*,
-            c.full_name AS customer_name,
-            p.product_name
-        FROM maintenance m
+            sr.*,
+            c.full_name AS customer_name
+        FROM service_requests sr
         JOIN customers c
-            ON m.customer_id = c.id
-        JOIN products p
-            ON m.product_id = p.id
-        ORDER BY m.id DESC
+            ON sr.customer_id = c.id
+        ORDER BY sr.id DESC
     `;
 
     db.query(sql, (err, results) => {
@@ -40,63 +37,64 @@ router.get("/", (req, res) => {
 
 });
 
-
-// ===========================
-// ADD MAINTENANCE
-// ===========================
-router.post("/", (req, res) => {
+// =====================
+// ADD SERVICE REQUEST
+// =====================
+router.post("/", authMiddleware, (req, res) => {
 
     const {
         customer_id,
-        product_id,
-        maintenance_date,
-        maintenance_type,
+        request_type,
+        request_date,
+        issue_description,
+        service_status,
         technician_name,
-        status,
-        remarks
+        service_charge,
+        completed_date
     } = req.body;
 
     const sql = `
-        INSERT INTO maintenance
+        INSERT INTO service_requests
         (
             customer_id,
-            product_id,
-            maintenance_date,
-            maintenance_type,
+            request_type,
+            request_date,
+            issue_description,
+            service_status,
             technician_name,
-            status,
-            remarks
+            service_charge,
+            completed_date
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(
         sql,
         [
             customer_id,
-            product_id,
-            maintenance_date,
-            maintenance_type,
+            request_type,
+            request_date,
+            issue_description,
+            service_status,
             technician_name,
-            status,
-            remarks
+            service_charge,
+            completed_date || null
         ],
         (err, result) => {
 
             if (err) {
-
                 console.error(err);
 
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to Save"
+                    message: "Unable to save service request"
                 });
-
             }
 
             res.json({
                 success: true,
-                message: "Maintenance Added Successfully"
+                message: "Service Request Added Successfully",
+                id: result.insertId
             });
 
         }
@@ -104,14 +102,14 @@ router.post("/", (req, res) => {
 
 });
 
-// ===========================
-// GET SINGLE MAINTENANCE
-// ===========================
-router.get("/:id", (req, res) => {
+// =====================
+// GET SINGLE SERVICE REQUEST
+// =====================
+router.get("/:id", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT *
-        FROM maintenance
+        FROM service_requests
         WHERE id = ?
     `;
 
@@ -128,7 +126,7 @@ router.get("/:id", (req, res) => {
         if (result.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Maintenance Not Found"
+                message: "Service Request Not Found"
             });
         }
 
@@ -141,33 +139,35 @@ router.get("/:id", (req, res) => {
 
 });
 
-// ===========================
-// UPDATE MAINTENANCE
-// ===========================
-router.put("/:id", (req, res) => {
+// =====================
+// UPDATE SERVICE REQUEST
+// =====================
+router.put("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
     const {
         customer_id,
-        product_id,
-        maintenance_date,
-        maintenance_type,
+        request_type,
+        request_date,
+        issue_description,
+        service_status,
         technician_name,
-        status,
-        remarks
+        service_charge,
+        completed_date
     } = req.body;
 
     const sql = `
-        UPDATE maintenance
+        UPDATE service_requests
         SET
             customer_id = ?,
-            product_id = ?,
-            maintenance_date = ?,
-            maintenance_type = ?,
+            request_type = ?,
+            request_date = ?,
+            issue_description = ?,
+            service_status = ?,
             technician_name = ?,
-            status = ?,
-            remarks = ?
+            service_charge = ?,
+            completed_date = ?
         WHERE id = ?
     `;
 
@@ -175,12 +175,13 @@ router.put("/:id", (req, res) => {
         sql,
         [
             customer_id,
-            product_id,
-            maintenance_date,
-            maintenance_type,
+            request_type,
+            request_date,
+            issue_description,
+            service_status,
             technician_name,
-            status,
-            remarks,
+            service_charge,
+            completed_date || null,
             id
         ],
         (err) => {
@@ -189,13 +190,13 @@ router.put("/:id", (req, res) => {
                 console.error(err);
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to update maintenance"
+                    message: "Unable to update service request"
                 });
             }
 
             res.json({
                 success: true,
-                message: "Maintenance Updated Successfully"
+                message: "Service Request Updated Successfully"
             });
 
         }
@@ -203,14 +204,14 @@ router.put("/:id", (req, res) => {
 
 });
 
-// ===========================
-// DELETE MAINTENANCE
-// ===========================
-router.delete("/:id", (req, res) => {
+// =====================
+// DELETE SERVICE REQUEST
+// =====================
+router.delete("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
-    const sql = "DELETE FROM maintenance WHERE id = ?";
+    const sql = "DELETE FROM service_requests WHERE id = ?";
 
     db.query(sql, [id], (err, result) => {
 
@@ -218,20 +219,20 @@ router.delete("/:id", (req, res) => {
             console.error(err);
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete maintenance"
+                message: "Unable to delete service request"
             });
         }
 
         if (result.affectedRows === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Maintenance not found"
+                message: "Service Request not found"
             });
         }
 
         res.json({
             success: true,
-            message: "Maintenance Deleted Successfully"
+            message: "Service Request Deleted Successfully"
         });
 
     });

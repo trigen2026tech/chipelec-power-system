@@ -17,6 +17,11 @@ const enquiryRoutes = require("./routes/enquiries");
 const adminRoutes = require("./routes/admin");
 const brandRoutes = require("./routes/brands");
 const categoryRoutes = require("./routes/categories");
+const installationRoutes = require("./routes/installations");
+const salesRoutes = require("./routes/sales");
+const serviceRequestRoutes = require("./routes/serviceRequests");
+const maintenanceRoutes = require("./routes/maintenanceRoutes");
+
 
 const app = express();
 
@@ -38,6 +43,11 @@ app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/installations", installationRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/service-requests", serviceRequestRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
+
 
 
 app.get("/", (req, res) => {

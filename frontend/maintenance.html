@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Maintenance</title>
+
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/topbar.css">
+<link rel="stylesheet" href="css/table.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>CHIPELEC</h2>
+
+<a href="dashboard.html">📊 Dashboard</a>
+<a href="products.html">📦 Products</a>
+<a href="brands.html">🏷 Brands</a>
+<a href="categories.html">📂 Categories</a>
+<a href="customers.html">👥 Customers</a>
+<a href="sales.html">💰 Sales</a>
+<a href="installations.html">🛠 Installations</a>
+<a href="service-requests.html">📞 Service Requests</a>
+<a href="maintenance.html" class="active">🔧 Maintenance</a>
+<a href="reports.html">📈 Reports</a>
+<a href="profile.html">👤 Profile</a>
+<a href="#" onclick="logout()">🚪 Logout</a>
+
+</div>
+
+<div class="content">
+
+<div class="topbar">
+
+<div class="search-box">
+
+<i class="bi bi-search"></i>
+
+<input
+type="text"
+placeholder="Search..."
+id="searchMaintenance">
+
+</div>
+
+</div>
+
+<h1>Maintenance</h1>
+
+<button onclick="showForm()">
+
++ New Maintenance
+
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Customer</th>
+<th>Product</th>
+<th>Date</th>
+<th>Type</th>
+<th>Technician</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="maintenanceTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<div class="modal" id="maintenanceModal">
+
+<div class="modal-content">
+
+<h2>Maintenance</h2>
+
+<select id="customer_id"></select>
+
+<select id="product_id"></select>
+
+<input
+type="date"
+id="maintenance_date">
+
+<select id="maintenance_type">
+
+<option value="AMC">AMC</option>
+<option value="Battery Check">Battery Check</option>
+<option value="Water Top-up">Water Top-up</option>
+<option value="Preventive Maintenance">Preventive Maintenance</option>
+<option value="Repair">Repair</option>
+
+</select>
+
+<input
+type="text"
+id="technician_name"
+placeholder="Technician">
+
+<select id="status">
+
+<option>Scheduled</option>
+<option>Completed</option>
+<option>Cancelled</option>
+
+</select>
+
+<textarea
+id="remarks"
+placeholder="Remarks"></textarea>
+
+<button onclick="saveMaintenance()">
+
+Save
+
+</button>
+
+<button onclick="closeModal()">
+
+Cancel
+
+</button>
+
+</div>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/maintenance.js"></script>
+
+</body>
+
+</html>
