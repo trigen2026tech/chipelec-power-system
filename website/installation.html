@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Installation | CHIPELEC Power System</title>
+    <meta name="description" content="Book a professional installation for your battery or inverter.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="products.html">Products</a>
+                <a href="services.html">Services</a>
+                <a href="contact.html">Contact</a>
+                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
+        <div class="container">
+            <h1 style="color: white; font-size: 2.5rem;">Book an Installation</h1>
+            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Professional installation services by our certified engineers.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="py-5" style="background-color: var(--bg-color);">
+        <div class="container" style="max-width: 800px;">
+            <div class="card" style="padding: 40px;">
+                <form id="installationForm">
+                    <!-- Customer Details -->
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Customer Information</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Customer ID (If registered)</label>
+                            <input type="number" id="customerId" class="form-control" placeholder="e.g. 101">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Address *</label>
+                        <textarea id="address" class="form-control" rows="3" required placeholder="Enter your full installation address"></textarea>
+                    </div>
+
+                    <!-- Product Details -->
+                    <h3 style="margin-bottom: 20px; margin-top: 30px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Product Information</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Product ID *</label>
+                            <input type="number" id="productId" class="form-control" required placeholder="e.g. 5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date *</label>
+                            <input type="date" id="prefDate" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Remarks / Special Instructions</label>
+                        <textarea id="remarks" class="form-control" rows="3" placeholder="Any specific instructions for the installation engineer?"></textarea>
+                    </div>
+
+                    <!-- Submit Alert -->
+                    <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; width: 100%;">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>CHIPELEC.</h3>
+                    <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Enforce login
+        requireCustomerLogin();
+        const customer = getCustomerData();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-fill customer ID
+            if(customer) {
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerId').readOnly = true; // Prevent changing
+                
+                // Pre-fill address if available and field is empty
+                if(customer.address && !document.getElementById('address').value) {
+                    document.getElementById('address').value = `${customer.address}, ${customer.city || ''} ${customer.state || ''} ${customer.pincode || ''}`.trim();
+                }
+            }
+
+            // Pre-fill product ID if coming from products page
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('product')) {
+                document.getElementById('productId').value = urlParams.get('product');
+            }
+            
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('prefDate').setAttribute('min', today);
+
+            const form = document.getElementById('installationForm');
+            const alertBox = document.getElementById('alertBox');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const customer_id = document.getElementById('customerId').value || null;
+                const product_id = document.getElementById('productId').value;
+                const installation_date = document.getElementById('prefDate').value;
+                const address = document.getElementById('address').value;
+                const remarks = document.getElementById('remarks').value;
+
+                // Disable button and show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                try {
+                    // API Call
+                    const response = await api.installations.bookInstallation({
+                        customer_id,
+                        product_id,
+                        installation_date,
+                        installation_address: address,
+                        remarks,
+                        installation_status: 'Pending'
+                    });
+
+                    // Show success
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#dcfce7';
+                    alertBox.style.color = '#166534';
+                    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Installation request submitted successfully!';
+                    
+                    form.reset();
+                    
+                } catch (error) {
+                    // Show error
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                } finally {
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Request';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

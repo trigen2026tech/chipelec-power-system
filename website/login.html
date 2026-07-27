@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login | CHIPELEC Power System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: var(--bg-color); display: flex; flex-direction: column; min-height: 100vh;">
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+        <div class="card" style="width: 100%; max-width: 450px; padding: 40px;">
+            <div class="text-center mb-4">
+                <h2 style="color: var(--primary-color);">Welcome Back</h2>
+                <p style="color: var(--gray-medium);">Sign in to your customer portal</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                </div>
+                
+                <!-- Alert Box -->
+                <div id="alertBox" style="display: none; padding: 12px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 20px; font-weight: 500;"></div>
+                
+                <button type="submit" id="loginBtn" class="btn btn-primary" style="width: 100%;">Sign In</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p style="color: var(--gray-medium); font-size: 0.9rem;">Don't have an account? <a href="register.html" style="color: var(--secondary-color); font-weight: 600;">Register Now</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container text-center text-white">
+            <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // If already logged in, redirect to dashboard
+        if (isCustomerLoggedIn()) {
+            window.location.href = 'customer-dashboard.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const alertBox = document.getElementById('alertBox');
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Reset alert
+            alertBox.style.display = 'none';
+
+            // Loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+
+            try {
+                const response = await api.customerAuth.login(email, password);
+
+                // Store token and customer data
+                localStorage.setItem('customerToken', response.token);
+                localStorage.setItem('customerData', JSON.stringify(response.customer));
+
+                // Show success
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#dcfce7';
+                alertBox.style.color = '#166534';
+                alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Login successful! Redirecting...';
+
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'customer-dashboard.html';
+                }, 1000);
+
+            } catch (error) {
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + error.message;
+
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

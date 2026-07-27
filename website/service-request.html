@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Request | CHIPELEC Power System</title>
+    <meta name="description" content="Raise a complaint or request service for your products.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="products.html">Products</a>
+                <a href="services.html">Services</a>
+                <a href="contact.html">Contact</a>
+                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
+        <div class="container">
+            <h1 style="color: white; font-size: 2.5rem;">Raise a Service Request</h1>
+            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Facing an issue? Let our experts handle it promptly.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="py-5" style="background-color: var(--bg-color);">
+        <div class="container" style="max-width: 800px;">
+            <div class="card" style="padding: 40px;">
+                <form id="serviceForm">
+                    <!-- Customer Details -->
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Your Information</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Customer ID (If registered)</label>
+                            <input type="number" id="customerId" class="form-control" placeholder="e.g. 101">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Product ID *</label>
+                            <input type="number" id="productId" class="form-control" required placeholder="e.g. 5">
+                        </div>
+                    </div>
+
+                    <!-- Issue Details -->
+                    <h3 style="margin-bottom: 20px; margin-top: 30px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Issue Details</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Issue Description *</label>
+                        <textarea id="issueDesc" class="form-control" rows="5" required placeholder="Please describe the problem you are facing in detail"></textarea>
+                    </div>
+
+                    <!-- Submit Alert -->
+                    <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; width: 100%;">Submit Complaint</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>CHIPELEC.</h3>
+                    <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Enforce login
+        requireCustomerLogin();
+        const customer = getCustomerData();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-fill customer ID
+            if(customer) {
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerId').readOnly = true; // Prevent changing
+            }
+
+            const form = document.getElementById('serviceForm');
+            const alertBox = document.getElementById('alertBox');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const customer_id = document.getElementById('customerId').value || null;
+                const product_id = document.getElementById('productId').value;
+                const issue_description = document.getElementById('issueDesc').value;
+
+                // Disable button and show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                try {
+                    // API Call
+                    const response = await api.services.raiseRequest({
+                        customer_id,
+                        issue_description,
+                        request_type: 'Complaint',
+                        request_date: new Date().toISOString().split('T')[0],
+                        service_status: 'Pending'
+                    });
+
+                    // Show success
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#dcfce7';
+                    alertBox.style.color = '#166534';
+                    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Service request submitted successfully! Our team will contact you shortly.';
+                    
+                    form.reset();
+                    
+                } catch (error) {
+                    // Show error
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                } finally {
+                    // Re-enable button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Submit Complaint';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

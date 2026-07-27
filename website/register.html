@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registration | CHIPELEC Power System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background-color: var(--bg-color); display: flex; flex-direction: column; min-height: 100vh;">
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+        <div class="card" style="width: 100%; max-width: 600px; padding: 40px;">
+            <div class="text-center mb-4">
+                <h2 style="color: var(--primary-color);">Create Account</h2>
+                <p style="color: var(--gray-medium);">Register to access installations, service requests, and more</p>
+            </div>
+            
+            <form id="registerForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" id="regName" class="form-control" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        <input type="tel" id="regPhone" class="form-control" placeholder="Enter phone number" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" id="regEmail" class="form-control" placeholder="Enter email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password *</label>
+                    <input type="password" id="regPassword" class="form-control" placeholder="Min 6 characters" minlength="6" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea id="regAddress" class="form-control" rows="2" placeholder="Enter your address"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <input type="text" id="regCity" class="form-control" placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <input type="text" id="regState" class="form-control" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pincode</label>
+                        <input type="text" id="regPincode" class="form-control" placeholder="Pincode">
+                    </div>
+                </div>
+
+                <!-- Alert Box -->
+                <div id="alertBox" style="display: none; padding: 12px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 20px; font-weight: 500;"></div>
+
+                <button type="submit" id="registerBtn" class="btn btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p style="color: var(--gray-medium); font-size: 0.9rem;">Already have an account? <a href="login.html" style="color: var(--secondary-color); font-weight: 600;">Sign In</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container text-center text-white">
+            <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // If already logged in, redirect
+        if (isCustomerLoggedIn()) {
+            window.location.href = 'customer-dashboard.html';
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const alertBox = document.getElementById('alertBox');
+            const registerBtn = document.getElementById('registerBtn');
+
+            const full_name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const address = document.getElementById('regAddress').value.trim();
+            const city = document.getElementById('regCity').value.trim();
+            const state = document.getElementById('regState').value.trim();
+            const pincode = document.getElementById('regPincode').value.trim();
+
+            // Phone validation
+            if (!/^\d{10}$/.test(phone)) {
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter a valid 10-digit phone number.';
+                return;
+            }
+
+            // Reset alert
+            alertBox.style.display = 'none';
+
+            // Loading state
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
+            try {
+                const response = await api.customerAuth.register({
+                    full_name, phone, email, password, address, city, state, pincode
+                });
+
+                // Show success
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#dcfce7';
+                alertBox.style.color = '#166534';
+                alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Registration successful! Redirecting to login...';
+
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#fee2e2';
+                alertBox.style.color = '#991b1b';
+                alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + error.message;
+
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

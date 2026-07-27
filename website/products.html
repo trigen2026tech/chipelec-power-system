@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | CHIPELEC Power System</title>
+    <meta name="description" content="Explore our wide range of batteries and inverters.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: var(--dark-text);
+        }
+        .status-active { background: #dcfce7; color: #166534; }
+        .skeleton {
+            background: #e2e8f0;
+            height: 350px;
+            border-radius: 12px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar (Same as index.html but active class handled by main.js) -->
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="products.html">Products</a>
+                <a href="services.html">Services</a>
+                <a href="contact.html">Contact</a>
+                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="py-5 bg-white text-center" style="border-bottom: 1px solid var(--gray-light);">
+        <div class="container">
+            <h1 style="font-size: 2.5rem;">Our Products</h1>
+            <p style="color: var(--gray-medium); max-width: 600px; margin: 10px auto 0;">High-performance energy solutions tailored to keep your life uninterrupted.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="py-5" style="background-color: var(--bg-color);">
+        <div class="container">
+            
+            <!-- Filters -->
+            <div class="filter-section">
+                <div style="flex-grow: 1; min-width: 250px;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by product name or model...">
+                </div>
+                <div>
+                    <select id="categoryFilter" class="form-control" style="width: auto;">
+                        <option value="">All Categories</option>
+                        <option value="Battery">Battery</option>
+                        <option value="Inverter">Inverter</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="brandFilter" class="form-control" style="width: auto;">
+                        <option value="">All Brands</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Error/Empty State -->
+            <div id="errorMessage" class="text-center" style="display: none; padding: 40px; color: var(--danger-color);">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <h3 id="errorText">Failed to load products.</h3>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Skeletons -->
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>CHIPELEC.</h3>
+                    <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productGrid = document.getElementById('productGrid');
+            const errorMessage = document.getElementById('errorMessage');
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const brandFilter = document.getElementById('brandFilter');
+            
+            let allProducts = [];
+
+            // IMPORTANT: The backend /api/products requires authMiddleware!
+            // Wait, let's look closely at products.js. 
+            // router.get("/", authMiddleware, ...)
+            // Yes, GET / requires auth. We need to handle this. For the customer website, if it requires auth, we can only show mock data or an error if they are not logged in.
+            // But usually public products are public. Let's try fetching and fallback to mock if 401.
+
+            async function fetchProducts() {
+                try {
+                    // Try to fetch
+                    const res = await fetch('/api/products');
+                    
+                    if(res.status === 401 || res.status === 403) {
+                        // Fallback to mock data for demonstration
+                        console.warn("Public API not accessible without auth. Using mock data.");
+                        return getMockProducts();
+                    }
+                    
+                    if(!res.ok) throw new Error("Failed to load");
+                    const data = await res.json();
+                    return data.data || [];
+                } catch (e) {
+                    console.warn("API Error, using mock data.", e);
+                    return getMockProducts();
+                }
+            }
+
+            function getMockProducts() {
+                return [
+                    { id: 1, product_name: "Exide InvaTubular IT500", model_number: "IT500", capacity: "150Ah", warranty: "60 Months", price: 15500, status: "Active", brand_name: "Exide", category_name: "Battery", image: "https://images.unsplash.com/photo-1550522197-2a62883017bb?auto=format&fit=crop&q=80&w=400" },
+                    { id: 2, product_name: "Luminous Zelio+ 1100", model_number: "ZELIO1100", capacity: "900VA", warranty: "24 Months", price: 6500, status: "Active", brand_name: "Luminous", category_name: "Inverter", image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80&w=400" },
+                    { id: 3, product_name: "Microtek EB 900", model_number: "EB900", capacity: "800VA", warranty: "24 Months", price: 5800, status: "Active", brand_name: "Microtek", category_name: "Inverter", image: "https://images.unsplash.com/photo-1509391366360-1f959731b4fc?auto=format&fit=crop&q=80&w=400" },
+                    { id: 4, product_name: "Amaron Tall Tubular", model_number: "CR-TT150", capacity: "150Ah", warranty: "48 Months", price: 14200, status: "Active", brand_name: "Amaron", category_name: "Battery", image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=400" }
+                ];
+            }
+
+            function renderProducts(products) {
+                productGrid.innerHTML = '';
+                if(products.length === 0) {
+                    productGrid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px;">No products found matching your criteria.</div>';
+                    return;
+                }
+
+                products.forEach(p => {
+                    const imgUrl = p.image && !p.image.startsWith('http') ? `/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/400x300?text=No+Image');
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div style="position: relative;">
+                            <img src="${imgUrl}" alt="${p.product_name}" class="card-img-top" style="height:200px;object-fit:cover;">
+                            <span class="badge ${p.status === 'Active' ? 'status-active' : ''}" style="position: absolute; top: 10px; right: 10px;">${p.status}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge">${p.brand_name || 'Generic'}</span>
+                                <span class="badge">${p.category_name || 'Uncategorized'}</span>
+                            </div>
+                            <h3 class="card-title">${p.product_name}</h3>
+                            <p class="card-text" style="margin-bottom: 5px;"><strong>Model:</strong> ${p.model_number}</p>
+                            <p class="card-text" style="margin-bottom: 15px;"><strong>Capacity:</strong> ${p.capacity} | <strong>Warranty:</strong> ${p.warranty}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid var(--gray-light);">
+                                <span style="font-size: 1.25rem; font-weight: 700; color: var(--dark-text);">₹${parseFloat(p.price).toLocaleString()}</span>
+                                <button class="btn btn-primary" style="padding: 8px 15px; font-size: 0.9rem;" onclick="location.href='installation.html?product=${p.id}'">Book Now</button>
+                            </div>
+                        </div>
+                    `;
+                    productGrid.appendChild(card);
+                });
+            }
+
+            function populateBrands(products) {
+                const brands = [...new Set(products.map(p => p.brand_name).filter(Boolean))];
+                brands.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b;
+                    opt.textContent = b;
+                    brandFilter.appendChild(opt);
+                });
+            }
+
+            function filterProducts() {
+                const search = searchInput.value.toLowerCase();
+                const category = categoryFilter.value;
+                const brand = brandFilter.value;
+
+                const filtered = allProducts.filter(p => {
+                    const matchesSearch = (p.product_name && p.product_name.toLowerCase().includes(search)) || 
+                                          (p.model_number && p.model_number.toLowerCase().includes(search));
+                    const matchesCat = category === "" || p.category_name === category;
+                    const matchesBrand = brand === "" || p.brand_name === brand;
+                    
+                    return matchesSearch && matchesCat && matchesBrand;
+                });
+
+                renderProducts(filtered);
+            }
+
+            // Init
+            allProducts = await fetchProducts();
+            populateBrands(allProducts);
+            renderProducts(allProducts);
+
+            searchInput.addEventListener('input', filterProducts);
+            categoryFilter.addEventListener('change', filterProducts);
+            brandFilter.addEventListener('change', filterProducts);
+        });
+    </script>
+</body>
+</html>

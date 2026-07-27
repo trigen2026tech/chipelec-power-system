@@ -21,6 +21,7 @@ const installationRoutes = require("./routes/installations");
 const salesRoutes = require("./routes/sales");
 const serviceRequestRoutes = require("./routes/serviceRequests");
 const maintenanceRoutes = require("./routes/maintenanceRoutes");
+const customerAuthRoutes = require("./routes/customerAuth");
 
 
 const app = express();
@@ -47,6 +48,7 @@ app.use("/api/installations", installationRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/customer", customerAuthRoutes);
 
 
 
