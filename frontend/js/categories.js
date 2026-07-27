@@ -1,189 +1,158 @@
-const token = localStorage.getItem("token");
-
+// Note: token is handled in auth.js
 let editingCategory = null;
+let allCategories = [];
 
-// ----------------------------
-// LOAD CATEGORIES
-// ----------------------------
 async function loadCategories() {
+    try {
+        const response = await fetch("http://localhost:5000/api/categories", {
+            headers: { Authorization: "Bearer " + token }
+        });
 
-    const response = await fetch(
-        "http://localhost:5000/api/categories",
-        {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+        const result = await response.json();
+        allCategories = result.data || [];
+        renderTable(allCategories);
+    } catch (err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Failed to load categories', 'error');
+    }
+}
 
-    const result = await response.json();
-
+function renderTable(data) {
     const table = document.getElementById("categoryTable");
-
     table.innerHTML = "";
 
-    result.data.forEach(category => {
+    if (data.length === 0) {
+        table.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="3">
+                    <div class="empty-state-content">
+                        <i class="bi bi-collection"></i>
+                        <p>No categories found.</p>
+                    </div>
+                </td>
+            </tr>`;
+        return;
+    }
 
+    data.forEach(category => {
         table.innerHTML += `
-
         <tr>
-
-            <td>${category.id}</td>
-
-            <td>${category.category_name}</td>
-
-            <td>
-
-                <button onclick="editCategory(${category.id}, '${category.category_name}')">
-                    ✏️ Edit
+            <td class="id-column">#${category.id}</td>
+            <td style="font-weight: 500;">${category.category_name}</td>
+            <td class="actions">
+                <button class="btn-icon edit" onclick="editCategory(${category.id}, '${category.category_name}')" title="Edit">
+                    <i class="bi bi-pencil"></i>
                 </button>
-
-                <button onclick="deleteCategory(${category.id})">
-                    🗑 Delete
+                <button class="btn-icon delete" onclick="deleteCategory(${category.id})" title="Delete">
+                    <i class="bi bi-trash"></i>
                 </button>
-
             </td>
-
         </tr>
-
         `;
-
     });
-
 }
+
+// Search functionality
+document.getElementById('searchInput')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const filtered = allCategories.filter(c => c.category_name.toLowerCase().includes(term));
+    renderTable(filtered);
+});
 
 loadCategories();
 
-// ----------------------------
-// SHOW MODAL
-// ----------------------------
 function showForm() {
-
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-plus-circle"></i> Add New Category';
     document.getElementById("categoryModal").style.display = "flex";
-
 }
 
-// ----------------------------
-// CLOSE MODAL
-// ----------------------------
 function closeModal() {
-
     document.getElementById("categoryModal").style.display = "none";
-
     document.getElementById("category_name").value = "";
-
     editingCategory = null;
-
 }
 
-// ----------------------------
-// SAVE CATEGORY
-// ----------------------------
 async function saveCategory() {
-
     if (editingCategory) {
-
         return updateCategory();
-
     }
 
-    const category = {
-        category_name: document.getElementById("category_name").value
-    };
+    const name = document.getElementById("category_name").value;
+    if (!name) {
+        if(window.showToast) window.showToast('Category name is required', 'warning');
+        return;
+    }
 
-    const response = await fetch(
-        "http://localhost:5000/api/categories",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token
-            },
-            body: JSON.stringify(category)
-        }
-    );
+    const category = { category_name: name };
+
+    const response = await fetch("http://localhost:5000/api/categories", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify(category)
+    });
 
     const result = await response.json();
 
-    alert(result.message);
-
     if (result.success) {
-
+        if(window.showToast) window.showToast('Category added successfully');
         closeModal();
-
         loadCategories();
-
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
     }
-
 }
 
-// ----------------------------
-// EDIT CATEGORY
-// ----------------------------
 function editCategory(id, name) {
-
     editingCategory = id;
-
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square"></i> Edit Category';
     document.getElementById("category_name").value = name;
-
-    showForm();
-
+    document.getElementById("categoryModal").style.display = "flex";
 }
 
-// ----------------------------
-// UPDATE CATEGORY
-// ----------------------------
 async function updateCategory() {
-
-    const response = await fetch(
-        `http://localhost:5000/api/categories/${editingCategory}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token
-            },
-            body: JSON.stringify({
-                category_name: document.getElementById("category_name").value
-            })
-        }
-    );
-
-    const result = await response.json();
-
-    alert(result.message);
-
-    if (result.success) {
-
-        closeModal();
-
-        loadCategories();
-
+    const name = document.getElementById("category_name").value;
+    if (!name) {
+        if(window.showToast) window.showToast('Category name is required', 'warning');
+        return;
     }
 
-}
-
-// ----------------------------
-// DELETE CATEGORY
-// ----------------------------
-async function deleteCategory(id) {
-
-    if (!confirm("Delete this category?")) return;
-
-    const response = await fetch(
-        `http://localhost:5000/api/categories/${id}`,
-        {
-            method: "DELETE",
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+    const response = await fetch(`http://localhost:5000/api/categories/${editingCategory}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({ category_name: name })
+    });
 
     const result = await response.json();
 
-    alert(result.message);
+    if (result.success) {
+        if(window.showToast) window.showToast('Category updated successfully');
+        closeModal();
+        loadCategories();
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
+    }
+}
 
-    loadCategories();
+async function deleteCategory(id) {
+    if (!confirm("Delete this category? This action cannot be undone.")) return;
 
+    const response = await fetch(`http://localhost:5000/api/categories/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token }
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        if(window.showToast) window.showToast('Category deleted successfully');
+        loadCategories();
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
+    }
 }

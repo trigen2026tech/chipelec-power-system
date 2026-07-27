@@ -1,124 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installations | CHIPELEC Power System</title>
 
-<meta charset="UTF-8">
-<title>Installations</title>
-
-<link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/sidebar.css">
-<link rel="stylesheet" href="css/topbar.css">
-<link rel="stylesheet" href="css/table.css">
-<link rel="stylesheet" href="css/modal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/topbar.css">
+    <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
-
 <body>
 
-<div class="sidebar">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
-    <h2>CHIPELEC</h2>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="sidebar-header">
+            <h2>
+                <i class="bi bi-lightning-charge-fill"></i>
+                CHIPELEC
+            </h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="sidebar-section-title">Main Menu</div>
+            <a href="dashboard.html">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            
+            <div class="sidebar-section-title">Inventory</div>
+            <a href="products.html">
+                <i class="bi bi-box-seam-fill"></i> Products
+            </a>
+            <a href="brands.html">
+                <i class="bi bi-tags-fill"></i> Brands
+            </a>
+            <a href="categories.html">
+                <i class="bi bi-collection-fill"></i> Categories
+            </a>
+            
+            <div class="sidebar-section-title">Business</div>
+            <a href="customers.html">
+                <i class="bi bi-people-fill"></i> Customers
+            </a>
+            <a href="sales.html">
+                <i class="bi bi-cart-check-fill"></i> Sales
+            </a>
+            
+            <div class="sidebar-section-title">Operations</div>
+            <a href="installation.html" class="active">
+                <i class="bi bi-tools"></i> Installations
+            </a>
+            <a href="service-requests.html">
+                <i class="bi bi-headset"></i> Service Requests
+            </a>
+            <a href="maintenance.html">
+                <i class="bi bi-wrench-adjustable-circle-fill"></i> Maintenance
+            </a>
+            
+            <div class="sidebar-section-title">Analytics</div>
+            <a href="reports.html">
+                <i class="bi bi-bar-chart-line-fill"></i> Reports
+            </a>
+            
+            <hr>
+            
+            <a href="profile.html">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+            <a href="#" class="logout-link" onclick="logout(event)">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        </div>
+    </div>
 
-    <a href="dashboard.html">📊 Dashboard</a>
-    <a href="products.html">📦 Products</a>
-    <a href="brands.html">🏷 Brands</a>
-    <a href="categories.html">📂 Categories</a>
-    <a href="customers.html">👥 Customers</a>
-    <a href="sales.html">💰 Sales</a>
-    <a href="installations.html" class="active">🛠 Installations</a>
-    <a href="service-requests.html">📞 Service Requests</a>
-    <a href="maintenance.html">🔧 Maintenance</a>
-    <a href="reports.html">📈 Reports</a>
-    <a href="profile.html">👤 Profile</a>
-    <a href="#" onclick="logout()">🚪 Logout</a>
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-toggle" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
 
-</div>
+        <div class="topbar-right">
+            <div class="notification-bell">
+                <i class="bi bi-bell-fill"></i>
+                <span class="badge">3</span>
+            </div>
+            
+            <div class="user-profile" onclick="window.location.href='profile.html'">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" id="adminAvatar" alt="Admin">
+                <div class="user-info">
+                    <h4 id="adminName">Loading...</h4>
+                    <small id="adminRole">Administrator</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="content">
+    <!-- Main Content -->
+    <div class="content">
+        
+        <div class="page-header">
+            <h1><i class="bi bi-tools"></i> Installation Management</h1>
+            <div class="breadcrumb">
+                <a href="dashboard.html">Home</a>
+                <i class="bi bi-chevron-right"></i>
+                <span>Operations</span>
+                <i class="bi bi-chevron-right"></i>
+                <span>Installations</span>
+            </div>
+        </div>
 
-<h1>Installation Management</h1>
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="search-input">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Search installations...">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showForm()">
+                    <i class="bi bi-plus-lg"></i> Schedule Installation
+                </button>
+            </div>
+        </div>
 
-<button onclick="showForm()">+ New Installation</button>
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Product Name</th>
+                            <th>Installation Date</th>
+                            <th>Technician</th>
+                            <th>Status</th>
+                            <th width="120">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installationTable">
+                        <tr>
+                            <td colspan="6">
+                                <div class="loading-spinner">
+                                    <div class="spinner"></div>
+                                    <p>Loading installations...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<table>
+    </div>
 
-<thead>
+    <!-- Installation Modal -->
+    <div id="installationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="bi bi-tools"></i> Installation Details</h2>
+                <div class="close" onclick="closeModal()"><i class="bi bi-x"></i></div>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Customer <span style="color: #e11d48">*</span></label>
+                        <select id="customer_id">
+                            <option value="">Select Customer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Product <span style="color: #e11d48">*</span></label>
+                        <select id="product_id">
+                            <option value="">Select Product</option>
+                        </select>
+                    </div>
 
-<tr>
+                    <div class="form-group">
+                        <label>Installation Date <span style="color: #e11d48">*</span></label>
+                        <input type="date" id="installation_date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Technician Name <span style="color: #e11d48">*</span></label>
+                        <input type="text" id="technician_name" placeholder="Enter technician name">
+                    </div>
 
-<th>Customer</th>
-<th>Product</th>
-<th>Date</th>
-<th>Technician</th>
-<th>Status</th>
-<th>Action</th>
+                    <div class="form-group full-width">
+                        <label>Status <span style="color: #e11d48">*</span></label>
+                        <select id="installation_status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Installation Address <span style="color: #e11d48">*</span></label>
+                        <textarea id="installation_address" placeholder="Enter complete installation address"></textarea>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Remarks</label>
+                        <textarea id="remarks" placeholder="Enter any additional remarks or notes"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveInstallation()">
+                    <i class="bi bi-check-lg"></i> Save Installation
+                </button>
+            </div>
+        </div>
+    </div>
 
-</tr>
-
-</thead>
-
-<tbody id="installationTable">
-
-</tbody>
-
-</table>
-
-</div>
-
-<!-- Modal -->
-
-<div class="modal" id="installationModal">
-
-<div class="modal-content">
-
-<h2>Installation</h2>
-
-<select id="customer_id"></select>
-
-<select id="product_id"></select>
-
-<input type="date" id="installation_date">
-
-<input
-type="text"
-id="technician_name"
-placeholder="Technician Name">
-
-<textarea
-id="installation_address"
-placeholder="Installation Address"></textarea>
-
-<select id="installation_status">
-
-<option>Scheduled</option>
-<option>Completed</option>
-<option>Cancelled</option>
-
-</select>
-
-<textarea
-id="remarks"
-placeholder="Remarks"></textarea>
-
-<button onclick="saveInstallation()">
-
-Save
-
-</button>
-
-<button onclick="closeModal()">
-
-Cancel
-
-</button>
-
-</div>
-
-</div>
-
-<script src="js/auth.js"></script>
-<script src="js/installations.js"></script>
-
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/installations.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
 </html>

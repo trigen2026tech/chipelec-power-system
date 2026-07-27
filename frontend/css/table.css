@@ -1,119 +1,127 @@
-.top-bar{
+/* ==========================================
+   CHIPELEC POWER SYSTEM — Table CSS
+   ========================================== */
 
-display:flex;
-
-justify-content:space-between;
-
-margin-bottom:20px;
-
+.table-container {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    margin-top: 15px;
 }
 
-.top-bar input{
-
-width:300px;
-
-padding:10px;
-
+.table-responsive {
+    overflow-x: auto;
+    min-height: 300px;
 }
 
-.top-bar button{
-
-padding:10px 20px;
-
-background:#2563eb;
-
-color:white;
-
-border:none;
-
-cursor:pointer;
-
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
 }
 
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-background:white;
-
+/* Table Header */
+thead {
+    background: #f8fafc;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-table th,
-table td{
-
-padding:12px;
-
-border-bottom:1px solid #ddd;
-
-text-align:left;
-
+th {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
 }
 
-table th{
-
-background:#1f2937;
-
-color:white;
-
+/* Table Body */
+td {
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
 }
 
-table img{
-
-width:70px;
-
-height:70px;
-
-object-fit:cover;
-
-border-radius:5px;
-
+tbody tr {
+    transition: background-color 0.2s ease;
 }
 
-.form-container{
-
-margin-top:40px;
-
-display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:15px;
-
+tbody tr:hover {
+    background-color: #f8fafc;
 }
 
-.form-container input,
-.form-container textarea{
-
-padding:12px;
-
-font-size:15px;
-
+tbody tr:last-child td {
+    border-bottom: none;
 }
 
-.form-container textarea{
-
-grid-column:1/3;
-
-height:120px;
-
+/* Data specific styling */
+td.id-column {
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 60px;
 }
 
-.form-container button{
+td.price-column {
+    font-weight: 600;
+    font-family: monospace;
+    font-size: 15px;
+}
 
-grid-column:1/3;
+/* Product Images in Table */
+td img {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
 
-padding:15px;
+/* Actions Column */
+td.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    white-space: nowrap;
+}
 
-background:#16a34a;
+/* Empty State row */
+.empty-row td {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
 
-color:white;
+.empty-state-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
 
-border:none;
+.empty-state-content i {
+    font-size: 40px;
+    color: var(--border-light);
+}
 
-cursor:pointer;
-
-font-size:16px;
-
+/* Pagination (if added later) */
+.table-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    font-size: 14px;
+    color: var(--text-secondary);
 }

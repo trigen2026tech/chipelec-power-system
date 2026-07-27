@@ -1,139 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories | CHIPELEC Power System</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Categories</title>
-
-<link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/sidebar.css">
-<link rel="stylesheet" href="css/topbar.css">
-<link rel="stylesheet" href="css/table.css">
-<link rel="stylesheet" href="css/modal.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/topbar.css">
+    <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/modal.css">
 </head>
-
 <body>
 
-<!-- Sidebar -->
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
-<div class="sidebar">
-
-    <h2>CHIPELEC</h2>
-
-    <a href="dashboard.html">📊 Dashboard</a>
-    <a href="products.html">📦 Products</a>
-    <a href="brands.html">🏷 Brands</a>
-    <a href="categories.html" class="active">📂 Categories</a>
-    <a href="customers.html">👥 Customers</a>
-    <a href="sales.html">💰 Sales</a>
-    <a href="installations.html">🛠 Installations</a>
-    <a href="service-requests.html">📞 Service Requests</a>
-    <a href="maintenance.html">🔧 Maintenance</a>
-    <a href="reports.html">📈 Reports</a>
-    <a href="profile.html">👤 Profile</a>
-    <a href="#" onclick="logout()">🚪 Logout</a>
-
-</div>
-
-<!-- Content -->
-
-<div class="content">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="sidebar-header">
+            <h2>
+                <i class="bi bi-lightning-charge-fill"></i>
+                CHIPELEC
+            </h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="sidebar-section-title">Main Menu</div>
+            <a href="dashboard.html">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            
+            <div class="sidebar-section-title">Inventory</div>
+            <a href="products.html">
+                <i class="bi bi-box-seam-fill"></i> Products
+            </a>
+            <a href="brands.html">
+                <i class="bi bi-tags-fill"></i> Brands
+            </a>
+            <a href="categories.html" class="active">
+                <i class="bi bi-collection-fill"></i> Categories
+            </a>
+            
+            <div class="sidebar-section-title">Business</div>
+            <a href="customers.html">
+                <i class="bi bi-people-fill"></i> Customers
+            </a>
+            <a href="sales.html">
+                <i class="bi bi-cart-check-fill"></i> Sales
+            </a>
+            
+            <div class="sidebar-section-title">Operations</div>
+            <a href="installation.html">
+                <i class="bi bi-tools"></i> Installations
+            </a>
+            <a href="service-requests.html">
+                <i class="bi bi-headset"></i> Service Requests
+            </a>
+            <a href="maintenance.html">
+                <i class="bi bi-wrench-adjustable-circle-fill"></i> Maintenance
+            </a>
+            
+            <div class="sidebar-section-title">Analytics</div>
+            <a href="reports.html">
+                <i class="bi bi-bar-chart-line-fill"></i> Reports
+            </a>
+            
+            <hr>
+            
+            <a href="profile.html">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+            <a href="#" class="logout-link" onclick="logout(event)">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        </div>
+    </div>
 
     <!-- Topbar -->
-
     <div class="topbar">
-
-        <div class="search-box">
-
-            <i class="bi bi-search"></i>
-
-            <input
-                type="text"
-                id="searchCategory"
-                placeholder="Search Category...">
-
+        <div class="topbar-left">
+            <button class="mobile-toggle" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
         </div>
 
         <div class="topbar-right">
-
-            <div class="profile">
-
-                <img src="https://i.pravatar.cc/40">
-
-                <div>
-
-                    <h4 id="adminName">Loading...</h4>
-                    <small id="adminRole">Admin</small>
-
-                </div>
-
+            <div class="notification-bell">
+                <i class="bi bi-bell-fill"></i>
+                <span class="badge">3</span>
             </div>
+            
+            <div class="user-profile" onclick="window.location.href='profile.html'">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" id="adminAvatar" alt="Admin">
+                <div class="user-info">
+                    <h4 id="adminName">Loading...</h4>
+                    <small id="adminRole">Administrator</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Main Content -->
+    <div class="content">
+        
+        <div class="page-header">
+            <h1><i class="bi bi-collection-fill"></i> Category Management</h1>
+            <div class="breadcrumb">
+                <a href="dashboard.html">Home</a>
+                <i class="bi bi-chevron-right"></i>
+                <span>Inventory</span>
+                <i class="bi bi-chevron-right"></i>
+                <span>Categories</span>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="search-input">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Search categories...">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showForm()">
+                    <i class="bi bi-plus-lg"></i> Add New Category
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="80">ID</th>
+                            <th>Category Name</th>
+                            <th width="150">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTable">
+                        <tr>
+                            <td colspan="3">
+                                <div class="loading-spinner">
+                                    <div class="spinner"></div>
+                                    <p>Loading categories...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
 
-    <h1>📂 Categories</h1>
-
-    <button onclick="showForm()">
-        + New Category
-    </button>
-
-    <table>
-
-        <thead>
-
-            <tr>
-                <th>ID</th>
-                <th>Category Name</th>
-                <th>Action</th>
-            </tr>
-
-        </thead>
-
-        <tbody id="categoryTable">
-
-        </tbody>
-
-    </table>
-
-</div>
-
-<!-- Modal -->
-
-<div class="modal" id="categoryModal">
-
-    <div class="modal-content">
-
-        <h2>Category</h2>
-
-        <input
-            type="text"
-            id="category_name"
-            placeholder="Category Name">
-
-        <br><br>
-
-        <button onclick="saveCategory()">
-            Save
-        </button>
-
-        <button onclick="closeModal()">
-            Cancel
-        </button>
-
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h2 id="modalTitle"><i class="bi bi-collection"></i> Category Details</h2>
+                <div class="close" onclick="closeModal()"><i class="bi bi-x"></i></div>
+            </div>
+            <div class="modal-body">
+                <div class="form-group full-width">
+                    <label>Category Name <span style="color: #e11d48">*</span></label>
+                    <input type="text" id="category_name" placeholder="Enter category name">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">
+                    <i class="bi bi-check-lg"></i> Save Category
+                </button>
+            </div>
+        </div>
     </div>
 
-</div>
-
-<script src="js/auth.js"></script>
-<script src="js/categories.js"></script>
-
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/categories.js"></script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
-
 </html>

@@ -1,307 +1,286 @@
-const token = localStorage.getItem("token");
-
-let editingInstallationId = null;
-
-// ==========================
-// Load Installations
-// ==========================
+// Note: token is handled in auth.js
+let editingInstallation = null;
+let allInstallations = [];
 
 async function loadInstallations() {
+    try {
+        const response = await fetch("http://localhost:5000/api/installations", {
+            headers: { Authorization: "Bearer " + token }
+        });
 
-    const response = await fetch(
-        "http://localhost:5000/api/installations",
-        {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+        const result = await response.json();
+        allInstallations = result.data || [];
+        renderTable(allInstallations);
+    } catch (err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Failed to load installations', 'error');
+    }
+}
 
-    const result = await response.json();
-
+function renderTable(data) {
     const table = document.getElementById("installationTable");
-
     table.innerHTML = "";
 
-    result.data.forEach(item => {
+    if (data.length === 0) {
+        table.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="6">
+                    <div class="empty-state-content">
+                        <i class="bi bi-tools"></i>
+                        <p>No installations found.</p>
+                    </div>
+                </td>
+            </tr>`;
+        return;
+    }
+
+    data.forEach(inst => {
+        let statusBadge = "badge-info";
+        if (inst.status === "Completed") statusBadge = "badge-success";
+        else if (inst.status === "Scheduled") statusBadge = "badge-primary";
+        else if (inst.status === "Cancelled") statusBadge = "badge-error";
+
+        // Handle date formatting
+        let instDate = inst.installation_date;
+        if(instDate && instDate.includes('T')) {
+            instDate = instDate.split('T')[0];
+        }
+
+        // Bug Fix: Customer Name not showing. API might return customer_name or full_name
+        const customerDisplay = inst.customer_name || inst.full_name || 'Unknown Customer';
 
         table.innerHTML += `
         <tr>
-            <td>${item.customer_name}</td>
-            <td>${item.product_name}</td>
-            <td>${item.installation_date}</td>
-            <td>${item.technician_name}</td>
-            <td>${item.installation_status}</td>
-
-            <td>
-                <button onclick="editInstallation(${item.id})">✏️</button>
-                <button onclick="deleteInstallation(${item.id})">🗑</button>
+            <td style="font-weight: 500;">${customerDisplay}</td>
+            <td>${inst.product_name || '-'}</td>
+            <td>${instDate || '-'}</td>
+            <td>${inst.technician_name || 'Unassigned'}</td>
+            <td><span class="badge-status ${statusBadge}">${inst.status || 'Scheduled'}</span></td>
+            <td class="actions">
+                <button class="btn-icon edit" onclick="editInstallation(${inst.id})" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-icon delete" onclick="deleteInstallation(${inst.id})" title="Delete">
+                    <i class="bi bi-trash"></i>
+                </button>
             </td>
-
         </tr>
         `;
-
     });
+}
 
+// Search functionality
+document.getElementById('searchInput')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const filtered = allInstallations.filter(i => 
+        (i.customer_name && i.customer_name.toLowerCase().includes(term)) ||
+        (i.full_name && i.full_name.toLowerCase().includes(term)) ||
+        (i.product_name && i.product_name.toLowerCase().includes(term)) ||
+        (i.technician_name && i.technician_name.toLowerCase().includes(term)) ||
+        (i.status && i.status.toLowerCase().includes(term))
+    );
+    renderTable(filtered);
+});
+
+async function loadDropdowns() {
+    try {
+        const custResponse = await fetch("http://localhost:5000/api/customers", {
+            headers: { Authorization: "Bearer " + token }
+        });
+        const custResult = await custResponse.json();
+        const customerSelect = document.getElementById("customer_id");
+        customerSelect.innerHTML = '<option value="">Select Customer</option>';
+        if(custResult.data) {
+            custResult.data.forEach(c => {
+                customerSelect.innerHTML += `<option value="${c.id}">${c.full_name}</option>`;
+            });
+        }
+    } catch(e) { console.error(e); }
+
+    try {
+        const prodResponse = await fetch("http://localhost:5000/api/products", {
+            headers: { Authorization: "Bearer " + token }
+        });
+        const prodResult = await prodResponse.json();
+        const productSelect = document.getElementById("product_id");
+        productSelect.innerHTML = '<option value="">Select Product</option>';
+        if(prodResult.data) {
+            prodResult.data.forEach(p => {
+                productSelect.innerHTML += `<option value="${p.id}">${p.product_name}</option>`;
+            });
+        }
+    } catch(e) { console.error(e); }
 }
 
 loadInstallations();
 
-
-// ==========================
-// Load Customers
-// ==========================
-
-async function loadCustomers() {
-
-    const response = await fetch(
-        "http://localhost:5000/api/customers",
-        {
-            headers:{
-                Authorization:"Bearer " + token
-            }
-        }
-    );
-
-    const result = await response.json();
-
-    const select=document.getElementById("customer_id");
-
-    select.innerHTML="";
-
-    result.data.forEach(customer=>{
-
-        select.innerHTML +=
-        `<option value="${customer.id}">
-            ${customer.customer_name}
-        </option>`;
-
-    });
-
+async function showForm() {
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-plus-circle"></i> Schedule Installation';
+    await loadDropdowns();
+    document.getElementById("installationModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+    
+    // Set today's date by default
+    document.getElementById("installation_date").valueAsDate = new Date();
 }
 
-
-// ==========================
-// Load Products
-// ==========================
-
-async function loadProducts(){
-
-    const response=await fetch(
-        "http://localhost:5000/api/products",
-        {
-            headers:{
-                Authorization:"Bearer "+token
-            }
-        }
-    );
-
-    const result=await response.json();
-
-    const select=document.getElementById("product_id");
-
-    select.innerHTML="";
-
-    result.data.forEach(product=>{
-
-        select.innerHTML +=
-        `<option value="${product.id}">
-            ${product.product_name}
-        </option>`;
-
-    });
-
+function closeModal() {
+    document.getElementById("installationModal").style.display = "none";
+    document.body.style.overflow = "auto";
+    
+    document.getElementById("customer_id").value = "";
+    document.getElementById("product_id").value = "";
+    document.getElementById("installation_date").value = "";
+    document.getElementById("technician_name").value = "";
+    document.getElementById("installation_status").value = "Scheduled";
+    document.getElementById("installation_address").value = "";
+    document.getElementById("remarks").value = "";
+    
+    editingInstallation = null;
 }
-
-loadCustomers();
-loadProducts();
-
-
-// ==========================
-// Modal
-// ==========================
-
-function showForm(){
-
-    document.getElementById("installationModal").style.display="flex";
-
-}
-
-function closeModal(){
-
-    document.getElementById("installationModal").style.display="none";
-
-}
-
-
-// ==========================
-// Save
-// ==========================
 
 async function saveInstallation() {
-
-    if (editingInstallationId) {
-
-        await updateInstallation();
-
-    } else {
-
-        await addInstallation();
-
+    if (editingInstallation) {
+        return updateInstallation();
     }
 
-}
+    const customer_id = document.getElementById("customer_id").value;
+    const product_id = document.getElementById("product_id").value;
+    const inst_date = document.getElementById("installation_date").value;
+    const tech_name = document.getElementById("technician_name").value;
+    const address = document.getElementById("installation_address").value;
 
-// ==========================
-// Add Installation
-// ==========================
-
-async function addInstallation() {
+    if (!customer_id || !product_id || !inst_date || !tech_name || !address) {
+        if(window.showToast) window.showToast('Please fill all required fields', 'warning');
+        return;
+    }
 
     const installation = {
-
-        customer_id: document.getElementById("customer_id").value,
-        product_id: document.getElementById("product_id").value,
-        installation_date: document.getElementById("installation_date").value,
-        technician_name: document.getElementById("technician_name").value,
-        installation_address: document.getElementById("installation_address").value,
-        installation_status: document.getElementById("installation_status").value,
+        customer_id: customer_id,
+        product_id: product_id,
+        installation_date: inst_date,
+        technician_name: tech_name,
+        status: document.getElementById("installation_status").value,
+        installation_address: address,
         remarks: document.getElementById("remarks").value
-
     };
 
-    const response = await fetch(
-        "http://localhost:5000/api/installations",
-        {
+    try {
+        const response = await fetch("http://localhost:5000/api/installations", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token
             },
             body: JSON.stringify(installation)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if(window.showToast) window.showToast('Installation scheduled successfully');
+            closeModal();
+            loadInstallations();
+        } else {
+            if(window.showToast) window.showToast(result.message, 'error');
         }
-    );
-
-    const result = await response.json();
-
-    alert(result.message);
-
-    if (result.success) {
-
-        closeModal();
-
-        loadInstallations();
-
+    } catch(err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Connection error', 'error');
     }
-
 }
 
-// ==========================
-// EDIT INSTALLATION
-// ==========================
-
 async function editInstallation(id) {
+    editingInstallation = id;
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square"></i> Edit Installation';
+    
+    await loadDropdowns();
+    
+    const inst = allInstallations.find(i => i.id === id);
+    if(!inst) return;
 
-    editingInstallationId = id;
+    document.getElementById("customer_id").value = inst.customer_id;
+    document.getElementById("product_id").value = inst.product_id;
+    
+    let d = inst.installation_date;
+    if(d && d.includes('T')) d = d.split('T')[0];
+    document.getElementById("installation_date").value = d;
+    
+    document.getElementById("technician_name").value = inst.technician_name || "";
+    document.getElementById("installation_status").value = inst.status || "Scheduled";
+    document.getElementById("installation_address").value = inst.installation_address || "";
+    document.getElementById("remarks").value = inst.remarks || "";
 
-    const response = await fetch(
-        `http://localhost:5000/api/installations/${id}`,
-        {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+    document.getElementById("installationModal").style.display = "flex";
+    document.body.style.overflow = "hidden";
+}
 
-    const result = await response.json();
+async function updateInstallation() {
+    const customer_id = document.getElementById("customer_id").value;
+    const product_id = document.getElementById("product_id").value;
+    const inst_date = document.getElementById("installation_date").value;
+    const tech_name = document.getElementById("technician_name").value;
+    const address = document.getElementById("installation_address").value;
 
-    if (!result.success) {
-        alert(result.message);
+    if (!customer_id || !product_id || !inst_date || !tech_name || !address) {
+        if(window.showToast) window.showToast('Please fill all required fields', 'warning');
         return;
     }
 
-    const installation = result.data;
-
-    document.getElementById("customer_id").value = installation.customer_id;
-    document.getElementById("product_id").value = installation.product_id;
-    document.getElementById("installation_date").value = installation.installation_date;
-    document.getElementById("technician_name").value = installation.technician_name;
-    document.getElementById("installation_address").value = installation.installation_address;
-    document.getElementById("installation_status").value = installation.installation_status;
-    document.getElementById("remarks").value = installation.remarks;
-
-    showForm();
-
-}
-
-// ==========================
-// UPDATE INSTALLATION
-// ==========================
-
-async function updateInstallation() {
-
     const installation = {
-        customer_id: document.getElementById("customer_id").value,
-        product_id: document.getElementById("product_id").value,
-        installation_date: document.getElementById("installation_date").value,
-        technician_name: document.getElementById("technician_name").value,
-        installation_address: document.getElementById("installation_address").value,
-        installation_status: document.getElementById("installation_status").value,
+        customer_id: customer_id,
+        product_id: product_id,
+        installation_date: inst_date,
+        technician_name: tech_name,
+        status: document.getElementById("installation_status").value,
+        installation_address: address,
         remarks: document.getElementById("remarks").value
     };
 
-    const response = await fetch(
-        `http://localhost:5000/api/installations/${editingInstallationId}`,
-        {
+    try {
+        const response = await fetch(`http://localhost:5000/api/installations/${editingInstallation}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + token
             },
             body: JSON.stringify(installation)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if(window.showToast) window.showToast('Installation updated successfully');
+            closeModal();
+            loadInstallations();
+        } else {
+            if(window.showToast) window.showToast(result.message, 'error');
         }
-    );
-
-    const result = await response.json();
-
-    alert(result.message);
-
-    if (result.success) {
-
-        editingInstallationId = null;
-
-        closeModal();
-
-        loadInstallations();
-
+    } catch(err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Connection error', 'error');
     }
-
 }
 
-// ==========================
-// DELETE INSTALLATION
-// ==========================
-
 async function deleteInstallation(id) {
+    if (!confirm("Are you sure you want to delete this installation record?")) return;
 
-    if (!confirm("Delete this installation?")) return;
-
-    const response = await fetch(
-        `http://localhost:5000/api/installations/${id}`,
-        {
+    try {
+        const response = await fetch(`http://localhost:5000/api/installations/${id}`, {
             method: "DELETE",
-            headers: {
-                Authorization: "Bearer " + token
-            }
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            if(window.showToast) window.showToast('Installation deleted successfully');
+            loadInstallations();
+        } else {
+            if(window.showToast) window.showToast(result.message, 'error');
         }
-    );
-
-    const result = await response.json();
-
-    alert(result.message);
-
-    if (result.success) {
-        loadInstallations();
+    } catch(err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Connection error', 'error');
     }
-
 }

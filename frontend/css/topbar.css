@@ -1,123 +1,193 @@
-.topbar{
+/* ==========================================
+   CHIPELEC POWER SYSTEM — Topbar CSS
+   ========================================== */
 
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:30px;
-
+.topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--topbar-height);
+    background: var(--bg-topbar);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 35px;
+    z-index: 90;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.search-box{
-
-    background:white;
-
-    padding:12px 18px;
-
-    border-radius:12px;
-
-    width:350px;
-
-    display:flex;
-
-    align-items:center;
-
-    box-shadow:0 5px 15px rgba(0,0,0,.08);
-
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-.search-box input{
-
-    border:none;
-
-    outline:none;
-
-    margin-left:10px;
-
-    width:100%;
-
-    font-size:15px;
-
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
 }
 
-.topbar-right{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:25px;
-
+/* Global Search */
+.global-search {
+    position: relative;
+    width: 380px;
 }
 
-.notification{
-
-    position:relative;
-
-    font-size:24px;
-
-    cursor:pointer;
-
+.global-search i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+    pointer-events: none;
+    transition: color 0.3s ease;
 }
 
-.badge{
-
-    position:absolute;
-
-    top:-8px;
-
-    right:-10px;
-
-    background:red;
-
-    color:white;
-
-    border-radius:50%;
-
-    width:18px;
-
-    height:18px;
-
-    font-size:11px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
+.global-search input {
+    width: 100%;
+    background: var(--bg-body);
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    padding: 10px 20px 10px 44px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
 }
 
-.profile{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:12px;
-
+.global-search input::placeholder {
+    color: var(--text-muted);
 }
 
-.profile img{
-
-    width:45px;
-
-    height:45px;
-
-    border-radius:50%;
-
+.global-search input:focus {
+    outline: none;
+    background: var(--bg-card);
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
-.profile h4{
-
-    margin:0;
-
+.global-search input:focus + i {
+    color: var(--primary);
 }
 
-.profile small{
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
 
-    color:#666;
+/* Notification Bell */
+.notification-bell {
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.notification-bell:hover {
+    background: var(--bg-body);
+    color: var(--primary);
+}
+
+.notification-bell .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--accent-rose);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    height: 18px;
+    min-width: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--bg-card);
+}
+
+/* User Profile */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.user-profile:hover {
+    background: var(--bg-body);
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.user-info small {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .global-search {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .topbar {
+        left: 0;
+        padding: 0 16px;
+    }
+
+    .mobile-toggle {
+        display: block;
+    }
+
+    .global-search {
+        display: none; /* Hide global search on mobile to save space */
+    }
+
+    .user-info {
+        display: none; /* Hide text on mobile */
+    }
 }

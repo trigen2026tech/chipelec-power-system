@@ -1,168 +1,158 @@
-const token = localStorage.getItem("token");
-
+// Note: token is handled in auth.js
 let editingBrand = null;
+let allBrands = [];
 
 async function loadBrands() {
+    try {
+        const response = await fetch("http://localhost:5000/api/brands", {
+            headers: { Authorization: "Bearer " + token }
+        });
 
-    const response = await fetch(
-        "http://localhost:5000/api/brands",
-        {
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+        const result = await response.json();
+        allBrands = result.data || [];
+        renderTable(allBrands);
+    } catch (err) {
+        console.error(err);
+        if(window.showToast) window.showToast('Failed to load brands', 'error');
+    }
+}
 
-    const result = await response.json();
-
+function renderTable(data) {
     const table = document.getElementById("brandTable");
-
     table.innerHTML = "";
 
-    result.data.forEach(brand => {
+    if (data.length === 0) {
+        table.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="3">
+                    <div class="empty-state-content">
+                        <i class="bi bi-tags"></i>
+                        <p>No brands found.</p>
+                    </div>
+                </td>
+            </tr>`;
+        return;
+    }
 
+    data.forEach(brand => {
         table.innerHTML += `
-
         <tr>
-
-            <td>${brand.id}</td>
-
-            <td>${brand.brand_name}</td>
-
-            <td>
-
-                <button onclick="editBrand(${brand.id}, '${brand.brand_name}')">
-                    ✏️ Edit
+            <td class="id-column">#${brand.id}</td>
+            <td style="font-weight: 500;">${brand.brand_name}</td>
+            <td class="actions">
+                <button class="btn-icon edit" onclick="editBrand(${brand.id}, '${brand.brand_name}')" title="Edit">
+                    <i class="bi bi-pencil"></i>
                 </button>
-
-                <button onclick="deleteBrand(${brand.id})">
-                    🗑 Delete
+                <button class="btn-icon delete" onclick="deleteBrand(${brand.id})" title="Delete">
+                    <i class="bi bi-trash"></i>
                 </button>
-
             </td>
-
         </tr>
-
         `;
-
     });
-
 }
+
+// Search functionality
+document.getElementById('searchInput')?.addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    const filtered = allBrands.filter(b => b.brand_name.toLowerCase().includes(term));
+    renderTable(filtered);
+});
 
 loadBrands();
 
 function showForm() {
-
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-plus-circle"></i> Add New Brand';
     document.getElementById("brandModal").style.display = "flex";
-
 }
 
 function closeModal() {
-
     document.getElementById("brandModal").style.display = "none";
-
     document.getElementById("brand_name").value = "";
-
     editingBrand = null;
-
 }
 
 async function saveBrand() {
-
     if (editingBrand) {
-
         return updateBrand();
-
     }
 
-    const brand = {
-        brand_name: document.getElementById("brand_name").value
-    };
+    const name = document.getElementById("brand_name").value;
+    if (!name) {
+        if(window.showToast) window.showToast('Brand name is required', 'warning');
+        return;
+    }
 
-    const response = await fetch(
-        "http://localhost:5000/api/brands",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token
-            },
-            body: JSON.stringify(brand)
-        }
-    );
+    const brand = { brand_name: name };
+
+    const response = await fetch("http://localhost:5000/api/brands", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify(brand)
+    });
 
     const result = await response.json();
 
-    alert(result.message);
-
     if (result.success) {
-
+        if(window.showToast) window.showToast('Brand added successfully');
         closeModal();
-
         loadBrands();
-
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
     }
-
 }
 
 function editBrand(id, name) {
-
     editingBrand = id;
-
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square"></i> Edit Brand';
     document.getElementById("brand_name").value = name;
-
-    showForm();
-
+    document.getElementById("brandModal").style.display = "flex";
 }
 
 async function updateBrand() {
+    const name = document.getElementById("brand_name").value;
+    if (!name) {
+        if(window.showToast) window.showToast('Brand name is required', 'warning');
+        return;
+    }
 
-    const response = await fetch(
-        `http://localhost:5000/api/brands/${editingBrand}`,
-        {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + token
-            },
-            body: JSON.stringify({
-                brand_name: document.getElementById("brand_name").value
-            })
-        }
-    );
+    const response = await fetch(`http://localhost:5000/api/brands/${editingBrand}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({ brand_name: name })
+    });
 
     const result = await response.json();
 
-    alert(result.message);
-
     if (result.success) {
-
+        if(window.showToast) window.showToast('Brand updated successfully');
         closeModal();
-
         loadBrands();
-
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
     }
-
 }
 
 async function deleteBrand(id) {
+    if (!confirm("Delete this brand? This action cannot be undone.")) return;
 
-    if (!confirm("Delete this brand?")) return;
-
-    const response = await fetch(
-        `http://localhost:5000/api/brands/${id}`,
-        {
-            method: "DELETE",
-            headers: {
-                Authorization: "Bearer " + token
-            }
-        }
-    );
+    const response = await fetch(`http://localhost:5000/api/brands/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token }
+    });
 
     const result = await response.json();
 
-    alert(result.message);
-
-    loadBrands();
-
+    if (result.success) {
+        if(window.showToast) window.showToast('Brand deleted successfully');
+        loadBrands();
+    } else {
+        if(window.showToast) window.showToast(result.message, 'error');
+    }
 }
