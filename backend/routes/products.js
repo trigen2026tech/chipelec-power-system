@@ -5,7 +5,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const upload = require("../config/multer");
 
 // GET all products
-router.get("/", authMiddleware, (req, res) => {
+router.get("/", (req, res) => {
 
     const sql = `
         SELECT
@@ -48,7 +48,7 @@ router.get("/", authMiddleware, (req, res) => {
 // ======================
 // ADD PRODUCT
 // ======================
-router.post("/", (req, res) => {
+router.post("/", authMiddleware, (req, res) => {
 
     const {
         category_id,
@@ -116,7 +116,7 @@ router.post("/", (req, res) => {
 // GET SINGLE PRODUCT
 // ======================
 
-router.get("/:id", authMiddleware, (req, res) => {
+router.get("/:id", (req, res) => {
 
     const { id } = req.params;
 
@@ -158,7 +158,7 @@ router.get("/:id", authMiddleware, (req, res) => {
 // UPDATE PRODUCT
 // ======================
 
-router.put("/:id", (req, res) => {
+router.put("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
@@ -235,7 +235,7 @@ router.put("/:id", (req, res) => {
 // DELETE PRODUCT
 // ======================
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
