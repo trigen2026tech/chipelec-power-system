@@ -1,5 +1,5 @@
 // Base URL for API requests
-const API_BASE_URL = '/api';
+const API_BASE_URL = "https://chipelec-backend.onrender.com/api";
 
 // ======================
 // AUTH HELPERS
