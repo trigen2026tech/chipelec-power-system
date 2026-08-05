@@ -3,7 +3,15 @@ const cors = require("cors");
 require("dotenv").config();
 const path = require("path");
 
-
+console.log("========== ENV VARIABLES ==========");
+console.log({
+    DB_HOST: process.env.DB_HOST,
+    DB_PORT: process.env.DB_PORT,
+    DB_NAME: process.env.DB_NAME,
+    DB_USER: process.env.DB_USER,
+    DB_PASSWORD: process.env.DB_PASSWORD ? "Loaded" : "Missing"
+});
+console.log("==================================");
 
 
 const db = require("./config/db");

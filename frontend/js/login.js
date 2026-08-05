@@ -16,7 +16,8 @@ async function login() {
     msg.innerHTML = '';
 
     try {
-       const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/auth/login", {
+
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/auth/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

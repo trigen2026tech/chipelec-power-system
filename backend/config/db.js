@@ -33,7 +33,19 @@ connection.connect((err) => {
         console.error("❌ Database Connection Failed:", err);
         return;
     }
+
     console.log("✅ Connected to Aiven MySQL Database");
+
+    connection.query(
+        "SELECT DATABASE() AS db, CURRENT_USER() AS user;",
+        (err, results) => {
+            if (err) {
+                console.error("Query Error:", err);
+            } else {
+                console.log("Connected Database:", results);
+            }
+        }
+    );
 });
 
 module.exports = connection;
