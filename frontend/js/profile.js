@@ -40,7 +40,7 @@ async function saveProfile() {
     }
 
     // In a real application, we would call an API endpoint like:
-    // await fetch("http://localhost:5000/api/admin/profile", { method: "PUT", body: ... })
+    // await fetch("https://chipelec-power-system-production.up.railway.app/api/admin/profile", { method: "PUT", body: ... })
     // Since we don't have that endpoint guaranteed in the existing backend, we'll simulate success
     // and update local storage directly as per the previous basic implementation.
 

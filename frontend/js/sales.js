@@ -5,7 +5,7 @@ let productsData = [];
 
 async function loadSales() {
     try {
-        const response = await fetch("http://localhost:5000/api/sales", {
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/sales", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -83,7 +83,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 async function loadDropdowns() {
     // Load Customers
     try {
-        const custResponse = await fetch("http://localhost:5000/api/customers", {
+        const custResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
             headers: { Authorization: "Bearer " + token }
         });
         const custResult = await custResponse.json();
@@ -98,7 +98,7 @@ async function loadDropdowns() {
 
     // Load Products
     try {
-        const prodResponse = await fetch("http://localhost:5000/api/products", {
+        const prodResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
             headers: { Authorization: "Bearer " + token }
         });
         const prodResult = await prodResponse.json();
@@ -187,7 +187,7 @@ async function saveSale() {
     };
 
     try {
-        const response = await fetch("http://localhost:5000/api/sales", {
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/sales", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -259,7 +259,7 @@ async function updateSale() {
     };
 
     try {
-        const response = await fetch(`http://localhost:5000/api/sales/${editingSale}`, {
+        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/sales/${editingSale}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -287,7 +287,7 @@ async function deleteSale(id) {
     if (!confirm("Are you sure you want to delete this sale record?")) return;
 
     try {
-        const response = await fetch(`http://localhost:5000/api/sales/${id}`, {
+        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/sales/${id}`, {
             method: "DELETE",
             headers: { Authorization: "Bearer " + token }
         });

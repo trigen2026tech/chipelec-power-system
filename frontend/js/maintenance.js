@@ -4,7 +4,7 @@ let allMaintenance = [];
 
 async function loadMaintenance() {
     try {
-        const response = await fetch("http://localhost:5000/api/maintenance", {
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/maintenance", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -80,7 +80,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 
 async function loadDropdowns() {
     try {
-        const custResponse = await fetch("http://localhost:5000/api/customers", {
+        const custResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
             headers: { Authorization: "Bearer " + token }
         });
         const custResult = await custResponse.json();
@@ -94,7 +94,7 @@ async function loadDropdowns() {
     } catch(e) { console.error(e); }
 
     try {
-        const prodResponse = await fetch("http://localhost:5000/api/products", {
+        const prodResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
             headers: { Authorization: "Bearer " + token }
         });
         const prodResult = await prodResponse.json();
@@ -160,7 +160,7 @@ async function saveMaintenance() {
     };
 
     try {
-        const response = await fetch("http://localhost:5000/api/maintenance", {
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/maintenance", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -231,7 +231,7 @@ async function updateMaintenance() {
     };
 
     try {
-        const response = await fetch(`http://localhost:5000/api/maintenance/${editingMaintenance}`, {
+        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/maintenance/${editingMaintenance}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -259,7 +259,7 @@ async function deleteMaintenance(id) {
     if (!confirm("Are you sure you want to delete this maintenance record?")) return;
 
     try {
-        const response = await fetch(`http://localhost:5000/api/maintenance/${id}`, {
+        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/maintenance/${id}`, {
             method: "DELETE",
             headers: { Authorization: "Bearer " + token }
         });

@@ -4,7 +4,7 @@ let allBrands = [];
 
 async function loadBrands() {
     try {
-        const response = await fetch("http://localhost:5000/api/brands", {
+        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/brands", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -85,7 +85,7 @@ async function saveBrand() {
 
     const brand = { brand_name: name };
 
-    const response = await fetch("http://localhost:5000/api/brands", {
+    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/brands", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -119,7 +119,7 @@ async function updateBrand() {
         return;
     }
 
-    const response = await fetch(`http://localhost:5000/api/brands/${editingBrand}`, {
+    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/brands/${editingBrand}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -142,7 +142,7 @@ async function updateBrand() {
 async function deleteBrand(id) {
     if (!confirm("Delete this brand? This action cannot be undone.")) return;
 
-    const response = await fetch(`http://localhost:5000/api/brands/${id}`, {
+    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/brands/${id}`, {
         method: "DELETE",
         headers: { Authorization: "Bearer " + token }
     });
