@@ -242,8 +242,7 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <a href="product-details.html?id=${p.id}" class="btn btn-outline" style="padding: 8px; font-size: 0.85rem;">View Details</a>
                                 <a href="enquiry.html?product=${p.id}" class="btn btn-primary" style="padding: 8px; font-size: 0.85rem;">Enquire</a>
-                                <a href="tel:+919876543210" class="btn" style="background:#e5e7eb; color:var(--dark-text); padding: 8px; font-size: 0.85rem;"><i class="fas fa-phone-alt"></i> Call</a>
-                                <a href="https://wa.me/919876543210?text=I'm%20interested%20in%20${encodeURIComponent(p.product_name)}" target="_blank" class="btn" style="background:#25D366; color:#fff; padding: 8px; font-size: 0.85rem;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                                <a href="tel:+919876543210" class="btn" style="background:#e5e7eb; color:var(--dark-text); padding: 8px; font-size: 0.85rem; grid-column: 1 / -1;"><i class="fas fa-phone-alt"></i> Call</a>
                             </div>
                         </div>
                     `;
