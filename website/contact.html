@@ -35,29 +35,36 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
                 <div class="card p-4">
                     <h3 style="color: var(--primary-color); margin-bottom: 20px;">Send us a message</h3>
+                        <div id="contactAlert" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 600;"></div>
                     <form id="contactForm">
                         <div class="form-group">
                             <label class="form-label">Full Name *</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" id="contactName" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" required>
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" id="contactPhone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="contactEmail" class="form-control">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Message *</label>
-                            <textarea class="form-control" rows="5" required></textarea>
+                            <textarea id="contactMessage" class="form-control" rows="5" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        <button type="submit" id="contactSubmit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                     </form>
                 </div>
                 <div>
                     <div class="card p-4 mb-4">
                         <h3 style="color: var(--primary-color); margin-bottom: 20px;">Contact Information</h3>
                         <ul style="list-style: none; padding: 0;">
-                            <li style="margin-bottom: 15px;"><i class="fas fa-map-marker-alt" style="color: var(--secondary-color); width: 30px;"></i> 123 Power Street, Tech City, IN 400001</li>
-                            <li style="margin-bottom: 15px;"><i class="fas fa-phone" style="color: var(--secondary-color); width: 30px;"></i> +91 98765 43210</li>
-                            <li style="margin-bottom: 15px;"><i class="fas fa-envelope" style="color: var(--secondary-color); width: 30px;"></i> support@chipelec.com</li>
+                            <li style="margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start;"><i class="fas fa-map-marker-alt" style="color: var(--secondary-color); width: 20px; font-size: 1.2rem; margin-top: 4px;"></i> <div><strong>Address:</strong><br>123 Power Street, Tech City, IN 400001</div></li>
+                            <li style="margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start;"><i class="fas fa-phone" style="color: var(--secondary-color); width: 20px; font-size: 1.2rem; margin-top: 4px;"></i> <div><strong>Phone:</strong><br><a href="tel:+919876543210">+91 98765 43210</a></div></li>
+                            <li style="margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start;"><i class="fab fa-whatsapp" style="color: #25D366; width: 20px; font-size: 1.2rem; margin-top: 4px;"></i> <div><strong>WhatsApp:</strong><br><a href="https://wa.me/919876543210" target="_blank">+91 98765 43210</a></div></li>
+                            <li style="margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start;"><i class="fas fa-envelope" style="color: var(--secondary-color); width: 20px; font-size: 1.2rem; margin-top: 4px;"></i> <div><strong>Email:</strong><br><a href="mailto:support@chipelec.com">support@chipelec.com</a></div></li>
+                            <li style="margin-bottom: 0; display: flex; gap: 15px; align-items: flex-start;"><i class="fas fa-clock" style="color: var(--secondary-color); width: 20px; font-size: 1.2rem; margin-top: 4px;"></i> <div><strong>Working Hours:</strong><br>Mon - Sat: 9:00 AM - 7:00 PM<br>Sun: Closed</div></li>
                         </ul>
                     </div>
                     <div class="card overflow-hidden">
@@ -86,10 +93,49 @@
     </footer>
     <script src="js/main.js"></script>
     <script>
-        document.getElementById('contactForm').addEventListener('submit', (e) => {
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('Thank you for reaching out! We will get back to you soon.');
-            e.target.reset();
+            const btn = document.getElementById('contactSubmit');
+            const alertBox = document.getElementById('contactAlert');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            const data = {
+                full_name: document.getElementById('contactName').value,
+                phone: document.getElementById('contactPhone').value,
+                email: document.getElementById('contactEmail').value,
+                subject: 'General Contact Form Submission',
+                message: document.getElementById('contactMessage').value
+            };
+
+            try {
+                const res = await fetch('/api/enquiries', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                
+                if(result.success) {
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#dcfce7';
+                    alertBox.style.color = '#166534';
+                    alertBox.textContent = 'Message sent successfully! We will get back to you soon.';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    throw new Error(result.message || 'Failed to send message');
+                }
+            } catch(err) {
+                alertBox.style.display = 'block';
+                alertBox.style.backgroundColor = '#fee2e2';
+                alertBox.style.color = '#b91c1c';
+                alertBox.textContent = err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Message';
+            }
         });
     </script>
 </body>

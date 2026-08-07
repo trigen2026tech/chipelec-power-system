@@ -204,6 +204,48 @@
             </div>
         </div>
 
+        <!-- NEW ROW: Recent Enquiries and Low Stock -->
+        <div class="dashboard-grid" style="margin-top: 30px;">
+            <div class="card-container" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div class="card-header" style="padding: 0 0 16px 0; border-bottom: 1px solid var(--border-light); margin-bottom: 15px;">
+                    <h2><i class="bi bi-envelope-fill" style="color: #6366f1;"></i> Recent Enquiries</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" style="width: 100%; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee;">
+                                <th style="padding: 10px;">Name</th>
+                                <th style="padding: 10px;">Subject</th>
+                                <th style="padding: 10px;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentEnquiriesList">
+                            <tr><td colspan="3" style="text-align: center; padding: 15px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-container" style="background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div class="card-header" style="padding: 0 0 16px 0; border-bottom: 1px solid var(--border-light); margin-bottom: 15px;">
+                    <h2><i class="bi bi-exclamation-triangle-fill" style="color: #ef4444;"></i> Low Stock Alerts</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" style="width: 100%; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #eee;">
+                                <th style="padding: 10px;">Product</th>
+                                <th style="padding: 10px;">Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lowStockList">
+                            <tr><td colspan="2" style="text-align: center; padding: 15px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Scripts -->
@@ -216,6 +258,58 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
+
+        // Fetch Dashboard Extra Data
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if(!token) return;
+
+            try {
+                // Fetch Enquiries
+                const enqRes = await fetch('/api/enquiries', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(enqRes.ok) {
+                    const enqData = await enqRes.json();
+                    const list = document.getElementById('recentEnquiriesList');
+                    list.innerHTML = '';
+                    if(enqData.data && enqData.data.length > 0) {
+                        enqData.data.slice(0, 5).forEach(e => {
+                            list.innerHTML += `<tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">${e.full_name}</td>
+                                <td style="padding: 10px;">${e.subject}</td>
+                                <td style="padding: 10px;">${new Date(e.created_at).toLocaleDateString()}</td>
+                            </tr>`;
+                        });
+                    } else {
+                        list.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 15px;">No enquiries found.</td></tr>';
+                    }
+                }
+
+                // Fetch Products for Low Stock
+                const prodRes = await fetch('/api/products', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(prodRes.ok) {
+                    const prodData = await prodRes.json();
+                    const list = document.getElementById('lowStockList');
+                    list.innerHTML = '';
+                    const lowStock = prodData.data ? prodData.data.filter(p => parseInt(p.stock_quantity) < 10) : [];
+                    if(lowStock.length > 0) {
+                        lowStock.slice(0, 5).forEach(p => {
+                            list.innerHTML += `<tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">${p.product_name} <br><small style="color: #666;">${p.model_number}</small></td>
+                                <td style="padding: 10px; color: #ef4444; font-weight: bold;">${p.stock_quantity} left</td>
+                            </tr>`;
+                        });
+                    } else {
+                        list.innerHTML = '<tr><td colspan="2" style="text-align: center; padding: 15px;">All products are well stocked.</td></tr>';
+                    }
+                }
+            } catch(e) {
+                console.error("Error loading extra dashboard widgets:", e);
+            }
+        });
     </script>
 </body>
 </html>

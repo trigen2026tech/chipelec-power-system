@@ -2,6 +2,9 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const path = require("path");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const xss = require("xss-clean");
 
 console.log("========== ENV VARIABLES ==========");
 console.log({
@@ -35,6 +38,21 @@ const customerAuthRoutes = require("./routes/customerAuth");
 const app = express();
 
 // Middleware
+// Security Headers
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+}));
+app.use(xss());
+
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 200, // Limit each IP to 200 requests per `window` (here, per 15 minutes)
+    message: "Too many requests from this IP, please try again after 15 minutes",
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use("/api", apiLimiter);
+
 app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

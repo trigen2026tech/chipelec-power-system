@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | CHIPELEC Power System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .product-image-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-light);
+            text-align: center;
+        }
+        .product-image-container img {
+            max-width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+        }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .spec-table th, .spec-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            text-align: left;
+        }
+        .spec-table th {
+            background-color: var(--bg-color);
+            width: 30%;
+            color: var(--dark-text);
+        }
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="products.html">Products</a>
+                <a href="services.html">Services</a>
+                <a href="contact.html">Contact</a>
+                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+            </div>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-5" style="background-color: var(--bg-color); min-height: 80vh;">
+        <div class="container" id="loadingState">
+            <div class="text-center" style="padding: 60px;">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary-color);"></i>
+                <h3 class="mt-4">Loading Product Details...</h3>
+            </div>
+        </div>
+
+        <div class="container" id="errorState" style="display: none;">
+            <div class="text-center" style="padding: 60px; color: var(--danger-color);">
+                <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                <h3 id="errorMsg">Product not found.</h3>
+                <a href="products.html" class="btn btn-primary mt-4">Back to Products</a>
+            </div>
+        </div>
+
+        <div class="container" id="productContent" style="display: none;">
+            <!-- Content Injected via JS -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const productContent = document.getElementById('productContent');
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!productId) {
+                showError("No product ID provided.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/products/${productId}`);
+                if (!res.ok) {
+                    if (res.status === 404) throw new Error("Product not found.");
+                    throw new Error("Failed to load product details.");
+                }
+                const data = await res.json();
+                
+                if (data.success && data.data) {
+                    // Fetch brands and categories just to get their names if API doesn't join them for single GET.
+                    // Wait, the single GET in products.js DOES NOT join brands and categories!
+                    // Let's do a workaround: fetch all products and find the matching one to get the names, or just display IDs if all fails.
+                    const allRes = await fetch('/api/products');
+                    let brandName = "Unknown";
+                    let categoryName = "Unknown";
+                    if(allRes.ok) {
+                        const allData = await allRes.json();
+                        const p = allData.data.find(x => x.id == productId);
+                        if(p) {
+                            brandName = p.brand_name || data.data.brand_id;
+                            categoryName = p.category_name || data.data.category_id;
+                        }
+                    }
+
+                    renderProduct(data.data, brandName, categoryName);
+                } else {
+                    throw new Error("Product data not found.");
+                }
+            } catch (err) {
+                showError(err.message);
+            }
+
+            function showError(msg) {
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                errorMsg.textContent = msg;
+            }
+
+            function renderProduct(p, brandName, categoryName) {
+                const imgUrl = p.image && !p.image.startsWith('http') ? `/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
+                
+                let stockStatus = `<span style="color: var(--success-color); font-weight: 600;"><i class="fas fa-check-circle"></i> In Stock</span>`;
+                if(p.status !== 'Active') {
+                    stockStatus = `<span style="color: var(--danger-color); font-weight: 600;"><i class="fas fa-times-circle"></i> Out of Stock</span>`;
+                }
+
+                productContent.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <a href="products.html" style="color: var(--primary-color); font-weight: 500;"><i class="fas fa-arrow-left"></i> Back to Products</a>
+                    </div>
+                    
+                    <div class="product-detail-container animate-fade-in">
+                        <div class="product-image-container">
+                            <img src="${imgUrl}" alt="${p.product_name}">
+                        </div>
+                        
+                        <div class="product-info">
+                            <div class="mb-2">
+                                <span class="badge" style="background:var(--primary-color);color:#fff;">${brandName}</span>
+                                <span class="badge" style="background:var(--gray-light);color:var(--dark-text);">${categoryName}</span>
+                            </div>
+                            <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--dark-text);">${p.product_name}</h1>
+                            <p style="font-size: 1.1rem; color: var(--gray-medium); margin-bottom: 20px;">Model: ${p.model_number || 'N/A'}</p>
+                            
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--secondary-color); margin-bottom: 20px;">
+                                ₹${parseFloat(p.price || 0).toLocaleString()}
+                            </div>
+                            
+                            <div style="margin-bottom: 25px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid var(--gray-light);">
+                                <p style="margin-bottom: 5px;">Availability: ${stockStatus}</p>
+                                <p style="margin-bottom: 5px;">Warranty: <strong>${p.warranty || 'N/A'}</strong></p>
+                                <p style="margin-bottom: 0;">Capacity: <strong>${p.capacity || 'N/A'}</strong></p>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                                <a href="enquiry.html?product=${p.id}" class="btn btn-primary" style="padding: 15px; font-size: 1.1rem;"><i class="fas fa-envelope"></i> Enquire Now</a>
+                                <a href="tel:+919876543210" class="btn btn-outline" style="padding: 15px; font-size: 1.1rem;"><i class="fas fa-phone-alt"></i> Call Now</a>
+                                <a href="https://wa.me/919876543210?text=I'm%20interested%20in%20${encodeURIComponent(p.product_name)}" target="_blank" class="btn" style="background:#25D366; color:#fff; padding: 15px; font-size: 1.1rem; grid-column: 1 / -1;"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-4 animate-fade-in" style="padding: 30px; margin-top: 20px;">
+                        <h2 style="margin-bottom: 20px; font-size: 1.5rem; border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Product Description & Specifications</h2>
+                        <div style="line-height: 1.8; color: var(--dark-text); margin-bottom: 30px;">
+                            ${p.description ? p.description.replace(/\\n/g, '<br>') : 'No detailed description provided for this product.'}
+                        </div>
+                        
+                        <h3 style="margin-bottom: 15px; font-size: 1.2rem;">Technical Details</h3>
+                        <table class="spec-table">
+                            <tbody>
+                                <tr>
+                                    <th>Brand</th>
+                                    <td>${brandName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Category</th>
+                                    <td>${categoryName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Model Number</th>
+                                    <td>${p.model_number || 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <th>Capacity</th>
+                                    <td>${p.capacity || 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <th>Warranty</th>
+                                    <td>${p.warranty || 'N/A'}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                loadingState.style.display = 'none';
+                productContent.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
