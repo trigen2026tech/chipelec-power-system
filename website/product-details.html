@@ -111,22 +111,13 @@
             }
 
             try {
-                const res = await fetch(`/api/products/${productId}`);
-                if (!res.ok) {
-                    if (res.status === 404) throw new Error("Product not found.");
-                    throw new Error("Failed to load product details.");
-                }
-                const data = await res.json();
+                const data = await window.api.products.getProductById(productId);
                 
                 if (data.success && data.data) {
-                    // Fetch brands and categories just to get their names if API doesn't join them for single GET.
-                    // Wait, the single GET in products.js DOES NOT join brands and categories!
-                    // Let's do a workaround: fetch all products and find the matching one to get the names, or just display IDs if all fails.
-                    const allRes = await fetch('/api/products');
+                    const allData = await window.api.products.getAllProducts();
                     let brandName = "Unknown";
                     let categoryName = "Unknown";
-                    if(allRes.ok) {
-                        const allData = await allRes.json();
+                    if(allData.success) {
                         const p = allData.data.find(x => x.id == productId);
                         if(p) {
                             brandName = p.brand_name || data.data.brand_id;
@@ -149,7 +140,7 @@
             }
 
             function renderProduct(p, brandName, categoryName) {
-                const imgUrl = p.image && !p.image.startsWith('http') ? `/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
+                const imgUrl = p.image && !p.image.startsWith('http') ? `https://chipelec-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
                 
                 let stockStatus = `<span style="color: var(--success-color); font-weight: 600;"><i class="fas fa-check-circle"></i> In Stock</span>`;
                 if(p.status !== 'Active') {

@@ -181,31 +181,14 @@
 
             async function fetchProducts() {
                 try {
-                    // Try to fetch
-                    const res = await fetch('/api/products');
-                    
-                    if(res.status === 401 || res.status === 403) {
-                        // Fallback to mock data for demonstration
-                        console.warn("Public API not accessible without auth. Using mock data.");
-                        return getMockProducts();
-                    }
-                    
-                    if(!res.ok) throw new Error("Failed to load");
-                    const data = await res.json();
-                    return data.data || [];
+                    const products = await window.api.products.getAllProducts();
+                    return products.data || [];
                 } catch (e) {
-                    console.warn("API Error, using mock data.", e);
-                    return getMockProducts();
+                    console.error("API Error fetching products:", e);
+                    errorMessage.style.display = 'block';
+                    document.getElementById('errorText').innerText = "Failed to load products from database.";
+                    return [];
                 }
-            }
-
-            function getMockProducts() {
-                return [
-                    { id: 1, product_name: "Exide InvaTubular IT500", model_number: "IT500", capacity: "150Ah", warranty: "60 Months", price: 15500, status: "Active", brand_name: "Exide", category_name: "Battery", image: "https://images.unsplash.com/photo-1550522197-2a62883017bb?auto=format&fit=crop&q=80&w=400" },
-                    { id: 2, product_name: "Luminous Zelio+ 1100", model_number: "ZELIO1100", capacity: "900VA", warranty: "24 Months", price: 6500, status: "Active", brand_name: "Luminous", category_name: "Inverter", image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80&w=400" },
-                    { id: 3, product_name: "Microtek EB 900", model_number: "EB900", capacity: "800VA", warranty: "24 Months", price: 5800, status: "Active", brand_name: "Microtek", category_name: "Inverter", image: "https://images.unsplash.com/photo-1509391366360-1f959731b4fc?auto=format&fit=crop&q=80&w=400" },
-                    { id: 4, product_name: "Amaron Tall Tubular", model_number: "CR-TT150", capacity: "150Ah", warranty: "48 Months", price: 14200, status: "Active", brand_name: "Amaron", category_name: "Battery", image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=400" }
-                ];
             }
 
             function renderProducts(products) {
@@ -216,7 +199,7 @@
                 }
 
                 products.forEach(p => {
-                    const imgUrl = p.image && !p.image.startsWith('http') ? `/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/400x300?text=No+Image');
+                    const imgUrl = p.image && !p.image.startsWith('http') ? `https://chipelec-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/400x300?text=No+Image');
                     
                     const card = document.createElement('div');
                     card.className = 'card animate-fade-in';
