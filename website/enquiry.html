@@ -6,6 +6,72 @@
     <title>Enquiry | CHIPELEC Power System</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .product-enquiry-banner {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(135deg, #fff 0%, #f0f4ff 100%);
+            border: 1.5px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+        }
+        .product-enquiry-banner img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px;
+        }
+        .product-enquiry-banner .product-info-text h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .product-enquiry-banner .product-info-text p {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin: 0;
+        }
+        .product-enquiry-banner .product-badge {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .field-error {
+            color: #dc2626;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+        }
+        .form-control.is-invalid {
+            border-color: #dc2626 !important;
+        }
+        #productLoadingBanner {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px dashed #c7d2fe;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            color: #6366f1;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -26,40 +92,73 @@
     <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
         <div class="container">
             <h1 style="color: white; font-size: 2.5rem;">Submit an Enquiry</h1>
-            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Have a question about a product or service? Let us know!</p>
+            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Have a question about a product or service? Let us know and our team will get back to you shortly!</p>
         </div>
     </header>
 
     <main class="py-5" style="background-color: var(--bg-color);">
         <div class="container" style="max-width: 800px;">
             <div class="card p-4 animate-fade-in" style="padding: 40px;">
-                <div id="enquiryAlert" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-weight: 600;"></div>
-                
-                <form id="enquiryForm">
+
+                <!-- Success / Error Alert -->
+                <div id="enquiryAlert" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 600;"></div>
+
+                <!-- Product Loading Indicator -->
+                <div id="productLoadingBanner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Loading product information...</span>
+                </div>
+
+                <!-- Product Banner (shown when coming from a product page) -->
+                <div id="productBanner" class="product-enquiry-banner" style="display: none;">
+                    <img id="productBannerImg" src="" alt="Product">
+                    <div class="product-info-text">
+                        <span class="product-badge"><i class="fas fa-tag"></i> Enquiring About</span>
+                        <h4 id="productBannerName">—</h4>
+                        <p id="productBannerModel">—</p>
+                    </div>
+                </div>
+
+                <form id="enquiryForm" novalidate>
+                    <!-- Hidden product_id -->
+                    <input type="hidden" id="product_id" value="">
+
                     <div class="form-group d-flex gap-3">
                         <div style="flex: 1;">
-                            <label class="form-label" for="full_name">Full Name *</label>
-                            <input type="text" id="full_name" class="form-control" required>
+                            <label class="form-label" for="full_name">Full Name <span style="color:#dc2626">*</span></label>
+                            <input type="text" id="full_name" class="form-control" placeholder="Your full name" autocomplete="name">
+                            <div class="field-error" id="err_name">Please enter your name.</div>
                         </div>
                         <div style="flex: 1;">
-                            <label class="form-label" for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" class="form-control" required>
+                            <label class="form-label" for="phone">Phone Number <span style="color:#dc2626">*</span></label>
+                            <input type="tel" id="phone" class="form-control" placeholder="10-digit mobile number" autocomplete="tel">
+                            <div class="field-error" id="err_phone">Please enter a valid phone number.</div>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label class="form-label" for="email">Email Address</label>
-                        <input type="email" id="email" class="form-control">
+                        <input type="email" id="email" class="form-control" placeholder="your@email.com (optional)" autocomplete="email">
+                        <div class="field-error" id="err_email">Please enter a valid email address.</div>
                     </div>
+
+                    <div class="form-group" id="subjectGroup">
+                        <label class="form-label" for="subject">Subject / Product of Interest <span style="color:#dc2626">*</span></label>
+                        <input type="text" id="subject" class="form-control" placeholder="What are you enquiring about?" required>
+                        <div class="field-error" id="err_subject">Please enter a subject.</div>
+                    </div>
+
                     <div class="form-group">
-                        <label class="form-label" for="subject">Subject / Product of Interest *</label>
-                        <input type="text" id="subject" class="form-control" required>
+                        <label class="form-label" for="message">Message <span style="color:#dc2626">*</span></label>
+                        <textarea id="message" class="form-control" rows="5" placeholder="Describe your requirement in detail..."></textarea>
+                        <div class="field-error" id="err_message">Please enter your enquiry message.</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="message">Message *</label>
-                        <textarea id="message" class="form-control" rows="5" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;" id="submitBtn">Submit Enquiry</button>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Enquiry
+                    </button>
                 </form>
+
             </div>
         </div>
     </main>
@@ -71,60 +170,162 @@
             </div>
         </div>
     </footer>
+
     <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        const API_BASE = "https://chipelec-power-system-production.up.railway.app/api";
+        const UPLOADS_BASE = "https://chipelec-power-system-production.up.railway.app/uploads";
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('product');
             const subjectField = document.getElementById('subject');
-            
-            if(productId) {
-                subjectField.value = `Enquiry for Product ID: ${productId}`;
-                // Optionally fetch product name if needed, but for now ID is fine.
+
+            if (productId) {
+                // Show loading banner
+                document.getElementById('productLoadingBanner').style.display = 'flex';
+
+                try {
+                    // Fetch from all products list (which includes brand_name via JOIN)
+                    const res = await fetch(`${API_BASE}/products`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const product = data.data && data.data.find(p => p.id == productId);
+
+                        if (product) {
+                            // Set product_id hidden field
+                            document.getElementById('product_id').value = product.id;
+
+                            // Auto-fill subject
+                            subjectField.value = `Enquiry about ${product.product_name}`;
+
+                            // Build image URL
+                            let imgUrl = 'https://via.placeholder.com/80x80?text=No+Image';
+                            if (product.image) {
+                                imgUrl = product.image.startsWith('http')
+                                    ? product.image
+                                    : `${UPLOADS_BASE}/${product.image}`;
+                            }
+
+                            // Show product banner
+                            document.getElementById('productBannerImg').src = imgUrl;
+                            document.getElementById('productBannerName').textContent = product.product_name;
+                            document.getElementById('productBannerModel').textContent =
+                                (product.model_number ? `Model: ${product.model_number}` : '') +
+                                (product.brand_name ? ` | ${product.brand_name}` : '');
+
+                            document.getElementById('productBanner').style.display = 'flex';
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not load product info:', e);
+                } finally {
+                    document.getElementById('productLoadingBanner').style.display = 'none';
+                }
             }
 
+            // ---- Form Validation & Submit ----
             document.getElementById('enquiryForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
+
                 const btn = document.getElementById('submitBtn');
                 const alertBox = document.getElementById('enquiryAlert');
-                
+
+                // Clear previous errors
+                document.querySelectorAll('.field-error').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+                alertBox.style.display = 'none';
+
+                const full_name = document.getElementById('full_name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const subject = document.getElementById('subject').value.trim();
+                const message = document.getElementById('message').value.trim();
+                const product_id = document.getElementById('product_id').value;
+
+                let isValid = true;
+
+                if (!full_name) {
+                    document.getElementById('err_name').style.display = 'block';
+                    document.getElementById('full_name').classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!phone || !/^[0-9+\-\s]{7,15}$/.test(phone)) {
+                    document.getElementById('err_phone').style.display = 'block';
+                    document.getElementById('phone').classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    document.getElementById('err_email').style.display = 'block';
+                    document.getElementById('email').classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!subject) {
+                    document.getElementById('err_subject').style.display = 'block';
+                    document.getElementById('subject').classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!message) {
+                    document.getElementById('err_message').style.display = 'block';
+                    document.getElementById('message').classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                // Prevent double submission
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-                
-                const data = {
-                    full_name: document.getElementById('full_name').value,
-                    phone: document.getElementById('phone').value,
-                    email: document.getElementById('email').value,
-                    subject: document.getElementById('subject').value,
-                    message: document.getElementById('message').value
+
+                const payload = {
+                    full_name,
+                    phone,
+                    email: email || null,
+                    product_id: product_id ? parseInt(product_id) : null,
+                    subject,
+                    message
                 };
 
                 try {
-                    const res = await fetch('/api/enquiries', {
+                    const res = await fetch(`${API_BASE}/enquiries`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(payload)
                     });
-                    
+
                     const result = await res.json();
-                    
-                    if(result.success) {
+
+                    if (result.success) {
                         alertBox.style.display = 'block';
                         alertBox.style.backgroundColor = '#dcfce7';
                         alertBox.style.color = '#166534';
-                        alertBox.textContent = 'Enquiry submitted successfully! Our team will contact you soon.';
+                        alertBox.style.border = '1px solid #bbf7d0';
+                        alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Your enquiry has been submitted successfully! Our team will contact you soon.';
                         document.getElementById('enquiryForm').reset();
+                        document.getElementById('productBanner').style.display = 'none';
+                        document.getElementById('product_id').value = '';
+                        // Scroll to top of form
+                        alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     } else {
                         throw new Error(result.message || 'Failed to submit enquiry');
                     }
-                } catch(err) {
+                } catch (err) {
                     alertBox.style.display = 'block';
                     alertBox.style.backgroundColor = '#fee2e2';
                     alertBox.style.color = '#b91c1c';
-                    alertBox.textContent = err.message;
+                    alertBox.style.border = '1px solid #fecaca';
+                    alertBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' +
+                        (err.message === 'Failed to fetch'
+                            ? 'Unable to submit your enquiry right now. Please try again later.'
+                            : err.message);
                 } finally {
                     btn.disabled = false;
-                    btn.textContent = 'Submit Enquiry';
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Enquiry';
                 }
             });
         });

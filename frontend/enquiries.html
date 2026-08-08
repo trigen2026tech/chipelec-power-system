@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquiries | CHIPELEC Power System</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom CSS (same as all admin pages) -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/topbar.css">
+    <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/modal.css">
+
+    <style>
+        /* Enquiry detail modal specifics */
+        .enquiry-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+        }
+        .enquiry-detail-grid .detail-full {
+            grid-column: 1 / -1;
+        }
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+        }
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        .contact-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-call   { background: rgba(16,185,129,0.1);  color: #059669; border: 1px solid rgba(16,185,129,0.2); }
+        .btn-call:hover { background: #059669; color: #fff; }
+        .btn-mail   { background: rgba(99,102,241,0.1);  color: var(--primary); border: 1px solid rgba(99,102,241,0.2); }
+        .btn-mail:hover { background: var(--primary); color: #fff; }
+        .btn-wa     { background: rgba(37,211,102,0.1);  color: #16a34a; border: 1px solid rgba(37,211,102,0.2); }
+        .btn-wa:hover { background: #16a34a; color: #fff; }
+        .status-update-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0f4ff;
+            border: 1px solid #c7d2fe;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-top: 20px;
+        }
+        .status-update-bar label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .status-update-bar select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+        }
+        .status-update-bar select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+        /* New badge on sidebar link */
+        .sidebar-badge {
+            background: #ef4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        @media (max-width: 640px) {
+            .enquiry-detail-grid {
+                grid-template-columns: 1fr;
+            }
+            .enquiry-detail-grid .detail-full {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" onclick="toggleSidebar()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="sidebar-header">
+            <h2>
+                <i class="bi bi-lightning-charge-fill"></i>
+                CHIPELEC
+            </h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="sidebar-section-title">Main Menu</div>
+            <a href="dashboard.html">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            
+            <div class="sidebar-section-title">Inventory</div>
+            <a href="products.html">
+                <i class="bi bi-box-seam-fill"></i> Products
+            </a>
+            <a href="brands.html">
+                <i class="bi bi-tags-fill"></i> Brands
+            </a>
+            <a href="categories.html">
+                <i class="bi bi-collection-fill"></i> Categories
+            </a>
+            
+            <div class="sidebar-section-title">Business</div>
+            <a href="customers.html">
+                <i class="bi bi-people-fill"></i> Customers
+            </a>
+            <a href="enquiries.html" class="active">
+                <i class="bi bi-envelope-fill"></i> Enquiries
+                <span class="sidebar-badge" id="sidebarNewCount" style="display:none;"></span>
+            </a>
+            <a href="sales.html">
+                <i class="bi bi-cart-check-fill"></i> Sales
+            </a>
+            
+            <div class="sidebar-section-title">Operations</div>
+            <a href="installation.html">
+                <i class="bi bi-tools"></i> Installations
+            </a>
+            <a href="service-requests.html">
+                <i class="bi bi-headset"></i> Service Requests
+            </a>
+            <a href="maintenance.html">
+                <i class="bi bi-wrench-adjustable-circle-fill"></i> Maintenance
+            </a>
+            
+            <div class="sidebar-section-title">Analytics</div>
+            <a href="reports.html">
+                <i class="bi bi-bar-chart-line-fill"></i> Reports
+            </a>
+            
+            <hr>
+            
+            <a href="profile.html">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+            <a href="#" class="logout-link" onclick="logout(event)">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-toggle" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>
+
+        <div class="topbar-right">
+            <div class="notification-bell">
+                <i class="bi bi-bell-fill"></i>
+                <span class="badge" id="topbarNewCount" style="display:none;"></span>
+            </div>
+            
+            <div class="user-profile" onclick="window.location.href='profile.html'">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff" id="adminAvatar" alt="Admin">
+                <div class="user-info">
+                    <h4 id="adminName">Loading...</h4>
+                    <small id="adminRole">Administrator</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        
+        <div class="page-header">
+            <h1><i class="bi bi-envelope-fill"></i> Customer Enquiries</h1>
+            <div class="breadcrumb">
+                <a href="dashboard.html">Home</a>
+                <i class="bi bi-chevron-right"></i>
+                <span>Business</span>
+                <i class="bi bi-chevron-right"></i>
+                <span>Enquiries</span>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="search-input">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, email, phone, product...">
+            </div>
+            <div class="action-buttons" style="gap:10px;display:flex;align-items:center;flex-wrap:wrap;">
+                <select id="statusFilter" style="padding:9px 14px;border:1.5px solid var(--border-light);border-radius:var(--radius-sm);font-family:'Poppins',sans-serif;font-size:13px;outline:none;background:#fff;cursor:pointer;">
+                    <option value="">All Statuses</option>
+                    <option value="New">New</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Converted">Converted</option>
+                    <option value="Closed">Closed</option>
+                </select>
+                <select id="sortOrder" style="padding:9px 14px;border:1.5px solid var(--border-light);border-radius:var(--radius-sm);font-family:'Poppins',sans-serif;font-size:13px;outline:none;background:#fff;cursor:pointer;">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                </select>
+                <button class="btn btn-outline" onclick="loadEnquiries()" title="Refresh">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Result count -->
+        <div style="margin-bottom:12px;font-size:13px;color:var(--text-muted);">
+            <span id="enquiryCount"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="60">ID</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Product / Subject</th>
+                            <th>Message</th>
+                            <th width="130">Status</th>
+                            <th width="110">Date</th>
+                            <th width="100">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enquiryTable">
+                        <tr>
+                            <td colspan="8">
+                                <div class="loading-spinner">
+                                    <div class="spinner"></div>
+                                    <p>Loading enquiries...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Enquiry Detail Modal -->
+    <div id="enquiryModal" class="modal">
+        <div class="modal-content" style="max-width:720px;">
+            <div class="modal-header">
+                <h2>
+                    <i class="bi bi-envelope-open-fill"></i>
+                    Enquiry <span id="modalEnquiryId"></span>
+                    &nbsp;<span id="modalEnquiryStatus"></span>
+                </h2>
+                <div class="close" onclick="closeModal()"><i class="bi bi-x"></i></div>
+            </div>
+
+            <div class="modal-body">
+                <!-- Hidden -->
+                <input type="hidden" id="currentEnquiryId">
+
+                <!-- Product Image (if any) -->
+                <div id="modalProductImage" style="margin-bottom:16px;text-align:center;"></div>
+
+                <div class="enquiry-detail-grid">
+                    <div>
+                        <div class="detail-label">Customer Name</div>
+                        <div class="detail-box detail-value" id="modalCustomerName">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Phone Number</div>
+                        <div class="detail-box detail-value" id="modalCustomerPhone">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Email Address</div>
+                        <div class="detail-box detail-value" id="modalCustomerEmail">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Product / Subject</div>
+                        <div class="detail-box detail-value" id="modalProductInfo">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Subject</div>
+                        <div class="detail-box detail-value" id="modalSubject">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Received On</div>
+                        <div class="detail-box detail-value" id="modalCreatedAt">—</div>
+                    </div>
+                    <div class="detail-full">
+                        <div class="detail-label">Message</div>
+                        <div class="detail-box detail-value" id="modalMessage" style="white-space:pre-wrap;line-height:1.7;">—</div>
+                    </div>
+                    <div>
+                        <div class="detail-label">Last Updated</div>
+                        <div class="detail-box detail-value" id="modalUpdatedAt">—</div>
+                    </div>
+                </div>
+
+                <!-- Contact Buttons -->
+                <div class="contact-actions">
+                    <a id="btnCall" href="#" class="btn-call" target="_blank">
+                        <i class="bi bi-telephone-fill"></i> Call Customer
+                    </a>
+                    <a id="btnEmail" href="#" class="btn-mail" target="_blank">
+                        <i class="bi bi-envelope-fill"></i> Email Customer
+                    </a>
+                    <a id="btnWhatsapp" href="#" class="btn-wa" target="_blank">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+
+                <!-- Status Update -->
+                <div class="status-update-bar">
+                    <label for="statusSelect"><i class="bi bi-arrow-repeat"></i> Change Status:</label>
+                    <select id="statusSelect">
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Converted">Converted</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" id="updateStatusBtn" onclick="updateStatus()">
+                        <i class="bi bi-check-lg"></i> Update Status
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(document.getElementById('currentEnquiryId').value)">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+                <button type="button" class="btn btn-outline" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/enquiries.js"></script>
+
+    <script>
+        // Load new enquiry count for sidebar badge
+        (async function loadNewCount() {
+            try {
+                const t = localStorage.getItem('token');
+                if (!t) return;
+                const res = await fetch(
+                    'https://chipelec-power-system-production.up.railway.app/api/dashboard',
+                    { headers: { Authorization: 'Bearer ' + t } }
+                );
+                if (!res.ok) return;
+                const data = await res.json();
+                const count = data.data && data.data.new_enquiries;
+                if (count && count > 0) {
+                    const badge = document.getElementById('sidebarNewCount');
+                    const topBadge = document.getElementById('topbarNewCount');
+                    if (badge) { badge.textContent = count; badge.style.display = 'inline-block'; }
+                    if (topBadge) { topBadge.textContent = count; topBadge.style.display = 'inline-flex'; }
+                }
+            } catch(e) { /* silent */ }
+        })();
+    </script>
+
+</body>
+</html>
