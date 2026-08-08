@@ -3,48 +3,137 @@ const router = express.Router();
 const db = require("../config/db");
 const authMiddleware = require("../middleware/authMiddleware");
 
+// ================================================
+// HELPER: Ensure product_id column exists (runs once on first GET)
+// This makes the route safe whether or not the migration has been run.
+// ================================================
+
+let productIdColumnChecked = false;
+let productIdColumnExists = false;
+
+function ensureProductIdColumn(callback) {
+    if (productIdColumnChecked) {
+        return callback(null, productIdColumnExists);
+    }
+
+    const checkSql = `
+        SELECT COUNT(*) AS col_count
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME   = 'enquiries'
+          AND COLUMN_NAME  = 'product_id'
+    `;
+
+    db.query(checkSql, (err, rows) => {
+        if (err) {
+            console.error("Column check error:", err);
+            productIdColumnChecked = true;
+            productIdColumnExists = false;
+            return callback(null, false);
+        }
+
+        const exists = rows[0].col_count > 0;
+
+        if (!exists) {
+            // Auto-add the column so future queries work
+            const alterSql = `
+                ALTER TABLE enquiries
+                ADD COLUMN product_id INT NULL DEFAULT NULL
+            `;
+            db.query(alterSql, (alterErr) => {
+                if (alterErr) {
+                    // Column may have been added by another request between check and alter
+                    if (alterErr.code === 'ER_DUP_FIELDNAME') {
+                        productIdColumnExists = true;
+                    } else {
+                        console.error("ALTER TABLE enquiries add product_id failed:", alterErr);
+                        productIdColumnExists = false;
+                    }
+                } else {
+                    console.log("✅ enquiries.product_id column added automatically.");
+                    productIdColumnExists = true;
+                }
+                productIdColumnChecked = true;
+                callback(null, productIdColumnExists);
+            });
+        } else {
+            productIdColumnChecked = true;
+            productIdColumnExists = true;
+            callback(null, true);
+        }
+    });
+}
+
 // ======================
 // GET ALL ENQUIRIES
 // (Admin Protected)
-// Joins products table to return product_name
+// Safely handles whether product_id column exists or not
 // ======================
 
 router.get("/", authMiddleware, (req, res) => {
 
-    const sql = `
-        SELECT
-            e.id,
-            e.full_name,
-            e.email,
-            e.phone,
-            e.product_id,
-            e.subject,
-            e.message,
-            e.status,
-            e.created_at,
-            e.updated_at,
-            p.product_name,
-            p.model_number,
-            p.image AS product_image
-        FROM enquiries e
-        LEFT JOIN products p ON e.product_id = p.id
-        ORDER BY e.id DESC
-    `;
+    ensureProductIdColumn((err, hasProductId) => {
 
-    db.query(sql, (err, results) => {
+        let sql;
 
-        if (err) {
-            console.error("GET /enquiries error:", err);
-            return res.status(500).json({
-                success: false,
-                message: "Database Error"
-            });
+        if (hasProductId) {
+            sql = `
+                SELECT
+                    e.id,
+                    e.full_name,
+                    e.email,
+                    e.phone,
+                    e.product_id,
+                    e.subject,
+                    e.message,
+                    e.status,
+                    e.created_at,
+                    e.updated_at,
+                    p.product_name,
+                    p.model_number,
+                    p.image AS product_image
+                FROM enquiries e
+                LEFT JOIN products p ON e.product_id = p.id
+                ORDER BY e.id DESC
+            `;
+        } else {
+            // Fallback: no product_id column yet
+            sql = `
+                SELECT
+                    e.id,
+                    e.full_name,
+                    e.email,
+                    e.phone,
+                    e.subject,
+                    e.message,
+                    e.status,
+                    e.created_at,
+                    e.updated_at,
+                    NULL AS product_id,
+                    NULL AS product_name,
+                    NULL AS model_number,
+                    NULL AS product_image
+                FROM enquiries e
+                ORDER BY e.id DESC
+            `;
         }
 
-        res.json({
-            success: true,
-            count: results.length,
-            data: results
+        db.query(sql, (queryErr, results) => {
+
+            if (queryErr) {
+                console.error("GET /enquiries error:", queryErr);
+                return res.status(500).json({
+                    success: false,
+                    message: "Database Error"
+                });
+            }
+
+            res.json({
+                success: true,
+                count: results.length,
+                data: results
+            });
+
         });
 
     });
@@ -58,46 +147,73 @@ router.get("/", authMiddleware, (req, res) => {
 
 router.get("/:id", authMiddleware, (req, res) => {
 
-    const sql = `
-        SELECT
-            e.id,
-            e.full_name,
-            e.email,
-            e.phone,
-            e.product_id,
-            e.subject,
-            e.message,
-            e.status,
-            e.created_at,
-            e.updated_at,
-            p.product_name,
-            p.model_number,
-            p.image AS product_image
-        FROM enquiries e
-        LEFT JOIN products p ON e.product_id = p.id
-        WHERE e.id = ?
-    `;
+    ensureProductIdColumn((err, hasProductId) => {
 
-    db.query(sql, [req.params.id], (err, result) => {
+        let sql;
 
-        if (err) {
-            console.error("GET /enquiries/:id error:", err);
-            return res.status(500).json({
-                success: false,
-                message: "Database Error"
-            });
+        if (hasProductId) {
+            sql = `
+                SELECT
+                    e.id,
+                    e.full_name,
+                    e.email,
+                    e.phone,
+                    e.product_id,
+                    e.subject,
+                    e.message,
+                    e.status,
+                    e.created_at,
+                    e.updated_at,
+                    p.product_name,
+                    p.model_number,
+                    p.image AS product_image
+                FROM enquiries e
+                LEFT JOIN products p ON e.product_id = p.id
+                WHERE e.id = ?
+            `;
+        } else {
+            sql = `
+                SELECT
+                    e.id,
+                    e.full_name,
+                    e.email,
+                    e.phone,
+                    e.subject,
+                    e.message,
+                    e.status,
+                    e.created_at,
+                    e.updated_at,
+                    NULL AS product_id,
+                    NULL AS product_name,
+                    NULL AS model_number,
+                    NULL AS product_image
+                FROM enquiries e
+                WHERE e.id = ?
+            `;
         }
 
-        if (result.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Enquiry not found"
-            });
-        }
+        db.query(sql, [req.params.id], (queryErr, result) => {
 
-        res.json({
-            success: true,
-            data: result[0]
+            if (queryErr) {
+                console.error("GET /enquiries/:id error:", queryErr);
+                return res.status(500).json({
+                    success: false,
+                    message: "Database Error"
+                });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Enquiry not found"
+                });
+            }
+
+            res.json({
+                success: true,
+                data: result[0]
+            });
+
         });
 
     });
@@ -107,8 +223,7 @@ router.get("/:id", authMiddleware, (req, res) => {
 // ======================
 // ADD ENQUIRY
 // (Public API — No auth required)
-// Accepts product_id (optional) for product-specific enquiries
-// Backward compatible: product_id is nullable
+// Backward compatible: product_id is optional
 // ======================
 
 router.post("/", (req, res) => {
@@ -133,33 +248,41 @@ router.post("/", (req, res) => {
         return res.status(400).json({ success: false, message: "Please enter your enquiry message." });
     }
 
-    const sql = `
-        INSERT INTO enquiries
-        (
-            full_name,
-            phone,
-            email,
-            product_id,
-            subject,
-            message
-        )
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
+    ensureProductIdColumn((err, hasProductId) => {
 
-    db.query(
-        sql,
-        [
-            full_name.trim(),
-            phone.trim(),
-            email ? email.trim() : null,
-            product_id ? parseInt(product_id) : null,
-            subject ? subject.trim() : null,
-            message.trim()
-        ],
-        (err, result) => {
+        let sql, params;
 
-            if (err) {
-                console.error("POST /enquiries error:", err);
+        if (hasProductId) {
+            sql = `
+                INSERT INTO enquiries (full_name, phone, email, product_id, subject, message)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `;
+            params = [
+                full_name.trim(),
+                phone.trim(),
+                email ? email.trim() : null,
+                product_id ? parseInt(product_id) : null,
+                subject ? subject.trim() : null,
+                message.trim()
+            ];
+        } else {
+            sql = `
+                INSERT INTO enquiries (full_name, phone, email, subject, message)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            params = [
+                full_name.trim(),
+                phone.trim(),
+                email ? email.trim() : null,
+                subject ? subject.trim() : null,
+                message.trim()
+            ];
+        }
+
+        db.query(sql, params, (queryErr, result) => {
+
+            if (queryErr) {
+                console.error("POST /enquiries error:", queryErr);
                 return res.status(500).json({
                     success: false,
                     message: "Unable to submit enquiry. Please try again."
@@ -172,8 +295,9 @@ router.post("/", (req, res) => {
                 enquiryId: result.insertId
             });
 
-        }
-    );
+        });
+
+    });
 
 });
 

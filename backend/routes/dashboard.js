@@ -35,13 +35,19 @@ router.get("/", authMiddleware, async (req, res) => {
             );
         });
 
-        // Count new/unread enquiries
-        const newEnquiries = await new Promise((resolve, reject) => {
-            db.query(
-                "SELECT COUNT(*) AS total FROM enquiries WHERE status = 'New'",
-                (err, result) => err ? reject(err) : resolve(result)
-            );
-        });
+        // Count new/unread enquiries (graceful fallback to 0 if query fails)
+        let newEnquiriesCount = 0;
+        try {
+            const newEnquiries = await new Promise((resolve, reject) => {
+                db.query(
+                    "SELECT COUNT(*) AS total FROM enquiries WHERE status = 'New'",
+                    (err, result) => err ? reject(err) : resolve(result)
+                );
+            });
+            newEnquiriesCount = newEnquiries[0].total;
+        } catch (enqErr) {
+            console.error("Dashboard: enquiry count failed (non-fatal):", enqErr.message);
+        }
 
         res.json({
             success: true,
@@ -50,7 +56,7 @@ router.get("/", authMiddleware, async (req, res) => {
                 brands: brands[0].total,
                 customers: customers[0].total,
                 installations: installations[0].total,
-                new_enquiries: newEnquiries[0].total
+                new_enquiries: newEnquiriesCount
             }
         });
 
