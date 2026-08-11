@@ -46,14 +46,15 @@
         </aside>
         
         <main class="main-content">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-4">
-                <div>
-                    <h1>Welcome back, <span id="welcomeName">Customer</span>!</h1>
-                    <p>Customer ID: #<span id="displayCustomerId"></span></p>
+            <div class="welcome-banner animate-fade-in">
+                <div style="position: relative; z-index: 2;">
+                    <h1 style="font-size: 36px; margin-bottom: 8px;">Welcome back, <span id="welcomeName">Customer</span>!</h1>
+                    <p style="font-size: 16px; opacity: 0.9; max-width: 500px; margin-bottom: 24px;">Manage your power solutions, track installations, and monitor service requests all in one place.</p>
+                    <p style="font-size: 14px; font-weight: 600; opacity: 0.8; margin: 0;">Customer ID: #<span id="displayCustomerId"></span></p>
                 </div>
             </div>
             
-            <div class="stats-grid">
+            <div class="stats-grid animate-fade-in-up">
                 <div class="stat-card">
                     <div class="stat-icon primary"><i class="fas fa-box"></i></div>
                     <div class="stat-content">
@@ -77,25 +78,14 @@
                 </div>
             </div>
             
-            <div class="card">
+            <div class="card animate-fade-in-up" style="animation-delay: 0.2s;">
                 <div class="card-header">
                     <h3>Recent Activity</h3>
                 </div>
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentActivityBody">
-                            <tr><td colspan="5" class="text-center p-4">Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    <div class="timeline" id="recentActivityTimeline">
+                        <div class="text-center p-4">Loading activity...</div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -116,45 +106,67 @@
                         document.getElementById('statInstallations').textContent = stats.activeInstallations;
                         document.getElementById('statComplaints').textContent = stats.openComplaints;
 
-                        const tbody = document.getElementById('recentActivityBody');
-                        tbody.innerHTML = '';
+                        const timelineContainer = document.getElementById('recentActivityTimeline');
+                        timelineContainer.innerHTML = '';
                         
                         if(stats.recentActivity.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No recent activity found.</td></tr>';
+                            timelineContainer.innerHTML = '<div class="text-center p-4 text-muted">No recent activity found.</div>';
                         } else {
                             stats.recentActivity.forEach(act => {
-                                const tr = document.createElement('tr');
+                                const itemDiv = document.createElement('div');
+                                itemDiv.className = 'timeline-item';
                                 
                                 let badgeClass = 'badge-default';
+                                let iconClass = 'fas fa-info';
+                                let iconColor = '';
                                 const status = act.status.toLowerCase();
+                                
                                 if(status.includes('completed') || status.includes('resolved') || status.includes('approved')) {
                                     badgeClass = 'badge-completed';
+                                    iconClass = 'fas fa-check';
+                                    iconColor = 'success';
                                 } else if(status.includes('scheduled') || status.includes('assigned')) {
                                     badgeClass = 'badge-scheduled';
+                                    iconClass = 'fas fa-calendar-alt';
                                 } else if(status.includes('pending')) {
                                     badgeClass = 'badge-pending';
+                                    iconClass = 'fas fa-clock';
+                                    iconColor = 'warning';
                                 } else if(status.includes('cancelled') || status.includes('rejected')) {
                                     badgeClass = 'badge-cancelled';
+                                    iconClass = 'fas fa-times';
+                                    iconColor = 'danger';
                                 } else if(status.includes('in progress')) {
                                     badgeClass = 'badge-in-progress';
+                                    iconClass = 'fas fa-spinner';
                                 }
                                 
-                                const dateStr = act.date ? new Date(act.date).toLocaleDateString() : 'N/A';
+                                const dateStr = act.date ? new Date(act.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+                                const typeStr = act.type === 'Installation' ? 'INS' : 'SRV';
+                                const href = act.type === 'Installation' ? 'installation.html' : 'service-request.html';
                                 
-                                tr.innerHTML = `
-                                    <td>#${act.type === 'Installation' ? 'INS' : 'SRV'}-${act.id}</td>
-                                    <td>${act.type}</td>
-                                    <td>${dateStr}</td>
-                                    <td><span class="badge ${badgeClass}">${act.status}</span></td>
-                                    <td><a href="${act.type === 'Installation' ? 'installation.html' : 'service-request.html'}" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;">View</a></td>
+                                itemDiv.innerHTML = `
+                                    <div class="timeline-icon ${iconColor}">
+                                        <i class="${iconClass}" style="font-size: 10px; color: inherit;"></i>
+                                    </div>
+                                    <div class="timeline-content d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                        <div>
+                                            <div class="timeline-date">${dateStr}</div>
+                                            <div class="timeline-title">${act.type} Request #${typeStr}-${act.id}</div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="badge ${badgeClass}">${act.status}</span>
+                                            <a href="${href}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;"><i class="fas fa-arrow-right"></i></a>
+                                        </div>
+                                    </div>
                                 `;
-                                tbody.appendChild(tr);
+                                timelineContainer.appendChild(itemDiv);
                             });
                         }
                     }
                 } catch(err) {
                     console.error(err);
-                    document.getElementById('recentActivityBody').innerHTML = '<tr><td colspan="5" class="text-center p-4 text-danger">Failed to load data.</td></tr>';
+                    document.getElementById('recentActivityTimeline').innerHTML = '<div class="text-center p-4 text-danger">Failed to load activity data.</div>';
                 }
             }
         });

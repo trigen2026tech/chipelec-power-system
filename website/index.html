@@ -1,109 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHIPELEC Power System - Reliable Battery & Inverter Solutions</title>
-    <meta name="description"
-        content="CHIPELEC Power System provides reliable battery and inverter solutions for homes and businesses.">
+    <meta name="description" content="CHIPELEC Power System provides reliable battery and inverter solutions for homes and businesses.">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, var(--bg-subtle-blue) 0%, #FFFFFF 100%);
+            padding: 120px 0 80px;
+            overflow: hidden;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hero-content h1 {
+            font-size: 3.8rem;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            color: var(--primary-color);
+        }
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 90%;
+        }
+        .hero-image-wrapper {
+            position: relative;
+        }
+        .hero-image-wrapper img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-hover);
+            position: relative;
+            z-index: 2;
+        }
+        .hero-shape {
+            position: absolute;
+            top: 20px; left: -20px; right: 20px; bottom: -20px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
+            border-radius: var(--radius-lg);
+            z-index: 1;
+            opacity: 0.15;
+        }
+        
+        .feature-card {
+            padding: 40px;
+            text-align: left;
+            border: none;
+            background: transparent;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition-normal);
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            z-index: -1;
+            transition: var(--transition-normal);
+        }
+        .feature-card:hover::before {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+        .feature-icon-wrapper {
+            width: 64px; height: 64px;
+            border-radius: 16px;
+            background: var(--bg-subtle-blue);
+            color: var(--accent-blue);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            margin-bottom: 24px;
+        }
+        .feature-card:nth-child(2) .feature-icon-wrapper {
+            background: #FFFBEB; color: var(--accent-color);
+        }
+        .feature-card:nth-child(3) .feature-icon-wrapper {
+            background: #ECFDF5; color: var(--accent-teal);
+        }
+        
+        .solutions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .solution-card {
+            display: flex;
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+            border: 1px solid var(--border-color);
+        }
+        .solution-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+        .solution-img {
+            width: 40%;
+            object-fit: cover;
+        }
+        .solution-content {
+            padding: 40px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        @media (max-width: 992px) {
+            .hero-grid, .solutions-grid { grid-template-columns: 1fr; }
+            .hero-content h1 { font-size: 2.8rem; }
+            .solution-card { flex-direction: column; }
+            .solution-img { width: 100%; height: 250px; }
+            .solution-content { width: 100%; }
+        }
+    </style>
 </head>
-
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a href="index.html" class="navbar-brand">CHIPELEC POWER SYSTEM<span>.</span></a>
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
             <div class="nav-links">
-                <a href="index.html">Home</a>
+                <a href="index.html" class="active">Home</a>
                 <a href="about.html">About</a>
                 <a href="products.html">Products</a>
                 <a href="services.html">Services</a>
                 <a href="contact.html">Contact</a>
-                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+                <a href="login.html" class="btn btn-primary" style="padding: 8px 24px;">Login</a>
             </div>
-            <div class="mobile-menu-btn">
+            <div class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')">
                 <i class="fas fa-bars"></i>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="hero"
-        style="background: linear-gradient(rgba(19, 75, 66, 0.9), rgba(19, 75, 66, 0.8)), url('https://images.unsplash.com/photo-1620646233562-f2a316444d37?auto=format&fit=crop&q=80') center/cover; padding: 120px 0; color: white; text-align: center;">
-        <div class="container">
-            <h1 style="font-size: 3.5rem; margin-bottom: 20px; color: white;">Empowering Your World with Reliable Energy
-            </h1>
-            <p
-                style="font-size: 1.2rem; margin-bottom: 40px; color: #e2e8f0; max-width: 800px; margin-left: auto; margin-right: auto;">
-                Premium battery and inverter solutions for homes and businesses. Stay powered through every outage with
-                CHIPELEC Power System.</p>
-            <div class="d-flex gap-3 justify-content-center" style="justify-content: center; display: flex; gap: 20px;">
-                <a href="products.html" class="btn btn-secondary">Explore Products</a>
-                <a href="contact.html" class="btn btn-outline" style="color: white; border-color: white;">Get a
-                    Quote</a>
+    <header class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content animate-fade-in-up">
+                <h1>POWERING YOUR<br>EVERYDAY LIFE.</h1>
+                <p>Reliable Batteries. Smart Inverters. Professional Service.<br>Stay powered through every outage with CHIPELEC.</p>
+                <div class="d-flex gap-3">
+                    <a href="products.html" class="btn btn-primary">Explore Products</a>
+                    <a href="contact.html" class="btn btn-secondary">Request Service</a>
+                </div>
+            </div>
+            <div class="hero-image-wrapper animate-fade-in">
+                <div class="hero-shape"></div>
+                <img src="https://images.unsplash.com/photo-1620646233562-f2a316444d37?auto=format&fit=crop&q=80" alt="Power Systems">
             </div>
         </div>
     </header>
 
-    <!-- About Snippet -->
-    <section class="py-5 bg-white">
+    <!-- About Snippet / Features -->
+    <section class="py-8 bg-white">
         <div class="container">
-            <div class="section-title">
-                <h2>Why Choose CHIPELEC?</h2>
-                <p>We are industry leaders in delivering uncompromised power backup solutions with a legacy of trust and
-                    innovation.</p>
+            <div class="text-center mb-8 animate-fade-in-up">
+                <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Why Choose CHIPELEC?</h2>
+                <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+                    We deliver uncompromised power backup solutions with a legacy of trust, innovation, and professional service.
+                </p>
             </div>
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: center;">
-                <div class="card p-4" style="padding: 30px;">
-                    <i class="fas fa-shield-alt"
-                        style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
-                    <h3 class="card-title">Trusted Quality</h3>
-                    <p class="card-text">Premium grade materials ensuring long-lasting performance and reliability.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="feature-icon-wrapper"><i class="fas fa-shield-alt"></i></div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 12px;">Trusted Quality</h3>
+                    <p style="color: var(--text-muted);">Premium grade materials ensuring long-lasting performance, reliability, and peace of mind.</p>
                 </div>
-                <div class="card p-4" style="padding: 30px;">
-                    <i class="fas fa-bolt"
-                        style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
-                    <h3 class="card-title">Fast Installation</h3>
-                    <p class="card-text">Professional and swift installation services by certified engineers.</p>
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="feature-icon-wrapper"><i class="fas fa-bolt"></i></div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 12px;">Fast Installation</h3>
+                    <p style="color: var(--text-muted);">Professional and swift installation services by our team of certified and experienced engineers.</p>
                 </div>
-                <div class="card p-4" style="padding: 30px;">
-                    <i class="fas fa-headset"
-                        style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px;"></i>
-                    <h3 class="card-title">24/7 Support</h3>
-                    <p class="card-text">Round the clock customer service to address your queries instantly.</p>
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="feature-icon-wrapper"><i class="fas fa-headset"></i></div>
+                    <h3 style="font-size: 1.5rem; margin-bottom: 12px;">24/7 Support</h3>
+                    <p style="color: var(--text-muted);">Round the clock customer service to address your queries instantly and ensure smooth operation.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Featured Categories -->
-    <section class="py-5" style="background-color: var(--bg-color);">
+    <section class="py-8 bg-subtle-blue">
         <div class="container">
-            <div class="section-title">
-                <h2>Our Solutions</h2>
-                <p>Discover our range of advanced power solutions tailored for your specific needs.</p>
+            <div class="text-center mb-8">
+                <h2 style="font-size: 2.5rem; margin-bottom: 16px;">Our Solutions</h2>
+                <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+                    Discover our range of advanced power solutions tailored for your specific needs.
+                </p>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1550522197-2a62883017bb?auto=format&fit=crop&q=80"
-                        alt="Batteries" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h3 class="card-title">Premium Batteries</h3>
-                        <p class="card-text">High-capacity tubular and flat plate batteries for long backups.</p>
-                        <a href="battery.html" class="btn btn-outline mt-3">View Batteries</a>
+            <div class="solutions-grid">
+                <div class="solution-card">
+                    <img src="https://images.unsplash.com/photo-1550522197-2a62883017bb?auto=format&fit=crop&q=80" alt="Batteries" class="solution-img">
+                    <div class="solution-content">
+                        <span class="badge" style="background: #FFFBEB; color: var(--accent-color); width: max-content; margin-bottom: 16px;">Energy Storage</span>
+                        <h3 style="font-size: 1.8rem; margin-bottom: 12px;">Premium Batteries</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 24px;">High-capacity tubular and flat plate batteries designed for extremely long backups and durability.</p>
+                        <a href="battery.html" class="btn btn-outline" style="width: max-content;">View Batteries <i class="fas fa-arrow-right ml-2"></i></a>
                     </div>
                 </div>
-                <div class="card">
-                    <img src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80"
-                        alt="Inverters" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h3 class="card-title">Smart Inverters</h3>
-                        <p class="card-text">Sine wave inverters with smart technology for seamless transition.</p>
-                        <a href="inverter.html" class="btn btn-outline mt-3">View Inverters</a>
+                <div class="solution-card">
+                    <img src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=80" alt="Inverters" class="solution-img">
+                    <div class="solution-content">
+                        <span class="badge" style="background: #EFF6FF; color: var(--accent-blue); width: max-content; margin-bottom: 16px;">Power Conversion</span>
+                        <h3 style="font-size: 1.8rem; margin-bottom: 12px;">Smart Inverters</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 24px;">Pure sine wave inverters equipped with smart technology for seamless power transition.</p>
+                        <a href="inverter.html" class="btn btn-outline" style="width: max-content;">View Inverters <i class="fas fa-arrow-right ml-2"></i></a>
                     </div>
                 </div>
             </div>
@@ -115,7 +240,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h3>CHIPELEC.</h3>
+                    <h3 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">CHIPELEC<span style="color: var(--accent-blue);">.</span></h3>
                     <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
                     <div style="display: flex; gap: 15px; margin-top: 20px;">
                         <a href="#"><i class="fab fa-facebook fa-lg"></i></a>
@@ -145,10 +270,9 @@
                 <div class="footer-col">
                     <h3>Contact Us</h3>
                     <ul>
-                        <li><i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i> 123 Power Street, Tech
-                            City</li>
-                        <li><i class="fas fa-phone" style="margin-right: 10px;"></i> +91 98765 43210</li>
-                        <li><i class="fas fa-envelope" style="margin-right: 10px;"></i> support@chipelec.com</li>
+                        <li><i class="fas fa-map-marker-alt" style="margin-right: 10px; color: var(--accent-blue);"></i> 123 Power Street, Tech City</li>
+                        <li><i class="fas fa-phone" style="margin-right: 10px; color: var(--accent-blue);"></i> +91 98765 43210</li>
+                        <li><i class="fas fa-envelope" style="margin-right: 10px; color: var(--accent-blue);"></i> support@chipelec.com</li>
                     </ul>
                 </div>
             </div>
@@ -161,5 +285,4 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
 </body>
-
 </html>
