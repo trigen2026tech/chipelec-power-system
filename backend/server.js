@@ -1,3 +1,4 @@
+// v2.0.0 - Customer Portal (installations, service-requests, quotations, dashboard-stats)
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
