@@ -215,7 +215,7 @@ const ServiceAPI = {
           const customer = JSON.parse(customerStr);
           data.customer_id = customer.id;
       }
-      const res = await fetch(`${API_BASE_URL}/serviceRequests`, {
+      const res = await fetch(`${API_BASE_URL}/service-requests`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -228,7 +228,7 @@ const ServiceAPI = {
   },
   getServiceRequests: async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/serviceRequests`, {
+      const res = await fetch(`${API_BASE_URL}/service-requests`, {
         headers: getAuthHeaders()
       });
       const data = await handleResponse(res);
