@@ -6,74 +6,6 @@
     <title>Dashboard | CHIPELEC Power System</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            min-height: calc(100vh - 80px); /* minus navbar */
-        }
-        .sidebar {
-            background: var(--white);
-            border-right: 1px solid var(--gray-light);
-            padding: 30px 20px;
-        }
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar-nav li {
-            margin-bottom: 10px;
-        }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: var(--gray-medium);
-            border-radius: 6px;
-            font-weight: 500;
-        }
-        .sidebar-nav a i {
-            margin-right: 15px;
-            width: 20px;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active {
-            background: rgba(19, 75, 66, 0.05);
-            color: var(--primary-color);
-        }
-        .main-content {
-            padding: 40px;
-            background: var(--bg-color);
-        }
-        .stat-card {
-            background: var(--white);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(202, 118, 58, 0.1);
-            color: var(--secondary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none; /* Hide sidebar on mobile for simplicity in this demo */
-            }
-        }
-    </style>
 </head>
 <body>
     <script src="js/api.js"></script>
@@ -81,12 +13,16 @@
         requireCustomerLogin();
         const customer = getCustomerData();
     </script>
+    
     <nav class="navbar">
-        <div class="container d-flex justify-content-between align-items-center" style="max-width: 100%;">
+        <div class="container">
             <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
-            <div class="nav-links">
-                <a href="#" style="font-weight: 600;"><i class="fas fa-user-circle"></i> <span id="navCustomerName">Customer</span></a>
-                <a href="#" onclick="customerLogout()" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.9rem;">Logout</a>
+            <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links d-none d-md-flex">
+                <a href="#" class="d-flex align-items-center gap-2"><i class="fas fa-user-circle"></i> <span id="navCustomerName">Customer</span></a>
+                <a href="#" onclick="customerLogout()" class="btn btn-outline">Logout</a>
             </div>
         </div>
     </nav>
@@ -95,64 +31,73 @@
         <aside class="sidebar">
             <ul class="sidebar-nav">
                 <li><a href="customer-dashboard.html" class="active"><i class="fas fa-home"></i> Overview</a></li>
+                <li><a href="products.html"><i class="fas fa-box-open"></i> Products</a></li>
                 <li><a href="installation.html"><i class="fas fa-tools"></i> Installations</a></li>
                 <li><a href="service-request.html"><i class="fas fa-wrench"></i> Service Requests</a></li>
                 <li><a href="quotation.html"><i class="fas fa-file-invoice"></i> Quotations</a></li>
+                <li><a href="enquiry.html"><i class="fas fa-question-circle"></i> Enquiries</a></li>
                 <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="customerLogout()" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
         </aside>
         
         <main class="main-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 style="color: var(--primary-color);">Welcome back, <span id="welcomeName">Customer</span>!</h2>
-                <span style="color: var(--gray-medium);">Customer ID: #<span id="displayCustomerId"></span></span>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px;">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-box"></i></div>
-                    <div>
-                        <h3 id="statProducts" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
-                        <p style="color: var(--gray-medium); margin: 0;">My Products</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-tools"></i></div>
-                    <div>
-                        <h3 id="statInstallations" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
-                        <p style="color: var(--gray-medium); margin: 0;">Active Installations</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success-color);"></i></div>
-                    <div>
-                        <h3 id="statComplaints" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
-                        <p style="color: var(--gray-medium); margin: 0;">Open Complaints</p>
-                    </div>
+            <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-4">
+                <div>
+                    <h1>Welcome back, <span id="welcomeName">Customer</span>!</h1>
+                    <p>Customer ID: #<span id="displayCustomerId"></span></p>
                 </div>
             </div>
             
-            <div class="card p-4">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color);">Recent Activity</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon primary"><i class="fas fa-box"></i></div>
+                    <div class="stat-content">
+                        <h3 id="statProducts">0</h3>
+                        <p>My Products</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon warning"><i class="fas fa-tools"></i></div>
+                    <div class="stat-content">
+                        <h3 id="statInstallations">0</h3>
+                        <p>Active Installations</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-content">
+                        <h3 id="statComplaints">0</h3>
+                        <p>Open Complaints</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent Activity</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--gray-light); color: var(--gray-medium);">
-                                <th style="padding: 15px 10px;">ID</th>
-                                <th style="padding: 15px 10px;">Type</th>
-                                <th style="padding: 15px 10px;">Date</th>
-                                <th style="padding: 15px 10px;">Status</th>
-                                <th style="padding: 15px 10px;">Action</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="recentActivityBody">
-                            <tr><td colspan="5" style="padding: 15px 10px; text-align: center;">Loading...</td></tr>
+                            <tr><td colspan="5" class="text-center p-4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            
         </main>
     </div>
     <script>
@@ -175,30 +120,33 @@
                         tbody.innerHTML = '';
                         
                         if(stats.recentActivity.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="5" style="padding: 15px 10px; text-align: center;">No recent activity found.</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4">No recent activity found.</td></tr>';
                         } else {
                             stats.recentActivity.forEach(act => {
                                 const tr = document.createElement('tr');
-                                tr.style.borderBottom = '1px solid var(--gray-light)';
                                 
-                                let statusColor = '';
-                                let statusBg = '';
-                                if(act.status === 'Completed' || act.status === 'Resolved') {
-                                    statusBg = '#dcfce7'; statusColor = '#166534';
-                                } else if(act.status === 'Scheduled' || act.status === 'Assigned') {
-                                    statusBg = '#fef08a'; statusColor = '#854d0e';
-                                } else {
-                                    statusBg = '#f1f5f9'; statusColor = '#475569';
+                                let badgeClass = 'badge-default';
+                                const status = act.status.toLowerCase();
+                                if(status.includes('completed') || status.includes('resolved') || status.includes('approved')) {
+                                    badgeClass = 'badge-completed';
+                                } else if(status.includes('scheduled') || status.includes('assigned')) {
+                                    badgeClass = 'badge-scheduled';
+                                } else if(status.includes('pending')) {
+                                    badgeClass = 'badge-pending';
+                                } else if(status.includes('cancelled') || status.includes('rejected')) {
+                                    badgeClass = 'badge-cancelled';
+                                } else if(status.includes('in progress')) {
+                                    badgeClass = 'badge-in-progress';
                                 }
                                 
                                 const dateStr = act.date ? new Date(act.date).toLocaleDateString() : 'N/A';
                                 
                                 tr.innerHTML = `
-                                    <td style="padding: 15px 10px;">#${act.type === 'Installation' ? 'INS' : 'SRV'}-${act.id}</td>
-                                    <td style="padding: 15px 10px;">${act.type}</td>
-                                    <td style="padding: 15px 10px;">${dateStr}</td>
-                                    <td style="padding: 15px 10px;"><span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${act.status}</span></td>
-                                    <td style="padding: 15px 10px;"><a href="${act.type === 'Installation' ? 'installation.html' : 'service-request.html'}" style="color: var(--secondary-color);">View</a></td>
+                                    <td>#${act.type === 'Installation' ? 'INS' : 'SRV'}-${act.id}</td>
+                                    <td>${act.type}</td>
+                                    <td>${dateStr}</td>
+                                    <td><span class="badge ${badgeClass}">${act.status}</span></td>
+                                    <td><a href="${act.type === 'Installation' ? 'installation.html' : 'service-request.html'}" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;">View</a></td>
                                 `;
                                 tbody.appendChild(tr);
                             });
@@ -206,7 +154,7 @@
                     }
                 } catch(err) {
                     console.error(err);
-                    document.getElementById('recentActivityBody').innerHTML = '<tr><td colspan="5" style="padding: 15px 10px; text-align: center; color: red;">Failed to load data.</td></tr>';
+                    document.getElementById('recentActivityBody').innerHTML = '<tr><td colspan="5" class="text-center p-4 text-danger">Failed to load data.</td></tr>';
                 }
             }
         });

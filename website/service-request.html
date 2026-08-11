@@ -9,123 +9,109 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <script src="js/api.js"></script>
+    <script>
+        requireCustomerLogin();
+        const customer = getCustomerData();
+    </script>
+
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="container d-flex justify-content-between align-items-center">
+        <div class="container">
             <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="products.html">Products</a>
-                <a href="services.html">Services</a>
-                <a href="contact.html">Contact</a>
-                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
-            </div>
-            <div class="mobile-menu-btn">
+            <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('show')">
                 <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links d-none d-md-flex">
+                <a href="#" class="d-flex align-items-center gap-2"><i class="fas fa-user-circle"></i> <span id="navCustomerName">Customer</span></a>
+                <a href="#" onclick="customerLogout()" class="btn btn-outline">Logout</a>
             </div>
         </div>
     </nav>
 
-    <!-- Page Header -->
-    <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
-        <div class="container">
-            <h1 style="color: white; font-size: 2.5rem;">Raise a Service Request</h1>
-            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Facing an issue? Let our experts handle it promptly.</p>
-        </div>
-    </header>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="customer-dashboard.html"><i class="fas fa-home"></i> Overview</a></li>
+                <li><a href="products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                <li><a href="installation.html"><i class="fas fa-tools"></i> Installations</a></li>
+                <li><a href="service-request.html" class="active"><i class="fas fa-wrench"></i> Service Requests</a></li>
+                <li><a href="quotation.html"><i class="fas fa-file-invoice"></i> Quotations</a></li>
+                <li><a href="enquiry.html"><i class="fas fa-question-circle"></i> Enquiries</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="customerLogout()" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Raise a Service Request</h1>
+                <p>Facing an issue? Let our experts handle it promptly.</p>
+            </div>
 
-    <!-- Main Content -->
-    <main class="py-5" style="background-color: var(--bg-color);">
-        <div class="container" style="max-width: 800px;">
-            <div class="card" style="padding: 40px;">
-                <form id="serviceForm">
-                    <!-- Customer Details -->
-                    <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Your Information</h3>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">Customer ID (If registered)</label>
-                            <input type="number" id="customerId" class="form-control" placeholder="e.g. 101">
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h3>Your Information & Issue Details</h3>
+                </div>
+                <div class="card-body">
+                    <form id="serviceForm">
+                        <div class="d-flex gap-4" style="flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 250px;">
+                                <label class="form-label">Customer ID (If registered)</label>
+                                <input type="number" id="customerId" class="form-control" placeholder="e.g. 101">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 250px;">
+                                <label class="form-label">Product ID *</label>
+                                <input type="number" id="productId" class="form-control" required placeholder="e.g. 5">
+                            </div>
                         </div>
+
                         <div class="form-group">
-                            <label class="form-label">Product ID *</label>
-                            <input type="number" id="productId" class="form-control" required placeholder="e.g. 5">
+                            <label class="form-label">Issue Description *</label>
+                            <textarea id="issueDesc" class="form-control" rows="5" required placeholder="Please describe the problem you are facing in detail"></textarea>
                         </div>
-                    </div>
 
-                    <!-- Issue Details -->
-                    <h3 style="margin-bottom: 20px; margin-top: 30px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Issue Details</h3>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Issue Description *</label>
-                        <textarea id="issueDesc" class="form-control" rows="5" required placeholder="Please describe the problem you are facing in detail"></textarea>
-                    </div>
+                        <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
 
-                    <!-- Submit Alert -->
-                    <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
-
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; width: 100%;">Submit Complaint</button>
-                    </div>
-                </form>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                        </div>
+                    </form>
+                </div>
             </div>
             
-            <!-- History Section -->
-            <div class="card mt-5" style="padding: 40px; margin-top: 40px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">My Service Requests</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>My Service Requests</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--gray-light); color: var(--gray-medium);">
-                                <th style="padding: 15px 10px;">ID</th>
-                                <th style="padding: 15px 10px;">Product / Request Type</th>
-                                <th style="padding: 15px 10px;">Date</th>
-                                <th style="padding: 15px 10px;">Status</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product / Request Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody">
-                            <tr><td colspan="4" style="text-align: center; padding: 15px;">Loading...</td></tr>
+                            <tr><td colspan="4" class="text-center p-4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h3>CHIPELEC.</h3>
-                    <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
-                </div>
-                <div class="footer-col">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="products.html">Products</a></li>
-                        <li><a href="services.html">Services</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Enforce login
-        requireCustomerLogin();
-        const customer = getCustomerData();
-
         document.addEventListener('DOMContentLoaded', () => {
             if(customer) {
+                document.getElementById('navCustomerName').textContent = customer.full_name;
                 document.getElementById('customerId').value = customer.id;
                 document.getElementById('customerId').readOnly = true; 
             }
@@ -154,17 +140,19 @@
                     });
 
                     alertBox.style.display = 'block';
-                    alertBox.style.backgroundColor = '#dcfce7';
-                    alertBox.style.color = '#166534';
-                    alertBox.innerHTML = `<i class="fas fa-check-circle"></i> Service request submitted successfully! (ID: #SRV-${response.id})`;
+                    alertBox.style.backgroundColor = '#ECFDF5';
+                    alertBox.style.color = '#065F46';
+                    alertBox.style.border = '1px solid #10B981';
+                    alertBox.innerHTML = `<i class="fas fa-check-circle"></i> Service request submitted successfully! (ID: #SRV-${response.id || 'N/A'})`;
                     
                     form.reset();
                     loadHistory();
                     
                 } catch (error) {
                     alertBox.style.display = 'block';
-                    alertBox.style.backgroundColor = '#fee2e2';
-                    alertBox.style.color = '#991b1b';
+                    alertBox.style.backgroundColor = '#FEE2E2';
+                    alertBox.style.color = '#991B1B';
+                    alertBox.style.border = '1px solid #EF4444';
                     alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
                 } finally {
                     submitBtn.disabled = false;
@@ -180,34 +168,32 @@
                 tbody.innerHTML = '';
                 
                 if(!res.data || res.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 15px;">No service requests found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No service requests found.</td></tr>';
                     return;
                 }
                 
                 res.data.forEach(req => {
                     const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid var(--gray-light)';
                     
-                    let statusColor = '';
-                    let statusBg = '';
-                    if(req.service_status === 'Resolved') { statusBg = '#dcfce7'; statusColor = '#166534'; }
-                    else if(req.service_status === 'Assigned' || req.service_status === 'In Progress') { statusBg = '#fef08a'; statusColor = '#854d0e'; }
-                    else if(req.service_status === 'Cancelled') { statusBg = '#fee2e2'; statusColor = '#991b1b'; }
-                    else { statusBg = '#f1f5f9'; statusColor = '#475569'; }
+                    let badgeClass = 'badge-default';
+                    const status = (req.service_status || '').toLowerCase();
+                    if(status === 'resolved') { badgeClass = 'badge-completed'; }
+                    else if(status === 'assigned' || status === 'in progress') { badgeClass = 'badge-scheduled'; }
+                    else if(status === 'cancelled') { badgeClass = 'badge-cancelled'; }
 
                     const dateStr = req.request_date ? new Date(req.request_date).toLocaleDateString() : 'N/A';
                     
                     tr.innerHTML = `
-                        <td style="padding: 15px 10px;">#SRV-${req.id}</td>
-                        <td style="padding: 15px 10px;">${req.request_type || 'N/A'}</td>
-                        <td style="padding: 15px 10px;">${dateStr}</td>
-                        <td style="padding: 15px 10px;"><span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${req.service_status}</span></td>
+                        <td>#SRV-${req.id}</td>
+                        <td>${req.request_type || 'N/A'}</td>
+                        <td>${dateStr}</td>
+                        <td><span class="badge ${badgeClass}">${req.service_status}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
                 console.error(err);
-                document.getElementById('historyBody').innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 15px; color: red;">Failed to load history.</td></tr>';
+                document.getElementById('historyBody').innerHTML = '<tr><td colspan="4" class="text-center p-4 text-danger">Failed to load history.</td></tr>';
             }
         }
     </script>

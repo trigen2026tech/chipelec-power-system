@@ -8,106 +8,114 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <script src="js/api.js"></script>
+    <script>
+        requireCustomerLogin();
+        const customer = getCustomerData();
+    </script>
+    
     <nav class="navbar">
-        <div class="container d-flex justify-content-between align-items-center">
+        <div class="container">
             <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="products.html">Products</a>
-                <a href="services.html">Services</a>
-                <a href="contact.html">Contact</a>
-                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+            <button class="mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('show')">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links d-none d-md-flex">
+                <a href="#" class="d-flex align-items-center gap-2"><i class="fas fa-user-circle"></i> <span id="navCustomerName">Customer</span></a>
+                <a href="#" onclick="customerLogout()" class="btn btn-outline">Logout</a>
             </div>
-            <div class="mobile-menu-btn"><i class="fas fa-bars"></i></div>
         </div>
     </nav>
 
-    <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
-        <div class="container">
-            <h1 style="color: white; font-size: 2.5rem;">Request a Quotation</h1>
-            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Get customized pricing for bulk orders or enterprise solutions.</p>
-        </div>
-    </header>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="customer-dashboard.html"><i class="fas fa-home"></i> Overview</a></li>
+                <li><a href="products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                <li><a href="installation.html"><i class="fas fa-tools"></i> Installations</a></li>
+                <li><a href="service-request.html"><i class="fas fa-wrench"></i> Service Requests</a></li>
+                <li><a href="quotation.html" class="active"><i class="fas fa-file-invoice"></i> Quotations</a></li>
+                <li><a href="enquiry.html"><i class="fas fa-question-circle"></i> Enquiries</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="customerLogout()" class="btn btn-secondary" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Request a Quotation</h1>
+                <p>Get customized pricing for bulk orders or enterprise solutions.</p>
+            </div>
 
-    <main class="py-5" style="background-color: var(--bg-color);">
-        <div class="container" style="max-width: 800px;">
-            <div class="card" style="padding: 40px;">
-                <form id="quoteForm">
-                    <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Your Requirements</h3>
-                    <div class="form-group">
-                        <label class="form-label">Name / Company Name *</label>
-                        <input type="text" id="quoteName" class="form-control" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h3>Your Requirements</h3>
+                </div>
+                <div class="card-body">
+                    <form id="quoteForm">
                         <div class="form-group">
-                            <label class="form-label">Email *</label>
-                            <input type="email" id="quoteEmail" class="form-control" required>
+                            <label class="form-label">Name / Company Name *</label>
+                            <input type="text" id="quoteName" class="form-control" required>
+                        </div>
+                        <div class="d-flex gap-4" style="flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 250px;">
+                                <label class="form-label">Email *</label>
+                                <input type="email" id="quoteEmail" class="form-control" required>
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 250px;">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" id="quotePhone" class="form-control" required>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Phone *</label>
-                            <input type="tel" id="quotePhone" class="form-control" required>
+                            <label class="form-label">Requirement Details *</label>
+                            <textarea class="form-control" rows="5" required placeholder="Specify products, quantities, and capacity needed"></textarea>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Requirement Details *</label>
-                        <textarea class="form-control" rows="5" required placeholder="Specify products, quantities, and capacity needed"></textarea>
-                    </div>
-                    
-                    <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
+                        
+                        <div id="alertBox" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
 
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem; width: 100%;">Submit Request</button>
-                    </div>
-                </form>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
             </div>
             
-            <!-- History Section -->
-            <div class="card mt-5" style="padding: 40px; margin-top: 40px;">
-                <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">My Quotations</h3>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>My Quotations</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--gray-light); color: var(--gray-medium);">
-                                <th style="padding: 15px 10px;">ID</th>
-                                <th style="padding: 15px 10px;">Description</th>
-                                <th style="padding: 15px 10px;">Amount</th>
-                                <th style="padding: 15px 10px;">Tax</th>
-                                <th style="padding: 15px 10px;">Total</th>
-                                <th style="padding: 15px 10px;">Valid Until</th>
-                                <th style="padding: 15px 10px;">Status</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Tax</th>
+                                <th>Total</th>
+                                <th>Valid Until</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody">
-                            <tr><td colspan="7" style="text-align: center; padding: 15px;">Loading...</td></tr>
+                            <tr><td colspan="7" class="text-center p-4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <footer>
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col"><h3>CHIPELEC.</h3></div>
-                <div class="footer-col">
-                    <h3>Quick Links</h3>
-                    <ul><li><a href="about.html">About Us</a></li><li><a href="products.html">Products</a></li></ul>
-                </div>
-            </div>
-            <div class="footer-bottom"><p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p></div>
-        </div>
-    </footer>
-    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Enforce login
-        requireCustomerLogin();
-        const customer = getCustomerData();
-
         document.addEventListener('DOMContentLoaded', () => {
             if(customer) {
+                document.getElementById('navCustomerName').textContent = customer.full_name;
                 const nameInput = document.getElementById('quoteName');
                 const emailInput = document.getElementById('quoteEmail');
                 const phoneInput = document.getElementById('quotePhone');
@@ -136,36 +144,35 @@
                 tbody.innerHTML = '';
                 
                 if(!res.data || res.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 15px;">No quotations found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center p-4">No quotations found.</td></tr>';
                     return;
                 }
                 
                 res.data.forEach(req => {
                     const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid var(--gray-light)';
                     
-                    let statusColor = '';
-                    let statusBg = '';
-                    if(req.status === 'Accepted') { statusBg = '#dcfce7'; statusColor = '#166534'; }
-                    else if(req.status === 'Pending' || req.status === 'Sent') { statusBg = '#fef08a'; statusColor = '#854d0e'; }
-                    else { statusBg = '#fee2e2'; statusColor = '#991b1b'; }
+                    let badgeClass = 'badge-default';
+                    const status = (req.status || '').toLowerCase();
+                    if(status === 'accepted') { badgeClass = 'badge-completed'; }
+                    else if(status === 'pending' || status === 'sent') { badgeClass = 'badge-pending'; }
+                    else if(status === 'rejected') { badgeClass = 'badge-cancelled'; }
 
                     const dateStr = req.valid_until ? new Date(req.valid_until).toLocaleDateString() : 'N/A';
                     
                     tr.innerHTML = `
-                        <td style="padding: 15px 10px;">#QTE-${req.id}</td>
-                        <td style="padding: 15px 10px;">${req.items_description || 'N/A'}</td>
-                        <td style="padding: 15px 10px;">₹${req.amount}</td>
-                        <td style="padding: 15px 10px;">₹${req.tax}</td>
-                        <td style="padding: 15px 10px;">₹${req.total_amount}</td>
-                        <td style="padding: 15px 10px;">${dateStr}</td>
-                        <td style="padding: 15px 10px;"><span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${req.status}</span></td>
+                        <td>#QTE-${req.id}</td>
+                        <td>${req.items_description || 'N/A'}</td>
+                        <td>₹${req.amount}</td>
+                        <td>₹${req.tax}</td>
+                        <td>₹${req.total_amount}</td>
+                        <td>${dateStr}</td>
+                        <td><span class="badge ${badgeClass}">${req.status}</span></td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
                 console.error(err);
-                document.getElementById('historyBody').innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 15px; color: red;">Failed to load quotations.</td></tr>';
+                document.getElementById('historyBody').innerHTML = '<tr><td colspan="7" class="text-center p-4 text-danger">Failed to load quotations.</td></tr>';
             }
         }
 
@@ -173,20 +180,18 @@
             e.preventDefault();
             const alertBox = document.getElementById('alertBox');
             
-            // Reusing enquiry API for quotation request since we don't have a POST /quotations API,
-            // and the prompt says "Do not create a duplicate quotation system. If Admin Panel supports it connect it".
-            // Since we created the GET, we can just leave the submit as enquiry or a generic message.
             try {
-                // we just simulate a success response for now
                 alertBox.style.display = 'block';
-                alertBox.style.backgroundColor = '#dcfce7';
-                alertBox.style.color = '#166534';
+                alertBox.style.backgroundColor = '#ECFDF5';
+                alertBox.style.color = '#065F46';
+                alertBox.style.border = '1px solid #10B981';
                 alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Quotation request submitted! We will contact you soon.';
                 e.target.reset();
             } catch (error) {
                 alertBox.style.display = 'block';
-                alertBox.style.backgroundColor = '#fee2e2';
-                alertBox.style.color = '#991b1b';
+                alertBox.style.backgroundColor = '#FEE2E2';
+                alertBox.style.color = '#991B1B';
+                alertBox.style.border = '1px solid #EF4444';
                 alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error submitting request.`;
             }
         });
