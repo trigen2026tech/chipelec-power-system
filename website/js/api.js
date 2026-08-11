@@ -171,7 +171,12 @@ const ProductAPI = {
 const InstallationAPI = {
   bookInstallation: async (data) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/customer/installations`, {
+      const customerStr = localStorage.getItem('customer');
+      if(customerStr) {
+          const customer = JSON.parse(customerStr);
+          data.customer_id = customer.id;
+      }
+      const res = await fetch(`${API_BASE_URL}/installations`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -184,10 +189,16 @@ const InstallationAPI = {
   },
   getInstallations: async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/customer/installations`, {
+      const res = await fetch(`${API_BASE_URL}/installations`, {
         headers: getAuthHeaders()
       });
-      return await handleResponse(res);
+      const data = await handleResponse(res);
+      const customerStr = localStorage.getItem('customer');
+      if (data.success && data.data && customerStr) {
+          const customer = JSON.parse(customerStr);
+          data.data = data.data.filter(i => i.customer_id === customer.id);
+      }
+      return data;
     } catch (error) {
       console.error("Error fetching installations:", error);
       throw error;
@@ -199,7 +210,12 @@ const InstallationAPI = {
 const ServiceAPI = {
   raiseRequest: async (data) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/customer/service-requests`, {
+      const customerStr = localStorage.getItem('customer');
+      if(customerStr) {
+          const customer = JSON.parse(customerStr);
+          data.customer_id = customer.id;
+      }
+      const res = await fetch(`${API_BASE_URL}/serviceRequests`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -212,10 +228,16 @@ const ServiceAPI = {
   },
   getServiceRequests: async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/customer/service-requests`, {
+      const res = await fetch(`${API_BASE_URL}/serviceRequests`, {
         headers: getAuthHeaders()
       });
-      return await handleResponse(res);
+      const data = await handleResponse(res);
+      const customerStr = localStorage.getItem('customer');
+      if (data.success && data.data && customerStr) {
+          const customer = JSON.parse(customerStr);
+          data.data = data.data.filter(s => s.customer_id === customer.id);
+      }
+      return data;
     } catch (error) {
       console.error("Error fetching service requests:", error);
       throw error;
