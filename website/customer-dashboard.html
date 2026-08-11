@@ -94,11 +94,11 @@
     <div class="dashboard-layout">
         <aside class="sidebar">
             <ul class="sidebar-nav">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Overview</a></li>
-                <li><a href="#"><i class="fas fa-tools"></i> Installations</a></li>
-                <li><a href="#"><i class="fas fa-wrench"></i> Service Requests</a></li>
-                <li><a href="#"><i class="fas fa-file-invoice"></i> Quotations</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="customer-dashboard.html" class="active"><i class="fas fa-home"></i> Overview</a></li>
+                <li><a href="installation.html"><i class="fas fa-tools"></i> Installations</a></li>
+                <li><a href="service-request.html"><i class="fas fa-wrench"></i> Service Requests</a></li>
+                <li><a href="quotation.html"><i class="fas fa-file-invoice"></i> Quotations</a></li>
+                <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
         </aside>
         
@@ -112,21 +112,21 @@
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-box"></i></div>
                     <div>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">2</h3>
+                        <h3 id="statProducts" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
                         <p style="color: var(--gray-medium); margin: 0;">My Products</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-tools"></i></div>
                     <div>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">1</h3>
+                        <h3 id="statInstallations" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
                         <p style="color: var(--gray-medium); margin: 0;">Active Installations</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success-color);"></i></div>
                     <div>
-                        <h3 style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
+                        <h3 id="statComplaints" style="font-size: 1.8rem; margin: 0; color: var(--dark-text);">0</h3>
                         <p style="color: var(--gray-medium); margin: 0;">Open Complaints</p>
                     </div>
                 </div>
@@ -145,21 +145,8 @@
                                 <th style="padding: 15px 10px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--gray-light);">
-                                <td style="padding: 15px 10px;">#INS-1050</td>
-                                <td style="padding: 15px 10px;">Installation (Exide InvaTubular)</td>
-                                <td style="padding: 15px 10px;">Oct 12, 2026</td>
-                                <td style="padding: 15px 10px;"><span style="background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Scheduled</span></td>
-                                <td style="padding: 15px 10px;"><a href="#" style="color: var(--secondary-color);">View</a></td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--gray-light);">
-                                <td style="padding: 15px 10px;">#SRV-3291</td>
-                                <td style="padding: 15px 10px;">Service Request (Microtek Inverter)</td>
-                                <td style="padding: 15px 10px;">Sep 28, 2026</td>
-                                <td style="padding: 15px 10px;"><span style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Resolved</span></td>
-                                <td style="padding: 15px 10px;"><a href="#" style="color: var(--secondary-color);">View</a></td>
-                            </tr>
+                        <tbody id="recentActivityBody">
+                            <tr><td colspan="5" style="padding: 15px 10px; text-align: center;">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -169,13 +156,58 @@
         </main>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if(customer) {
                 document.getElementById('navCustomerName').textContent = customer.full_name;
-                // Just use first name for welcome
                 const firstName = customer.full_name.split(' ')[0];
                 document.getElementById('welcomeName').textContent = firstName;
                 document.getElementById('displayCustomerId').textContent = customer.id;
+
+                try {
+                    const response = await window.api.customerAuth.getDashboardStats();
+                    if(response.success) {
+                        const stats = response.data;
+                        document.getElementById('statProducts').textContent = stats.products;
+                        document.getElementById('statInstallations').textContent = stats.active_installations;
+                        document.getElementById('statComplaints').textContent = stats.open_complaints;
+
+                        const tbody = document.getElementById('recentActivityBody');
+                        tbody.innerHTML = '';
+                        
+                        if(stats.recent_activity.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" style="padding: 15px 10px; text-align: center;">No recent activity found.</td></tr>';
+                        } else {
+                            stats.recent_activity.forEach(act => {
+                                const tr = document.createElement('tr');
+                                tr.style.borderBottom = '1px solid var(--gray-light)';
+                                
+                                let statusColor = '';
+                                let statusBg = '';
+                                if(act.status === 'Completed' || act.status === 'Resolved') {
+                                    statusBg = '#dcfce7'; statusColor = '#166534';
+                                } else if(act.status === 'Scheduled' || act.status === 'Assigned') {
+                                    statusBg = '#fef08a'; statusColor = '#854d0e';
+                                } else {
+                                    statusBg = '#f1f5f9'; statusColor = '#475569';
+                                }
+                                
+                                const dateStr = act.date ? new Date(act.date).toLocaleDateString() : 'N/A';
+                                
+                                tr.innerHTML = `
+                                    <td style="padding: 15px 10px;">#${act.type === 'Installation' ? 'INS' : 'SRV'}-${act.id}</td>
+                                    <td style="padding: 15px 10px;">${act.type}</td>
+                                    <td style="padding: 15px 10px;">${dateStr}</td>
+                                    <td style="padding: 15px 10px;"><span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${act.status}</span></td>
+                                    <td style="padding: 15px 10px;"><a href="${act.type === 'Installation' ? 'installation.html' : 'service-request.html'}" style="color: var(--secondary-color);">View</a></td>
+                                `;
+                                tbody.appendChild(tr);
+                            });
+                        }
+                    }
+                } catch(err) {
+                    console.error(err);
+                    document.getElementById('recentActivityBody').innerHTML = '<tr><td colspan="5" style="padding: 15px 10px; text-align: center; color: red;">Failed to load data.</td></tr>';
+                }
             }
         });
     </script>

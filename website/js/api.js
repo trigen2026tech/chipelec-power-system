@@ -94,6 +94,54 @@ const CustomerAuthAPI = {
       console.error("Error fetching profile:", error);
       throw error;
     }
+  },
+  updateProfile: async (data) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
+  },
+  changePassword: async (data) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/change-password`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  },
+  getDashboardStats: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/dashboard-stats`, {
+        headers: getAuthHeaders()
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      throw error;
+    }
+  },
+  getQuotations: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/quotations`, {
+        headers: getAuthHeaders()
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error fetching quotations:", error);
+      throw error;
+    }
   }
 };
 
@@ -123,7 +171,7 @@ const ProductAPI = {
 const InstallationAPI = {
   bookInstallation: async (data) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/installations`, {
+      const res = await fetch(`${API_BASE_URL}/customer/installations`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -133,6 +181,17 @@ const InstallationAPI = {
       console.error("Error booking installation:", error);
       throw error;
     }
+  },
+  getInstallations: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/installations`, {
+        headers: getAuthHeaders()
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error fetching installations:", error);
+      throw error;
+    }
   }
 };
 
@@ -140,7 +199,7 @@ const InstallationAPI = {
 const ServiceAPI = {
   raiseRequest: async (data) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/service-requests`, {
+      const res = await fetch(`${API_BASE_URL}/customer/service-requests`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data)
@@ -148,6 +207,17 @@ const ServiceAPI = {
       return await handleResponse(res);
     } catch (error) {
       console.error("Error raising service request:", error);
+      throw error;
+    }
+  },
+  getServiceRequests: async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/customer/service-requests`, {
+        headers: getAuthHeaders()
+      });
+      return await handleResponse(res);
+    } catch (error) {
+      console.error("Error fetching service requests:", error);
       throw error;
     }
   }

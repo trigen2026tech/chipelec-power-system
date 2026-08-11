@@ -263,4 +263,152 @@ router.get("/profile", customerMiddleware, (req, res) => {
 
 });
 
+// ======================
+// UPDATE CUSTOMER PROFILE
+// ======================
+router.put("/profile", customerMiddleware, (req, res) => {
+    const { full_name, phone, address, city, state, pincode } = req.body;
+    const sql = `
+        UPDATE customers
+        SET full_name = ?, phone = ?, address = ?, city = ?, state = ?, pincode = ?
+        WHERE id = ?
+    `;
+    db.query(sql, [full_name, phone, address, city, state, pincode, req.customer.id], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ success: false, message: "Database Error" });
+        }
+        res.json({ success: true, message: "Profile updated successfully" });
+    });
+});
+
+// ======================
+// CHANGE PASSWORD
+// ======================
+router.put("/change-password", customerMiddleware, (req, res) => {
+    const { current_password, new_password } = req.body;
+    
+    db.query("SELECT password FROM customers WHERE id = ?", [req.customer.id], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        if (results.length === 0) return res.status(404).json({ success: false, message: "Customer not found" });
+
+        const isMatch = bcrypt.compareSync(current_password, results[0].password);
+        if (!isMatch) return res.status(401).json({ success: false, message: "Incorrect current password" });
+
+        const hashed = bcrypt.hashSync(new_password, 10);
+        db.query("UPDATE customers SET password = ? WHERE id = ?", [hashed, req.customer.id], (updateErr) => {
+            if (updateErr) return res.status(500).json({ success: false, message: "Database Error" });
+            res.json({ success: true, message: "Password updated successfully" });
+        });
+    });
+});
+
+// ======================
+// GET INSTALLATIONS
+// ======================
+router.get("/installations", customerMiddleware, (req, res) => {
+    const sql = `
+        SELECT i.*, p.product_name 
+        FROM installations i 
+        JOIN products p ON i.product_id = p.id 
+        WHERE i.customer_id = ? 
+        ORDER BY i.id DESC
+    `;
+    db.query(sql, [req.customer.id], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        res.json({ success: true, data: results });
+    });
+});
+
+// ======================
+// CREATE INSTALLATION
+// ======================
+router.post("/installations", customerMiddleware, (req, res) => {
+    const { product_id, installation_date, installation_address, remarks, preferred_time } = req.body;
+    const fullRemarks = preferred_time ? `Preferred Time: ${preferred_time} | ${remarks || ''}` : remarks;
+    const sql = `INSERT INTO installations (customer_id, product_id, installation_date, installation_address, installation_status, remarks) VALUES (?, ?, ?, ?, 'Pending', ?)`;
+    
+    db.query(sql, [req.customer.id, product_id, installation_date, installation_address, fullRemarks], (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        res.json({ success: true, message: "Installation request submitted successfully", id: result.insertId });
+    });
+});
+
+// ======================
+// GET SERVICE REQUESTS
+// ======================
+router.get("/service-requests", customerMiddleware, (req, res) => {
+    const sql = `SELECT * FROM service_requests WHERE customer_id = ? ORDER BY id DESC`;
+    db.query(sql, [req.customer.id], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        res.json({ success: true, data: results });
+    });
+});
+
+// ======================
+// CREATE SERVICE REQUEST
+// ======================
+router.post("/service-requests", customerMiddleware, (req, res) => {
+    const { request_type, request_date, issue_description, preferred_time, product_name } = req.body;
+    const fullDesc = `Product: ${product_name || 'N/A'} | Time: ${preferred_time || 'N/A'} | ${issue_description || ''}`;
+    
+    const sql = `INSERT INTO service_requests (customer_id, request_type, request_date, issue_description, service_status) VALUES (?, ?, ?, ?, 'Pending')`;
+    
+    db.query(sql, [req.customer.id, request_type, request_date, fullDesc], (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: "Database Error" });
+        res.json({ success: true, message: "Service request submitted successfully", id: result.insertId });
+    });
+});
+
+// ======================
+// GET QUOTATIONS
+// ======================
+router.get("/quotations", customerMiddleware, (req, res) => {
+    db.query("SELECT * FROM quotations WHERE customer_id = ? ORDER BY id DESC", [req.customer.id], (err, results) => {
+        if (err) {
+            // Ignore error if table doesn't exist yet, return empty
+            return res.json({ success: true, data: [] });
+        }
+        res.json({ success: true, data: results });
+    });
+});
+
+// ======================
+// GET DASHBOARD STATS
+// ======================
+router.get("/dashboard-stats", customerMiddleware, (req, res) => {
+    const customerId = req.customer.id;
+    let stats = { products: 0, active_installations: 0, open_complaints: 0, recent_activity: [] };
+    
+    db.query("SELECT COUNT(*) AS count FROM orders WHERE customer_id = ?", [customerId], (err, results) => {
+        if (!err && results && results.length > 0) stats.products = results[0].count;
+        
+        db.query("SELECT COUNT(*) AS count FROM installations WHERE customer_id = ? AND installation_status NOT IN ('Completed', 'Cancelled')", [customerId], (err, results) => {
+            if (!err && results && results.length > 0) stats.active_installations = results[0].count;
+            
+            db.query("SELECT COUNT(*) AS count FROM service_requests WHERE customer_id = ? AND service_status NOT IN ('Resolved', 'Cancelled')", [customerId], (err, results) => {
+                if (!err && results && results.length > 0) stats.open_complaints = results[0].count;
+                
+                const actSql = `
+                    (SELECT id, 'Installation' as type, installation_date as date, installation_status as status, created_at FROM installations WHERE customer_id = ?)
+                    UNION ALL
+                    (SELECT id, 'Service Request' as type, request_date as date, service_status as status, created_at FROM service_requests WHERE customer_id = ?)
+                    ORDER BY date DESC LIMIT 5
+                `;
+                // If created_at is missing, order by id or date
+                const fallbackSql = `
+                    (SELECT id, 'Installation' as type, installation_date as date, installation_status as status FROM installations WHERE customer_id = ?)
+                    UNION ALL
+                    (SELECT id, 'Service Request' as type, request_date as date, service_status as status FROM service_requests WHERE customer_id = ?)
+                    ORDER BY date DESC LIMIT 5
+                `;
+                db.query(fallbackSql, [customerId, customerId], (err, results) => {
+                    if (!err && results) stats.recent_activity = results;
+                    res.json({ success: true, data: stats });
+                });
+            });
+        });
+    });
+});
+
 module.exports = router;

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | CHIPELEC Power System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 80px); /* minus navbar */
+        }
+        .sidebar {
+            background: var(--white);
+            border-right: 1px solid var(--gray-light);
+            padding: 30px 20px;
+        }
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--gray-medium);
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .sidebar-nav a i {
+            margin-right: 15px;
+            width: 20px;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: rgba(19, 75, 66, 0.05);
+            color: var(--primary-color);
+        }
+        .main-content {
+            padding: 40px;
+            background: var(--bg-color);
+        }
+        .settings-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script src="js/api.js"></script>
+    <script>
+        requireCustomerLogin();
+        const customer = getCustomerData();
+    </script>
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center" style="max-width: 100%;">
+            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <div class="nav-links">
+                <a href="#" style="font-weight: 600;"><i class="fas fa-user-circle"></i> <span id="navCustomerName">Customer</span></a>
+                <a href="#" onclick="customerLogout()" class="btn btn-outline" style="padding: 6px 15px; font-size: 0.9rem;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-nav">
+                <li><a href="customer-dashboard.html"><i class="fas fa-home"></i> Overview</a></li>
+                <li><a href="installation.html"><i class="fas fa-tools"></i> Installations</a></li>
+                <li><a href="service-request.html"><i class="fas fa-wrench"></i> Service Requests</a></li>
+                <li><a href="quotation.html"><i class="fas fa-file-invoice"></i> Quotations</a></li>
+                <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 style="color: var(--primary-color);">Account Settings</h2>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Update Profile</h3>
+                <form id="profileForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" id="profName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address (Read-only)</label>
+                            <input type="email" id="profEmail" class="form-control" readonly style="background-color: #f1f5f9;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" id="profPhone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" id="profCity" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State</label>
+                            <input type="text" id="profState" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" id="profPincode" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Address</label>
+                        <textarea id="profAddress" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div id="profAlert" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
+
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 25px;">Save Changes</button>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">Change Password</h3>
+                <form id="passwordForm">
+                    <div class="form-group" style="max-width: 400px;">
+                        <label class="form-label">Current Password *</label>
+                        <input type="password" id="currentPass" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="max-width: 400px;">
+                        <label class="form-label">New Password *</label>
+                        <input type="password" id="newPass" class="form-control" required minlength="6">
+                    </div>
+                    <div class="form-group" style="max-width: 400px;">
+                        <label class="form-label">Confirm New Password *</label>
+                        <input type="password" id="confirmPass" class="form-control" required minlength="6">
+                    </div>
+
+                    <div id="passAlert" style="display: none; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500;"></div>
+
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 25px;">Update Password</button>
+                </form>
+            </div>
+            
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(customer) {
+                document.getElementById('navCustomerName').textContent = customer.full_name;
+
+                // Load fresh profile data
+                try {
+                    const res = await window.api.customerAuth.getProfile();
+                    if(res.success) {
+                        const prof = res.data;
+                        document.getElementById('profName').value = prof.full_name || '';
+                        document.getElementById('profEmail').value = prof.email || '';
+                        document.getElementById('profPhone').value = prof.phone || '';
+                        document.getElementById('profAddress').value = prof.address || '';
+                        document.getElementById('profCity').value = prof.city || '';
+                        document.getElementById('profState').value = prof.state || '';
+                        document.getElementById('profPincode').value = prof.pincode || '';
+                        
+                        // Update localstorage so other pages see new data
+                        localStorage.setItem('customerData', JSON.stringify(prof));
+                    }
+                } catch(err) {
+                    console.error("Failed to load profile:", err);
+                }
+            }
+
+            // Profile Submit
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                const alertBox = document.getElementById('profAlert');
+                
+                btn.disabled = true;
+                btn.innerHTML = 'Saving...';
+                
+                try {
+                    const data = {
+                        full_name: document.getElementById('profName').value,
+                        phone: document.getElementById('profPhone').value,
+                        address: document.getElementById('profAddress').value,
+                        city: document.getElementById('profCity').value,
+                        state: document.getElementById('profState').value,
+                        pincode: document.getElementById('profPincode').value
+                    };
+                    await window.api.customerAuth.updateProfile(data);
+                    
+                    // Update local storage object
+                    const updatedCustomer = { ...customer, ...data };
+                    localStorage.setItem('customerData', JSON.stringify(updatedCustomer));
+                    document.getElementById('navCustomerName').textContent = data.full_name;
+                    
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#dcfce7';
+                    alertBox.style.color = '#166534';
+                    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Profile updated successfully.';
+                } catch (error) {
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Save Changes';
+                }
+            });
+
+            // Password Submit
+            document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = e.target.querySelector('button');
+                const alertBox = document.getElementById('passAlert');
+                
+                const current_password = document.getElementById('currentPass').value;
+                const new_password = document.getElementById('newPass').value;
+                const confirm_password = document.getElementById('confirmPass').value;
+                
+                if (new_password !== confirm_password) {
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> Passwords do not match.`;
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = 'Updating...';
+                
+                try {
+                    await window.api.customerAuth.changePassword({ current_password, new_password });
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#dcfce7';
+                    alertBox.style.color = '#166534';
+                    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Password changed successfully.';
+                    e.target.reset();
+                } catch (error) {
+                    alertBox.style.display = 'block';
+                    alertBox.style.backgroundColor = '#fee2e2';
+                    alertBox.style.color = '#991b1b';
+                    alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Update Password';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -82,6 +82,27 @@
                     </div>
                 </form>
             </div>
+
+            <!-- History Section -->
+            <div class="card mt-5" style="padding: 40px; margin-top: 40px;">
+                <h3 style="margin-bottom: 20px; color: var(--primary-color); border-bottom: 2px solid var(--gray-light); padding-bottom: 10px;">My Installation Requests</h3>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-light); color: var(--gray-medium);">
+                                <th style="padding: 15px 10px;">ID</th>
+                                <th style="padding: 15px 10px;">Product</th>
+                                <th style="padding: 15px 10px;">Date</th>
+                                <th style="padding: 15px 10px;">Address</th>
+                                <th style="padding: 15px 10px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="5" style="text-align: center; padding: 15px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -117,24 +138,20 @@
         const customer = getCustomerData();
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Auto-fill customer ID
             if(customer) {
                 document.getElementById('customerId').value = customer.id;
-                document.getElementById('customerId').readOnly = true; // Prevent changing
+                document.getElementById('customerId').readOnly = true; 
                 
-                // Pre-fill address if available and field is empty
                 if(customer.address && !document.getElementById('address').value) {
                     document.getElementById('address').value = `${customer.address}, ${customer.city || ''} ${customer.state || ''} ${customer.pincode || ''}`.trim();
                 }
             }
 
-            // Pre-fill product ID if coming from products page
             const urlParams = new URLSearchParams(window.location.search);
             if(urlParams.has('product')) {
                 document.getElementById('productId').value = urlParams.get('product');
             }
             
-            // Set min date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('prefDate').setAttribute('min', today);
 
@@ -142,51 +159,85 @@
             const alertBox = document.getElementById('alertBox');
             const submitBtn = form.querySelector('button[type="submit"]');
 
+            loadHistory();
+
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const customer_id = document.getElementById('customerId').value || null;
                 const product_id = document.getElementById('productId').value;
                 const installation_date = document.getElementById('prefDate').value;
                 const address = document.getElementById('address').value;
                 const remarks = document.getElementById('remarks').value;
 
-                // Disable button and show loading state
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
                 
                 try {
-                    // API Call
-                    const response = await api.installations.bookInstallation({
-                        customer_id,
+                    const response = await window.api.installations.bookInstallation({
                         product_id,
                         installation_date,
                         installation_address: address,
-                        remarks,
-                        installation_status: 'Pending'
+                        remarks
                     });
 
-                    // Show success
                     alertBox.style.display = 'block';
                     alertBox.style.backgroundColor = '#dcfce7';
                     alertBox.style.color = '#166534';
-                    alertBox.innerHTML = '<i class="fas fa-check-circle"></i> Installation request submitted successfully!';
+                    alertBox.innerHTML = `<i class="fas fa-check-circle"></i> Installation request submitted successfully! (ID: #INS-${response.id})`;
                     
                     form.reset();
+                    loadHistory();
                     
                 } catch (error) {
-                    // Show error
                     alertBox.style.display = 'block';
                     alertBox.style.backgroundColor = '#fee2e2';
                     alertBox.style.color = '#991b1b';
                     alertBox.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
                 } finally {
-                    // Re-enable button
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Submit Request';
                 }
             });
         });
+
+        async function loadHistory() {
+            try {
+                const res = await window.api.installations.getInstallations();
+                const tbody = document.getElementById('historyBody');
+                tbody.innerHTML = '';
+                
+                if(!res.data || res.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 15px;">No installation requests found.</td></tr>';
+                    return;
+                }
+                
+                res.data.forEach(req => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid var(--gray-light)';
+                    
+                    let statusColor = '';
+                    let statusBg = '';
+                    if(req.installation_status === 'Completed') { statusBg = '#dcfce7'; statusColor = '#166534'; }
+                    else if(req.installation_status === 'Scheduled' || req.installation_status === 'In Progress') { statusBg = '#fef08a'; statusColor = '#854d0e'; }
+                    else if(req.installation_status === 'Cancelled') { statusBg = '#fee2e2'; statusColor = '#991b1b'; }
+                    else { statusBg = '#f1f5f9'; statusColor = '#475569'; }
+
+                    const dateStr = req.installation_date ? new Date(req.installation_date).toLocaleDateString() : 'N/A';
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 15px 10px;">#INS-${req.id}</td>
+                        <td style="padding: 15px 10px;">${req.product_name || 'Product ' + req.product_id}</td>
+                        <td style="padding: 15px 10px;">${dateStr}</td>
+                        <td style="padding: 15px 10px;">${req.installation_address || 'N/A'}</td>
+                        <td style="padding: 15px 10px;"><span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">${req.installation_status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error(err);
+                document.getElementById('historyBody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 15px; color: red;">Failed to load history.</td></tr>';
+            }
+        }
     </script>
 </body>
 </html>
