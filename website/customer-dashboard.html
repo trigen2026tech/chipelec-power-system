@@ -167,17 +167,17 @@
                     const response = await window.api.customerAuth.getDashboardStats();
                     if(response.success) {
                         const stats = response.data;
-                        document.getElementById('statProducts').textContent = stats.products;
-                        document.getElementById('statInstallations').textContent = stats.active_installations;
-                        document.getElementById('statComplaints').textContent = stats.open_complaints;
+                        document.getElementById('statProducts').textContent = stats.myProducts;
+                        document.getElementById('statInstallations').textContent = stats.activeInstallations;
+                        document.getElementById('statComplaints').textContent = stats.openComplaints;
 
                         const tbody = document.getElementById('recentActivityBody');
                         tbody.innerHTML = '';
                         
-                        if(stats.recent_activity.length === 0) {
+                        if(stats.recentActivity.length === 0) {
                             tbody.innerHTML = '<tr><td colspan="5" style="padding: 15px 10px; text-align: center;">No recent activity found.</td></tr>';
                         } else {
-                            stats.recent_activity.forEach(act => {
+                            stats.recentActivity.forEach(act => {
                                 const tr = document.createElement('tr');
                                 tr.style.borderBottom = '1px solid var(--gray-light)';
                                 

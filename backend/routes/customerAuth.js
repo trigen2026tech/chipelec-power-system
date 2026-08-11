@@ -378,24 +378,17 @@ router.get("/quotations", customerMiddleware, (req, res) => {
 // ======================
 router.get("/dashboard-stats", customerMiddleware, (req, res) => {
     const customerId = req.customer.id;
-    let stats = { products: 0, active_installations: 0, open_complaints: 0, recent_activity: [] };
+    let stats = { myProducts: 0, activeInstallations: 0, openComplaints: 0, recentActivity: [] };
     
     db.query("SELECT COUNT(*) AS count FROM orders WHERE customer_id = ?", [customerId], (err, results) => {
-        if (!err && results && results.length > 0) stats.products = results[0].count;
+        if (!err && results && results.length > 0) stats.myProducts = results[0].count;
         
         db.query("SELECT COUNT(*) AS count FROM installations WHERE customer_id = ? AND installation_status NOT IN ('Completed', 'Cancelled')", [customerId], (err, results) => {
-            if (!err && results && results.length > 0) stats.active_installations = results[0].count;
+            if (!err && results && results.length > 0) stats.activeInstallations = results[0].count;
             
             db.query("SELECT COUNT(*) AS count FROM service_requests WHERE customer_id = ? AND service_status NOT IN ('Resolved', 'Cancelled')", [customerId], (err, results) => {
-                if (!err && results && results.length > 0) stats.open_complaints = results[0].count;
+                if (!err && results && results.length > 0) stats.openComplaints = results[0].count;
                 
-                const actSql = `
-                    (SELECT id, 'Installation' as type, installation_date as date, installation_status as status, created_at FROM installations WHERE customer_id = ?)
-                    UNION ALL
-                    (SELECT id, 'Service Request' as type, request_date as date, service_status as status, created_at FROM service_requests WHERE customer_id = ?)
-                    ORDER BY date DESC LIMIT 5
-                `;
-                // If created_at is missing, order by id or date
                 const fallbackSql = `
                     (SELECT id, 'Installation' as type, installation_date as date, installation_status as status FROM installations WHERE customer_id = ?)
                     UNION ALL
@@ -403,7 +396,7 @@ router.get("/dashboard-stats", customerMiddleware, (req, res) => {
                     ORDER BY date DESC LIMIT 5
                 `;
                 db.query(fallbackSql, [customerId, customerId], (err, results) => {
-                    if (!err && results) stats.recent_activity = results;
+                    if (!err && results) stats.recentActivity = results;
                     res.json({ success: true, data: stats });
                 });
             });
