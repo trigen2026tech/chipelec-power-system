@@ -123,25 +123,42 @@ const CustomerAuthAPI = {
   },
   getDashboardStats: async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/customer/dashboard-stats`, {
-        headers: getAuthHeaders()
-      });
-      return await handleResponse(res);
+      const customerStr = localStorage.getItem('customer');
+      if (!customerStr) throw new Error("Not logged in");
+      const customer = JSON.parse(customerStr);
+      const headers = getAuthHeaders();
+      
+      const [ordersRes, instRes, srvRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/orders`, { headers }).then(r => r.json()).catch(() => ({data: []})),
+          fetch(`${API_BASE_URL}/installations`, { headers }).then(r => r.json()).catch(() => ({data: []})),
+          fetch(`${API_BASE_URL}/service-requests`, { headers }).then(r => r.json()).catch(() => ({data: []}))
+      ]);
+      
+      const orders = (ordersRes.data || []).filter(o => o.customer_name === customer.full_name);
+      const installations = (instRes.data || []).filter(i => i.customer_id === customer.id);
+      const services = (srvRes.data || []).filter(s => s.customer_id === customer.id);
+      
+      const myProducts = orders.length;
+      const activeInstallations = installations.filter(i => !['Completed', 'Cancelled'].includes(i.installation_status)).length;
+      const openComplaints = services.filter(s => !['Resolved', 'Cancelled'].includes(s.service_status)).length;
+      
+      const recentActivity = [
+          ...installations.map(i => ({ id: i.id, type: 'Installation', date: i.installation_date, status: i.installation_status })),
+          ...services.map(s => ({ id: s.id, type: 'Service Request', date: s.request_date, status: s.service_status }))
+      ].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 5);
+      
+      return {
+          success: true,
+          data: { myProducts, activeInstallations, openComplaints, recentActivity }
+      };
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       throw error;
     }
   },
   getQuotations: async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/customer/quotations`, {
-        headers: getAuthHeaders()
-      });
-      return await handleResponse(res);
-    } catch (error) {
-      console.error("Error fetching quotations:", error);
-      throw error;
-    }
+    // Railway backend frozen: simulate empty quotations since endpoint doesn't exist in production yet
+    return { success: true, data: [] };
   }
 };
 
