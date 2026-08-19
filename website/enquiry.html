@@ -191,7 +191,7 @@
     <script src="js/api.js"></script>
     <script>
         const API_BASE = "https://chipelec-power-system-production.up.railway.app/api";
-        const UPLOADS_BASE = "https://chipelec-power-system-production.up.railway.app/uploads";
+        
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -217,11 +217,13 @@
                             subjectField.value = `Enquiry about ${product.product_name}`;
 
                             // Build image URL
-                            let imgUrl = 'https://via.placeholder.com/80x80?text=No+Image';
+                            let imgUrl = '/products/no-image.png';
                             if (product.image) {
                                 imgUrl = product.image.startsWith('http')
                                     ? product.image
-                                    : `${UPLOADS_BASE}/${product.image}`;
+                                    : product.image.startsWith('/')
+                                        ? product.image
+                                        : `/${product.image}`;
                             }
 
                             // Show product banner
