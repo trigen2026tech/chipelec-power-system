@@ -236,123 +236,216 @@ router.put("/:id", authMiddleware, (req, res) => {
 // ======================
 
 router.delete("/:id", authMiddleware, (req, res) => {
+
     const { id } = req.params;
 
-    console.log("========== DELETE PRODUCT REQUEST ==========");
-    console.log("Product ID:", id);
+    // Get a dedicated connection from the pool
+    db.getConnection((connectionError, connection) => {
 
-    // Get a connection from the pool to manage the transaction lifecycle
-    db.getConnection((connErr, connection) => {
-        if (connErr) {
-            console.error("Error getting connection from pool:", connErr);
+        if (connectionError) {
+
+            console.error("DELETE PRODUCT - CONNECTION ERROR:", connectionError);
+
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete product"
+                message: "Database connection failed"
             });
         }
 
         // Start transaction
-        connection.beginTransaction((txErr) => {
-            if (txErr) {
-                console.error("Error beginning transaction:", txErr);
+        connection.beginTransaction((transactionError) => {
+
+            if (transactionError) {
+
+                console.error("DELETE PRODUCT - TRANSACTION ERROR:", transactionError);
+
                 connection.release();
+
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to delete product"
+                    message: "Unable to start delete transaction"
                 });
             }
 
-            // Step 1: Verify the product exists
-            const checkSql = "SELECT id FROM products WHERE id = ?";
-            connection.query(checkSql, [id], (checkErr, checkResult) => {
-                if (checkErr) {
-                    console.error("Error checking product:", checkErr);
-                    return connection.rollback(() => {
-                        connection.release();
-                        res.status(500).json({
-                            success: false,
-                            message: "Unable to delete product"
-                        });
-                    });
-                }
+            // ==========================================
+            // STEP 1: CHECK PRODUCT EXISTS
+            // ==========================================
 
-                if (checkResult.length === 0) {
-                    return connection.rollback(() => {
-                        connection.release();
-                        res.status(404).json({
-                            success: false,
-                            message: "Product not found"
-                        });
-                    });
-                }
+            const checkProductSql = `
+                SELECT id
+                FROM products
+                WHERE id = ?
+            `;
 
-                // Step 2: Delete dependent records in inventory_transactions first
-                const deleteInvSql = "DELETE FROM inventory_transactions WHERE product_id = ?";
-                connection.query(deleteInvSql, [id], (invErr, invResult) => {
-                    if (invErr) {
-                        console.error("Error deleting inventory transactions:", invErr);
+            connection.query(
+                checkProductSql,
+                [id],
+                (checkError, products) => {
+
+                    if (checkError) {
+
+                        console.error("CHECK PRODUCT ERROR:", checkError);
+
                         return connection.rollback(() => {
                             connection.release();
+
                             res.status(500).json({
                                 success: false,
-                                message: "Unable to delete product"
+                                message: "Unable to check product"
                             });
                         });
                     }
 
-                    console.log(`Deleted dependent inventory transactions for product ${id}.`);
+                    // Product doesn't exist
+                    if (products.length === 0) {
 
-                    // Step 3: Hard-delete the product itself
-                    const deleteSql = "DELETE FROM products WHERE id = ?";
-                    connection.query(deleteSql, [id], (deleteErr, deleteResult) => {
-                        if (deleteErr) {
-                            console.error("Error deleting product record:", deleteErr);
-                            return connection.rollback(() => {
-                                connection.release();
-                                res.status(500).json({
-                                    success: false,
-                                    message: "Unable to delete product"
-                                });
+                        return connection.rollback(() => {
+                            connection.release();
+
+                            res.status(404).json({
+                                success: false,
+                                message: "Product not found"
                             });
-                        }
+                        });
+                    }
 
-                        if (deleteResult.affectedRows === 0) {
-                            return connection.rollback(() => {
-                                connection.release();
-                                res.status(404).json({
-                                    success: false,
-                                    message: "Product not found"
-                                });
-                            });
-                        }
+                    // ==========================================
+                    // STEP 2: DELETE INVENTORY TRANSACTIONS
+                    // ==========================================
 
-                        // Commit the transaction
-                        connection.commit((commitErr) => {
-                            if (commitErr) {
-                                console.error("Error committing transaction:", commitErr);
+                    const deleteInventorySql = `
+                        DELETE FROM inventory_transactions
+                        WHERE product_id = ?
+                    `;
+
+                    connection.query(
+                        deleteInventorySql,
+                        [id],
+                        (inventoryError, inventoryResult) => {
+
+                            if (inventoryError) {
+
+                                console.error(
+                                    "DELETE INVENTORY TRANSACTIONS ERROR:",
+                                    inventoryError
+                                );
+
                                 return connection.rollback(() => {
                                     connection.release();
+
                                     res.status(500).json({
                                         success: false,
-                                        message: "Unable to delete product"
+                                        message: "Unable to delete product inventory records"
                                     });
                                 });
                             }
 
-                            console.log(`Product ${id} and its dependencies hard-deleted successfully.`);
-                            connection.release();
-                            return res.status(200).json({
-                                success: true,
-                                message: "Product deleted successfully"
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-});
+                            console.log(
+                                "Inventory transactions deleted:",
+                                inventoryResult.affectedRows
+                            );
 
+                            // ==========================================
+                            // STEP 3: DELETE PRODUCT
+                            // ==========================================
+
+                            const deleteProductSql = `
+                                DELETE FROM products
+                                WHERE id = ?
+                            `;
+
+                            connection.query(
+                                deleteProductSql,
+                                [id],
+                                (deleteError, deleteResult) => {
+
+                                    if (deleteError) {
+
+                                        console.error(
+                                            "DELETE PRODUCT ERROR:",
+                                            deleteError
+                                        );
+
+                                        return connection.rollback(() => {
+                                            connection.release();
+
+                                            res.status(500).json({
+                                                success: false,
+                                                message: "Unable to delete product"
+                                            });
+                                        });
+                                    }
+
+                                    // ==========================================
+                                    // STEP 4: VERIFY PRODUCT WAS DELETED
+                                    // ==========================================
+
+                                    if (deleteResult.affectedRows === 0) {
+
+                                        return connection.rollback(() => {
+                                            connection.release();
+
+                                            res.status(404).json({
+                                                success: false,
+                                                message: "Product not found"
+                                            });
+                                        });
+                                    }
+
+                                    // ==========================================
+                                    // STEP 5: COMMIT
+                                    // ==========================================
+
+                                    connection.commit((commitError) => {
+
+                                        if (commitError) {
+
+                                            console.error(
+                                                "DELETE PRODUCT COMMIT ERROR:",
+                                                commitError
+                                            );
+
+                                            return connection.rollback(() => {
+                                                connection.release();
+
+                                                res.status(500).json({
+                                                    success: false,
+                                                    message: "Unable to complete product deletion"
+                                                });
+                                            });
+                                        }
+
+                                        console.log(
+                                            `✅ Product ${id} permanently deleted`
+                                        );
+
+                                        console.log(
+                                            `Inventory transactions removed: ${inventoryResult.affectedRows}`
+                                        );
+
+                                        connection.release();
+
+                                        return res.status(200).json({
+                                            success: true,
+                                            message: "Product deleted successfully"
+                                        });
+
+                                    });
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        });
+
+    });
+
+});
 
 // ======================
 // UPLOAD PRODUCT IMAGE
