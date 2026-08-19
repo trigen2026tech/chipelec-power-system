@@ -236,128 +236,117 @@ router.put("/:id", authMiddleware, (req, res) => {
 // ======================
 
 router.delete("/:id", authMiddleware, (req, res) => {
-
     const { id } = req.params;
 
     console.log("========== DELETE PRODUCT REQUEST ==========");
     console.log("Product ID:", id);
 
-    // Step 1: Check whether product exists
-    const checkSql = "SELECT id, status FROM products WHERE id = ?";
-    db.query(checkSql, [id], (checkErr, checkResult) => {
-        if (checkErr) {
-            console.error("========== CHECK PRODUCT ERROR ==========");
-            console.error("Product ID:", id);
-            console.error("MySQL Error Code:", checkErr.code);
-            console.error("MySQL Error Number:", checkErr.errno);
-            console.error("MySQL SQL Message:", checkErr.sqlMessage);
-            console.error("=========================================");
+    // Get a connection from the pool to manage the transaction lifecycle
+    db.getConnection((connErr, connection) => {
+        if (connErr) {
+            console.error("Error getting connection from pool:", connErr);
             return res.status(500).json({
                 success: false,
                 message: "Unable to delete product"
             });
         }
 
-        if (checkResult.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Product not found"
-            });
-        }
-
-        // Step 2: Check inventory_transactions references
-        const checkInventorySql = "SELECT COUNT(*) AS count FROM inventory_transactions WHERE product_id = ?";
-        db.query(checkInventorySql, [id], (invErr, invResult) => {
-            if (invErr) {
-                console.error("========== CHECK INVENTORY ERROR ==========");
-                console.error("Product ID:", id);
-                console.error("MySQL Error Code:", invErr.code);
-                console.error("MySQL Error Number:", invErr.errno);
-                console.error("MySQL SQL Message:", invErr.sqlMessage);
-                console.error("===========================================");
+        // Start transaction
+        connection.beginTransaction((txErr) => {
+            if (txErr) {
+                console.error("Error beginning transaction:", txErr);
+                connection.release();
                 return res.status(500).json({
                     success: false,
                     message: "Unable to delete product"
                 });
             }
 
-            const hasInventoryHistory = invResult[0].count > 0;
-
-            if (hasInventoryHistory) {
-                console.log("FOREIGN KEY ERROR DETECTED");
-                console.log("ATTEMPTING SOFT DELETE");
-
-                const softDeleteSql = "UPDATE products SET status = 'Inactive' WHERE id = ?";
-                db.query(softDeleteSql, [id], (updateErr, updateResult) => {
-                    if (updateErr) {
-                        console.error("========== SOFT DELETE ERROR ==========");
-                        console.error("Product ID:", id);
-                        console.error("MySQL Error Code:", updateErr.code);
-                        console.error("MySQL Error Number:", updateErr.errno);
-                        console.error("MySQL SQL Message:", updateErr.sqlMessage);
-                        console.error("=======================================");
-                        return res.status(500).json({
+            // Step 1: Verify the product exists
+            const checkSql = "SELECT id FROM products WHERE id = ?";
+            connection.query(checkSql, [id], (checkErr, checkResult) => {
+                if (checkErr) {
+                    console.error("Error checking product:", checkErr);
+                    return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).json({
                             success: false,
                             message: "Unable to delete product"
                         });
+                    });
+                }
+
+                if (checkResult.length === 0) {
+                    return connection.rollback(() => {
+                        connection.release();
+                        res.status(404).json({
+                            success: false,
+                            message: "Product not found"
+                        });
+                    });
+                }
+
+                // Step 2: Delete dependent records in inventory_transactions first
+                const deleteInvSql = "DELETE FROM inventory_transactions WHERE product_id = ?";
+                connection.query(deleteInvSql, [id], (invErr, invResult) => {
+                    if (invErr) {
+                        console.error("Error deleting inventory transactions:", invErr);
+                        return connection.rollback(() => {
+                            connection.release();
+                            res.status(500).json({
+                                success: false,
+                                message: "Unable to delete product"
+                            });
+                        });
                     }
 
-                    console.log(`Product ${id} deactivated because inventory history exists. SOFT DELETE SUCCESS`);
-                    return res.status(200).json({
-                        success: true,
-                        message: "Product deactivated successfully"
-                    });
-                });
-                return;
-            }
+                    console.log(`Deleted dependent inventory transactions for product ${id}.`);
 
-            // Step 3: No inventory history, safe to hard delete
-            console.log("DELETE QUERY STARTED");
-            const deleteSql = "DELETE FROM products WHERE id = ?";
-            db.query(deleteSql, [id], (err, result) => {
-                if (err) {
-                    console.error("========== DELETE PRODUCT ERROR ==========");
-                    console.error("Product ID:", id);
-                    console.error("MySQL Error Code:", err.code);
-                    console.error("MySQL Error Number:", err.errno);
-                    console.error("MySQL SQL Message:", err.sqlMessage);
-                    console.error("==========================================");
-
-                    // Fallback to soft delete if another constraint triggers it
-                    if (err.code === "ER_ROW_IS_REFERENCED_2" || err.errno === 1451) {
-                        const softDeleteSql = "UPDATE products SET status = 'Inactive' WHERE id = ?";
-                        db.query(softDeleteSql, [id], (fallbackErr) => {
-                            if (fallbackErr) {
-                                return res.status(500).json({
+                    // Step 3: Hard-delete the product itself
+                    const deleteSql = "DELETE FROM products WHERE id = ?";
+                    connection.query(deleteSql, [id], (deleteErr, deleteResult) => {
+                        if (deleteErr) {
+                            console.error("Error deleting product record:", deleteErr);
+                            return connection.rollback(() => {
+                                connection.release();
+                                res.status(500).json({
                                     success: false,
                                     message: "Unable to delete product"
                                 });
+                            });
+                        }
+
+                        if (deleteResult.affectedRows === 0) {
+                            return connection.rollback(() => {
+                                connection.release();
+                                res.status(404).json({
+                                    success: false,
+                                    message: "Product not found"
+                                });
+                            });
+                        }
+
+                        // Commit the transaction
+                        connection.commit((commitErr) => {
+                            if (commitErr) {
+                                console.error("Error committing transaction:", commitErr);
+                                return connection.rollback(() => {
+                                    connection.release();
+                                    res.status(500).json({
+                                        success: false,
+                                        message: "Unable to delete product"
+                                    });
+                                });
                             }
+
+                            console.log(`Product ${id} and its dependencies hard-deleted successfully.`);
+                            connection.release();
                             return res.status(200).json({
                                 success: true,
-                                message: "Product deactivated successfully"
+                                message: "Product deleted successfully"
                             });
                         });
-                        return;
-                    }
-
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to delete product"
                     });
-                }
-
-                if (result.affectedRows === 0) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Product not found"
-                    });
-                }
-
-                console.log(`Product ${id} hard-deleted successfully. HARD DELETE SUCCESS`);
-                return res.status(200).json({
-                    success: true,
-                    message: "Product deleted successfully"
                 });
             });
         });
