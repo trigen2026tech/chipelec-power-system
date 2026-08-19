@@ -246,7 +246,7 @@ router.delete("/:id", authMiddleware, (req, res) => {
     db.query(deleteSql, [id], (err, result) => {
         if (err) {
             // Foreign key constraint violation (ER_ROW_IS_REFERENCED_2)
-            if (err.errno === 1451) {
+            if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
                 // Perform soft delete
                 const softDeleteSql = `
                     UPDATE products
@@ -258,12 +258,12 @@ router.delete("/:id", authMiddleware, (req, res) => {
                         console.error(updateErr);
                         return res.status(500).json({
                             success: false,
-                            message: "Unable to delete or deactivate product"
+                            message: "Unable to delete product"
                         });
                     }
                     return res.status(200).json({
                         success: true,
-                        message: "This product is already associated with customer/business records and cannot be permanently deleted. It has been marked inactive instead."
+                        message: "Product deactivated successfully"
                     });
                 });
                 return;

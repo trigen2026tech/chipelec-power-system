@@ -145,7 +145,7 @@
             async function fetchProducts() {
                 try {
                     const products = await window.api.products.getAllProducts();
-                    return products.data || [];
+                    return (products.data || []).filter(p => p.status !== 'Inactive');
                 } catch (e) {
                     console.error("API Error fetching products:", e);
                     errorMessage.style.display = 'block';
