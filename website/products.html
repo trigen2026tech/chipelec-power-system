@@ -162,7 +162,7 @@
                 }
 
                 products.forEach(p => {
-                    const imgUrl = p.image && !p.image.startsWith('http') ? `https://chipelec-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/400x300?text=No+Image');
+                    const imgUrl = p.image || '/products/default.jpeg';
                     
                     const catLower = (p.category_name || '').toLowerCase();
                     const categoryBg = catLower === 'battery' ? '#FFFBEB' : (catLower === 'inverter' ? '#EFF6FF' : 'var(--bg-subtle-blue)');
