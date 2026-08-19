@@ -44,7 +44,7 @@ function renderTable(data) {
         table.innerHTML += `
         <tr>
             <td>
-                <img src="https://chipelec-power-system-production.up.railway.app/uploads/${product.image || 'no-image.png'}" alt="${product.product_name}" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+                <img src="${product.image || '/products/no-image.png'}" alt="${product.product_name}" onerror="this.src='/products/no-image.png'">
             </td>
             <td style="font-weight: 500;">${product.product_name}</td>
             <td><span class="badge-status badge-info">${product.brand_name || '-'}</span></td>
