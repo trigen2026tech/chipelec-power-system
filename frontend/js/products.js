@@ -4,7 +4,7 @@ let allProducts = []; // For search filtering
 
 async function loadProducts() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+        const response = await fetch("https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/products", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -44,7 +44,7 @@ function renderTable(data) {
         table.innerHTML += `
         <tr>
             <td>
-                <img src="https://chipelec-power-system-production.up.railway.app/uploads/${product.image || 'no-image.png'}" alt="${product.product_name}" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+                <img src="https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/uploads/${product.image || 'no-image.png'}" alt="${product.product_name}" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
             </td>
             <td style="font-weight: 500;">${product.product_name}</td>
             <td><span class="badge-status badge-info">${product.brand_name || '-'}</span></td>
@@ -80,7 +80,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 });
 
 async function loadBrands() {
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/brands", {
+    const response = await fetch("https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/brands", {
         headers: { Authorization: "Bearer " + token }
     });
     const result = await response.json();
@@ -92,7 +92,7 @@ async function loadBrands() {
 }
 
 async function loadCategories() {
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/categories", {
+    const response = await fetch("https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/categories", {
         headers: { Authorization: "Bearer " + token }
     });
     const result = await response.json();
@@ -131,7 +131,7 @@ async function addProduct() {
         category_id: categoryId
     };
 
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+    const response = await fetch("https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/products", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -190,20 +190,24 @@ window.onclick = function(event) {
 };
 
 async function deleteProduct(id) {
-    if (!confirm("Are you sure you want to delete this product?")) {
+    const product = allProducts.find(p => p.id === id);
+    const productName = product ? product.product_name : 'this product';
+    const modelNumber = product && product.model_number ? ` (Model: ${product.model_number})` : '';
+    
+    if (!confirm(`Are you sure you want to delete ${productName}${modelNumber}?`)) {
         return;
     }
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${id}`, {
+        const response = await fetch(`https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/products/${id}`, {
             method: "DELETE",
             headers: { Authorization: "Bearer " + token }
         });
 
         const result = await response.json();
 
-        if (response.ok && result.success) {
-            if(window.showToast) window.showToast('Product deleted successfully');
+        if (response.ok && result && result.success) {
+            if(window.showToast) window.showToast(result.message || 'Product deleted successfully');
             loadProducts();
         } else {
             if(window.showToast) window.showToast(result.message || 'Error deleting product', 'error');
@@ -218,7 +222,7 @@ async function editProduct(id) {
     editingProductId = id;
     document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square"></i> Edit Product';
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${id}`, {
+    const response = await fetch(`https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/products/${id}`, {
         headers: { Authorization: "Bearer " + token }
     });
 
@@ -283,7 +287,7 @@ async function updateProduct() {
         status: "Available"
     };
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${editingProductId}`, {
+    const response = await fetch(`https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/api/products/${editingProductId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

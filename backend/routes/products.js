@@ -236,70 +236,58 @@ router.put("/:id", authMiddleware, (req, res) => {
 // ======================
 
 router.delete("/:id", authMiddleware, (req, res) => {
-
     const { id } = req.params;
 
-    // Check if the product is used in installations
-    const checkSql = `
-        SELECT COUNT(*) AS total
-        FROM installations
-        WHERE product_id = ?
+    const deleteSql = `
+        DELETE FROM products
+        WHERE id = ?
     `;
 
-    db.query(checkSql, [id], (err, rows) => {
-
+    db.query(deleteSql, [id], (err, result) => {
         if (err) {
-            console.error(err);
+            // Foreign key constraint violation (ER_ROW_IS_REFERENCED_2)
+            if (err.errno === 1451) {
+                // Perform soft delete
+                const softDeleteSql = `
+                    UPDATE products
+                    SET status = 'Inactive'
+                    WHERE id = ?
+                `;
+                db.query(softDeleteSql, [id], (updateErr, updateResult) => {
+                    if (updateErr) {
+                        console.error(updateErr);
+                        return res.status(500).json({
+                            success: false,
+                            message: "Unable to delete or deactivate product"
+                        });
+                    }
+                    return res.status(200).json({
+                        success: true,
+                        message: "This product is already associated with customer/business records and cannot be permanently deleted. It has been marked inactive instead."
+                    });
+                });
+                return;
+            }
 
+            console.error(err);
             return res.status(500).json({
                 success: false,
-                message: "Database Error"
+                message: "Unable to delete product"
             });
         }
 
-        if (rows[0].total > 0) {
-
-            return res.status(400).json({
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
                 success: false,
-                message: "This product cannot be deleted because it is used in installation records."
+                message: "Product not found"
             });
-
         }
 
-        const deleteSql = `
-            DELETE FROM products
-            WHERE id = ?
-        `;
-
-        db.query(deleteSql, [id], (err, result) => {
-
-            if (err) {
-                console.error(err);
-
-                return res.status(500).json({
-                    success: false,
-                    message: "Unable to delete product"
-                });
-            }
-
-            if (result.affectedRows === 0) {
-
-                return res.status(404).json({
-                    success: false,
-                    message: "Product not found"
-                });
-
-            }
-
-            res.json({
-                success: true,
-                message: "Product deleted successfully"
-            });
-
+        res.json({
+            success: true,
+            message: "Product deleted successfully"
         });
-
     });
-
 });
 // ======================
 // UPLOAD PRODUCT IMAGE

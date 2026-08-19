@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details | CHIPELEC Power System</title>
+    <title>Product Details | ( CHIPELEC-POWER-SYSTEM ) Power System</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+            <a href="index.html" class="navbar-brand">( CHIPELEC-POWER-SYSTEM )<span>.</span></a>
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="about.html">About</a>
@@ -50,7 +50,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h3 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">CHIPELEC<span style="color: var(--accent-blue);">.</span></h3>
+                    <h3 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">( CHIPELEC-POWER-SYSTEM )<span style="color: var(--accent-blue);">.</span></h3>
                     <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
                 </div>
                 <div class="footer-col">
@@ -64,11 +64,12 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+                <p>&copy; 2026 ( CHIPELEC-POWER-SYSTEM ) Power System. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+    <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -114,7 +115,7 @@
             }
 
             function renderProduct(p, brandName, categoryName) {
-                const imgUrl = p.image && !p.image.startsWith('http') ? `https://chipelec-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
+                const imgUrl = p.image && !p.image.startsWith('http') ? `https://( CHIPELEC-POWER-SYSTEM )-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
                 
                 let stockStatus = `<span style="color: var(--success-color); font-weight: 600;"><i class="fas fa-check-circle"></i> In Stock</span>`;
                 if(p.status !== 'Active') {
@@ -209,3 +210,4 @@
     </script>
 </body>
 </html>
+
