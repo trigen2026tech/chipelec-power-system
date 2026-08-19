@@ -154,15 +154,18 @@ function viewEnquiry(id) {
     const e = allEnquiries.find(x => x.id === id);
     if (!e) return;
 
-    const uploadBase = "https://chipelec-power-system-production.up.railway.app/uploads";
     let imgHtml = '';
-    if (e.product_image) {
-        const imgSrc = e.product_image.startsWith('http')
+
+if (e.product_image) {
+    const imgSrc = e.product_image.startsWith('http')
+        ? e.product_image
+        : e.product_image.startsWith('/')
             ? e.product_image
-            : `${uploadBase}/${e.product_image}`;
-        imgHtml = `<img src="${imgSrc}" alt="${e.product_name}"
-            style="width:100%;max-width:200px;height:140px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;padding:8px;background:#f8fafc;">`;
-    }
+            : `/${e.product_image}`;
+
+    imgHtml = `<img src="${imgSrc}" alt="${e.product_name}"
+        style="width:100%;max-width:200px;height:140px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;padding:8px;background:#f8fafc;">`;
+}
 
     const whatsapp = e.phone ? `https://wa.me/${e.phone.replace(/\D/g, '')}` : '#';
 
