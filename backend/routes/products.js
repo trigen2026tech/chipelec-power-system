@@ -245,9 +245,19 @@ router.delete("/:id", authMiddleware, (req, res) => {
 
     db.query(deleteSql, [id], (err, result) => {
         if (err) {
+            // Log the FULL MySQL error so it is visible in Railway logs
+            console.error("========== DELETE PRODUCT ERROR ==========");
+            console.error("Product ID:", id);
+            console.error("MySQL Error Code:", err.code);
+            console.error("MySQL Error Number:", err.errno);
+            console.error("MySQL SQL Message:", err.sqlMessage);
+            console.error("MySQL SQL State:", err.sqlState);
+            console.error("Full Error:", err);
+            console.error("==========================================");
+
             // Foreign key constraint violation (ER_ROW_IS_REFERENCED_2)
             if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
-                // Perform soft delete
+                console.log("Product", id, "has dependent records. Performing soft delete.");
                 const softDeleteSql = `
                     UPDATE products
                     SET status = 'Inactive'
@@ -255,10 +265,11 @@ router.delete("/:id", authMiddleware, (req, res) => {
                 `;
                 db.query(softDeleteSql, [id], (updateErr, updateResult) => {
                     if (updateErr) {
-                        console.error(updateErr);
+                        console.error("SOFT DELETE FAILED:", updateErr);
                         return res.status(500).json({
                             success: false,
-                            message: "Unable to delete product"
+                            message: "Unable to delete product",
+                            debug: { code: updateErr.code, sqlMessage: updateErr.sqlMessage }
                         });
                     }
                     return res.status(200).json({
@@ -269,10 +280,10 @@ router.delete("/:id", authMiddleware, (req, res) => {
                 return;
             }
 
-            console.error(err);
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete product"
+                message: "Unable to delete product",
+                debug: { code: err.code, sqlMessage: err.sqlMessage }
             });
         }
 
@@ -283,6 +294,7 @@ router.delete("/:id", authMiddleware, (req, res) => {
             });
         }
 
+        console.log("Product", id, "hard-deleted successfully.");
         res.json({
             success: true,
             message: "Product deleted successfully"
