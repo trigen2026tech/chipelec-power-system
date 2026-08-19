@@ -2,11 +2,6 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
 
-    const authHeader = req.headers.authorization;
-
-    console.log("Authorization Header:", authHeader);
-    console.log("JWT_SECRET:", process.env.JWT_SECRET);
-
     if (!authHeader) {
         return res.status(401).json({
             success: false,
@@ -16,13 +11,11 @@ module.exports = (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    console.log("Received Token:", token);
-
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        console.log("Decoded Token:", decoded);
+        console.log("JWT verification successful. Admin ID:", decoded.id);
 
         req.admin = decoded;
 
