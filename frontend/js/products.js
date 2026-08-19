@@ -191,30 +191,97 @@ window.onclick = function(event) {
 
 async function deleteProduct(id) {
     const product = allProducts.find(p => p.id === id);
-    const productName = product ? product.product_name : 'this product';
-    const modelNumber = product && product.model_number ? ` (Model: ${product.model_number})` : '';
-    
+
+    const productName = product ? product.product_name : "this product";
+    const modelNumber = product && product.model_number
+        ? ` (Model: ${product.model_number})`
+        : "";
+
     if (!confirm(`Are you sure you want to delete ${productName}${modelNumber}?`)) {
         return;
     }
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: "Bearer " + token }
+        const url = `https://chipelec-power-system-production.up.railway.app/api/products/${id}`;
+
+        console.log("Deleting product:", {
+            id: id,
+            url: url,
+            tokenExists: !!token
         });
 
-        const result = await response.json();
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
 
-        if (response.ok && result && result.success) {
-            if(window.showToast) window.showToast(result.message || 'Product deleted successfully');
-            loadProducts();
-        } else {
-            if(window.showToast) window.showToast(result.message || 'Error deleting product', 'error');
+        console.log("Delete response status:", response.status);
+
+        const responseText = await response.text();
+
+        console.log("Delete raw response:", responseText);
+
+        let result;
+
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error("Invalid JSON response:", parseError);
+
+            throw new Error(
+                `Server returned HTTP ${response.status}: ${responseText}`
+            );
         }
+
+        console.log("Delete parsed response:", result);
+
+        if (response.ok && result.success) {
+
+            if (window.showToast) {
+                window.showToast(
+                    result.message || "Product deleted successfully",
+                    "success"
+                );
+            }
+
+            await loadProducts();
+
+        } else {
+
+            const message =
+                result.message ||
+                `Failed to delete product. Server returned ${response.status}`;
+
+            console.error("Delete failed:", {
+                status: response.status,
+                response: result
+            });
+
+            if (window.showToast) {
+                window.showToast(message, "error");
+            } else {
+                alert(message);
+            }
+        }
+
     } catch (error) {
-        console.error(error);
-        if(window.showToast) window.showToast("Unable to connect to the server.", 'error');
+
+        console.error("========== DELETE PRODUCT ERROR ==========");
+        console.error("Product ID:", id);
+        console.error("Error:", error);
+        console.error("==========================================");
+
+        if (window.showToast) {
+            window.showToast(
+                error.message || "Unable to delete product",
+                "error"
+            );
+        } else {
+            alert(error.message || "Unable to delete product");
+        }
     }
 }
 
