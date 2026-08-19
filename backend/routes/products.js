@@ -208,19 +208,19 @@ router.put("/:id", authMiddleware, (req, res) => {
         ],
         (err, result) => {
 
-           if (err) {
+            if (err) {
 
-    console.error("UPDATE ERROR:", err);
+                console.error("UPDATE ERROR:", err);
 
-    return res.status(500).json({
-        success: false,
-        code: err.code,
-        errno: err.errno,
-        sqlMessage: err.sqlMessage,
-        message: err.message
-    });
+                return res.status(500).json({
+                    success: false,
+                    code: err.code,
+                    errno: err.errno,
+                    sqlMessage: err.sqlMessage,
+                    message: err.message
+                });
 
-}
+            }
 
             res.json({
                 success: true,
@@ -236,74 +236,140 @@ router.put("/:id", authMiddleware, (req, res) => {
 // ======================
 
 router.delete("/:id", authMiddleware, (req, res) => {
+
     const { id } = req.params;
 
-    const deleteSql = `
-        DELETE FROM products
-        WHERE id = ?
-    `;
+    console.log("========== DELETE PRODUCT REQUEST ==========");
+    console.log("Product ID:", id);
 
-    db.query(deleteSql, [id], (err, result) => {
-        if (err) {
-            // Log the FULL MySQL error so it is visible in Railway logs
-            console.error("========== DELETE PRODUCT ERROR ==========");
+    // Step 1: Check whether product exists and read its current status
+    const checkSql = `SELECT id, product_name, status FROM products WHERE id = ?`;
+
+    db.query(checkSql, [id], (checkErr, checkResult) => {
+
+        if (checkErr) {
+            console.error("========== CHECK PRODUCT ERROR ==========");
             console.error("Product ID:", id);
-            console.error("MySQL Error Code:", err.code);
-            console.error("MySQL Error Number:", err.errno);
-            console.error("MySQL SQL Message:", err.sqlMessage);
-            console.error("MySQL SQL State:", err.sqlState);
-            console.error("Full Error:", err);
-            console.error("==========================================");
-
-            // Foreign key constraint violation (ER_ROW_IS_REFERENCED_2)
-            if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
-                console.log("Product", id, "has dependent records. Performing soft delete.");
-                const softDeleteSql = `
-                    UPDATE products
-                    SET status = 'Inactive'
-                    WHERE id = ?
-                `;
-                db.query(softDeleteSql, [id], (updateErr, updateResult) => {
-                    if (updateErr) {
-                        console.error("SOFT DELETE FAILED:", updateErr);
-                        return res.status(500).json({
-                            success: false,
-                            message: "Unable to delete product",
-                            debug: { code: updateErr.code, sqlMessage: updateErr.sqlMessage }
-                        });
-                    }
-                    return res.status(200).json({
-                        success: true,
-                        message: "Product deactivated successfully"
-                    });
-                });
-                return;
-            }
-
+            console.error("MySQL Error Code:", checkErr.code);
+            console.error("MySQL Error Number:", checkErr.errno);
+            console.error("MySQL SQL State:", checkErr.sqlState);
+            console.error("MySQL SQL Message:", checkErr.sqlMessage);
+            console.error("=========================================");
             return res.status(500).json({
                 success: false,
-                message: "Unable to delete product",
-                debug: { code: err.code, sqlMessage: err.sqlMessage }
+                message: "Unable to delete product"
             });
         }
 
-        if (result.affectedRows === 0) {
+        if (checkResult.length === 0) {
+            console.log("Product", id, "not found.");
             return res.status(404).json({
                 success: false,
                 message: "Product not found"
             });
         }
 
-        console.log("Product", id, "hard-deleted successfully.");
-        res.json({
-            success: true,
-            message: "Product deleted successfully"
+        const currentStatus = checkResult[0].status;
+        const productName   = checkResult[0].product_name;
+        console.log(`Product found: "${productName}", current status: "${currentStatus}"`);
+
+        // Step 2: Attempt hard delete
+        console.log("DELETE QUERY STARTED");
+
+        const deleteSql = `DELETE FROM products WHERE id = ?`;
+
+        db.query(deleteSql, [id], (err, result) => {
+
+            if (err) {
+
+                // ==========================================
+                // EXPOSE THE FULL MYSQL ERROR IN LOGS
+                // ==========================================
+                console.error("========== DELETE PRODUCT ERROR ==========");
+                console.error("Product ID:", id);
+                console.error("MySQL Error Code:", err.code);
+                console.error("MySQL Error Number:", err.errno);
+                console.error("MySQL SQL State:", err.sqlState);
+                console.error("MySQL SQL Message:", err.sqlMessage);
+                console.error("Full MySQL Error:", JSON.stringify(err));
+                console.error("==========================================");
+
+                // ==========================================
+                // FOREIGN KEY CONSTRAINT → SOFT DELETE
+                // ==========================================
+
+                if (
+                    err.code  === "ER_ROW_IS_REFERENCED_2" ||
+                    err.errno === 1451
+                ) {
+
+                    console.log("FOREIGN KEY ERROR DETECTED");
+                    console.log("ATTEMPTING SOFT DELETE");
+
+                    // Use 'Out of Stock' — guaranteed safe across any ENUM
+                    // that the products table already uses in this project.
+                    // 'Available' and 'Out of Stock' are the values the
+                    // frontend already sends/displays.
+                    const softDeleteSql = `
+                        UPDATE products
+                        SET status = 'Out of Stock'
+                        WHERE id = ?
+                    `;
+
+                    db.query(softDeleteSql, [id], (updateErr, updateResult) => {
+
+                        if (updateErr) {
+
+                            console.error("========== SOFT DELETE ERROR ==========");
+                            console.error("Product ID:", id);
+                            console.error("MySQL Error Code:", updateErr.code);
+                            console.error("MySQL Error Number:", updateErr.errno);
+                            console.error("MySQL SQL Message:", updateErr.sqlMessage);
+                            console.error("Full Error:", JSON.stringify(updateErr));
+                            console.error("=======================================");
+
+                            return res.status(500).json({
+                                success: false,
+                                message: "Unable to delete product"
+                            });
+                        }
+
+                        console.log("SOFT DELETE SUCCESS — Product", id, "marked Out of Stock.");
+
+                        return res.status(200).json({
+                            success: true,
+                            message: "Product deactivated successfully"
+                        });
+
+                    });
+
+                    return;
+                }
+
+                // Other unexpected database error
+                return res.status(500).json({
+                    success: false,
+                    message: "Unable to delete product"
+                });
+            }
+
+            // ==========================================
+            // HARD DELETE SUCCESS
+            // ==========================================
+
+            console.log("HARD DELETE SUCCESS — Product", id, "permanently removed.");
+
+            return res.status(200).json({
+                success: true,
+                message: "Product deleted successfully"
+            });
+
         });
+
     });
+
 });
-// ======================
-// UPLOAD PRODUCT IMAGE
-// ======================
+
 
 // ======================
 // UPLOAD PRODUCT IMAGE
@@ -373,5 +439,5 @@ router.post(
 
 
 
-        // Keep the rest of your existing code below
+// Keep the rest of your existing code below
 module.exports = router;
