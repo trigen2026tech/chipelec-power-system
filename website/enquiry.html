@@ -216,18 +216,35 @@
                             // Auto-fill subject
                             subjectField.value = `Enquiry about ${product.product_name}`;
 
-                            // Build image URL
+                            // Build product image URL
                             let imgUrl = '/products/no-image.png';
+
                             if (product.image) {
-                                imgUrl = product.image.startsWith('http')
-                                    ? product.image
-                                    : product.image.startsWith('/')
-                                        ? product.image
-                                        : `/${product.image}`;
+                                const imagePath = String(product.image).trim();
+
+                                if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                                    imgUrl = imagePath;
+                                } else {
+                                    // Convert /products/13.jpeg → https://your-vercel-site/products/13.jpeg
+                                    imgUrl = `${window.location.origin}/${imagePath.replace(/^\/+/, '')}`;
+                                }
                             }
 
-                            // Show product banner
-                            document.getElementById('productBannerImg').src = imgUrl;
+                            console.log('Product image from database:', product.image);
+                            console.log('Final image URL:', imgUrl);
+
+                            // Show product image
+                            const productImg = document.getElementById('productBannerImg');
+
+                            productImg.src = imgUrl;
+
+                            productImg.onerror = function () {
+                                console.error('IMAGE FAILED TO LOAD:', this.src);
+                            };
+
+                            productImg.onload = function () {
+                                console.log('IMAGE LOADED:', this.src);
+                            };
                             document.getElementById('productBannerName').textContent = product.product_name;
                             document.getElementById('productBannerModel').textContent =
                                 (product.model_number ? `Model: ${product.model_number}` : '') +
