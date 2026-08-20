@@ -115,12 +115,40 @@
             }
 
             function renderProduct(p, brandName, categoryName) {
-                const imgUrl = p.image && !p.image.startsWith('http') ? `https://chipelec-power-system-production.up.railway.app/uploads/${p.image}` : (p.image || 'https://via.placeholder.com/600x400?text=No+Image');
-                
-                let stockStatus = `<span style="color: var(--success-color); font-weight: 600;"><i class="fas fa-check-circle"></i> In Stock</span>`;
-                if(p.status !== 'Active') {
-                    stockStatus = `<span style="color: var(--danger-color); font-weight: 600;"><i class="fas fa-times-circle"></i> Out of Stock</span>`;
+                // Build product image URL
+            let imgUrl = '/products/no-image.png';
+
+            if (p.image) {
+                const imagePath = String(p.image).trim();
+
+                if (
+                    imagePath.startsWith('http://') ||
+                    imagePath.startsWith('https://')
+                ) {
+                    imgUrl = imagePath;
+                } else {
+                    imgUrl = `${window.location.origin}/${imagePath.replace(/^\/+/, '')}`;
                 }
+            }
+
+            // Stock / availability
+            const stockQuantity = Number(p.stock_quantity || 0);
+
+            let stockStatus = '';
+
+            if (stockQuantity > 0 && p.status === 'Available') {
+                stockStatus = `
+                    <span style="color: var(--success-color); font-weight: 600;">
+                        <i class="fas fa-check-circle"></i> Available
+                    </span>
+                `;
+            } else {
+                stockStatus = `
+                    <span style="color: var(--danger-color); font-weight: 600;">
+                        <i class="fas fa-times-circle"></i> Out of Stock
+                    </span>
+                `;
+            }
 
                 productContent.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center mb-6">
@@ -146,9 +174,29 @@
                             
                             <div class="card mb-6" style="padding: var(--space-4); background: #fff;">
                                 <div class="d-flex align-items-center gap-3 mb-2">
-                                    <div style="width: 24px;">${stockStatus}</div>
-                                    <span style="font-weight: 500;">Availability</span>
-                                </div>
+                                        <div style="width: 24px;">
+                                            ${stockQuantity > 0
+                                                ? '<i class="fas fa-check-circle" style="color: var(--success-color);"></i>'
+                                                : '<i class="fas fa-times-circle" style="color: var(--danger-color);"></i>'
+                                            }
+                                        </div>
+
+                                        <span style="font-weight: 500;">
+                                            Availability:
+                                            ${stockStatus}
+                                        </span>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div style="width: 24px; color: var(--accent-blue);">
+                                            <i class="fas fa-boxes-stacked"></i>
+                                        </div>
+
+                                        <span style="font-weight: 500;">
+                                            Stock:
+                                            <strong>${stockQuantity} units</strong>
+                                        </span>
+                                    </div>
                                 <div class="d-flex align-items-center gap-3 mb-2">
                                     <div style="width: 24px; color: var(--accent-color);"><i class="fas fa-shield-alt"></i></div>
                                     <span style="font-weight: 500;">Warranty: <strong>${p.warranty || 'N/A'}</strong></span>
