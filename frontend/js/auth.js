@@ -4,6 +4,31 @@
 
 window.API_BASE_URL = "http://localhost:5000/api";
 
+// =============================================
+// GLOBAL 401 HANDLER
+// If any API call returns 401 (invalid/expired/stale token),
+// clear storage and redirect to login automatically.
+// =============================================
+const _originalFetch = window.fetch;
+window.fetch = async function(...args) {
+    const response = await _originalFetch(...args);
+    if (response.status === 401) {
+        const clone = response.clone();
+        try {
+            const data = await clone.json();
+            if (data && data.message && (data.message === "Invalid Token" || data.message === "Access Denied. No Token Provided.")) {
+                console.warn("Auth: Received 401. Token is invalid or stale. Redirecting to login...");
+                localStorage.removeItem("token");
+                localStorage.removeItem("admin");
+                if (!window.location.href.includes("login.html")) {
+                    window.location.href = "login.html";
+                }
+            }
+        } catch(e) { /* non-JSON response, ignore */ }
+    }
+    return response;
+};
+
 const token = localStorage.getItem("token");
 
 // Check if we need to redirect to login
