@@ -27,6 +27,8 @@ module.exports = (req, res, next) => {
 
         console.log("JWT Verify Error:", err.name);
         console.log("JWT Verify Message:", err.message);
+        console.log("Token received:", token ? token.substring(0, 10) + "..." : "none");
+        console.log("Secret available:", !!process.env.JWT_SECRET);
 
         return res.status(401).json({
             success: false,

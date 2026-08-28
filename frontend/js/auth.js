@@ -2,7 +2,7 @@
    CHIPELEC POWER SYSTEM — Auth Helpers
    ========================================== */
 
-window.API_BASE_URL = "http://localhost:5000/api";
+// API_BASE_URL is defined in config.js (loaded before this file on every page)
 
 // =============================================
 // GLOBAL 401 HANDLER

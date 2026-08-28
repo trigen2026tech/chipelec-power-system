@@ -28,7 +28,17 @@ async function login() {
             })
         });
 
-        const data = await response.json();
+        // Safe JSON parsing — avoids crash if server returns HTML error page
+        let data;
+        const rawText = await response.text();
+        try {
+            data = JSON.parse(rawText);
+        } catch (parseErr) {
+            btn.classList.remove('btn-loading');
+            msg.innerHTML = `<div class="error-msg">Server error (HTTP ${response.status}). Please try again.</div>`;
+            console.error("Login: Server returned non-JSON response:", rawText.substring(0, 200));
+            return;
+        }
 
         if (data.success) {
             localStorage.setItem("token", data.token);
