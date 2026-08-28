@@ -1,4 +1,4 @@
-// v2.0.0 - Customer Portal (installations, service-requests, quotations, dashboard-stats)
+// v2.1.0 - Fix product DELETE route (async/await, FK handling)
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -79,7 +79,17 @@ app.use("/api/customer", customerAuthRoutes);
 
 
 app.get("/", (req, res) => {
-    res.send("🚀 Chipelec Power System Backend Running");
+    res.send("🚀 Chipelec Power System Backend Running — v2.1.0");
+});
+
+// Version check — used to confirm which code Railway is running
+app.get("/api/version", (req, res) => {
+    res.json({
+        version: "2.1.0",
+        commit: "2b7bfa0",
+        deployedAt: new Date().toISOString(),
+        fixes: ["DELETE /api/products/:id async/await FK handling"]
+    });
 });
 
 const PORT = process.env.PORT || 5000;
