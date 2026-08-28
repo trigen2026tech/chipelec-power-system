@@ -5,7 +5,6 @@ require("dotenv").config();
 const path = require("path");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const xss = require("xss-clean");
 
 console.log("========== ENV VARIABLES ==========");
 console.log({
@@ -43,7 +42,7 @@ const app = express();
 app.use(helmet({
     crossOriginResourcePolicy: false,
 }));
-app.use(xss());
+
 
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

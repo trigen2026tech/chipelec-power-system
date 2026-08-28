@@ -61,7 +61,7 @@ function downloadExcel(dataArray, filename) {
 // --- Sales Report ---
 async function showSalesReport() {
     try {
-        const res = await fetch("https://chipelec-power-system-production.up.railway.app/api/sales", {
+        const res = await fetch(window.API_BASE_URL + "/sales", {
             headers: { Authorization: "Bearer " + token }
         });
         const result = await res.json();
@@ -134,7 +134,7 @@ window.exportSalesExcel = function() {
 // --- Customer Report ---
 async function showCustomerReport() {
     try {
-        const res = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
+        const res = await fetch(window.API_BASE_URL + "/customers", {
             headers: { Authorization: "Bearer " + token }
         });
         const result = await res.json();
@@ -178,7 +178,7 @@ window.exportCustomerExcel = function() {
 // --- Maintenance Report ---
 async function showMaintenanceReport() {
     try {
-        const res = await fetch("https://chipelec-power-system-production.up.railway.app/api/maintenance", {
+        const res = await fetch(window.API_BASE_URL + "/maintenance", {
             headers: { Authorization: "Bearer " + token }
         });
         const result = await res.json();
@@ -256,7 +256,7 @@ window.exportMaintenanceExcel = function() {
 // --- Inventory Report ---
 async function showInventoryReport() {
     try {
-        const res = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+        const res = await fetch(window.API_BASE_URL + "/products", {
             headers: { Authorization: "Bearer " + token }
         });
         const result = await res.json();

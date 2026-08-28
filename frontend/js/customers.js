@@ -4,7 +4,7 @@ let allCustomers = [];
 
 async function loadCustomers() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
+        const response = await fetch(window.API_BASE_URL + "/customers", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -121,7 +121,7 @@ async function saveCustomer() {
         pincode: document.getElementById("pincode").value
     };
 
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
+    const response = await fetch(window.API_BASE_URL + "/customers", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -180,7 +180,7 @@ async function updateCustomer() {
         pincode: document.getElementById("pincode").value
     };
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/customers/${editingCustomer}`, {
+    const response = await fetch(`${window.API_BASE_URL}/customers/${editingCustomer}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -203,7 +203,7 @@ async function updateCustomer() {
 async function deleteCustomer(id) {
     if (!confirm("Are you sure you want to delete this customer?")) return;
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/customers/${id}`, {
+    const response = await fetch(`${window.API_BASE_URL}/customers/${id}`, {
         method: "DELETE",
         headers: { Authorization: "Bearer " + token }
     });

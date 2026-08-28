@@ -17,7 +17,7 @@ async function login() {
 
     try {
 
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/auth/login", {
+        const response = await fetch(window.API_BASE_URL + "/auth/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

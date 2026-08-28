@@ -1,5 +1,5 @@
 // Base URL for API requests
-const API_BASE_URL = "https://chipelec-power-system-production.up.railway.app/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 // ======================
 // AUTH HELPERS

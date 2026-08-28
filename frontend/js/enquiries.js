@@ -2,7 +2,7 @@
    CHIPELEC POWER SYSTEM — Admin Enquiries
    ========================================== */
 
-const API_BASE = "https://chipelec-power-system-production.up.railway.app/api";
+const API_BASE = window.API_BASE_URL + "";
 
 // State
 let allEnquiries = [];

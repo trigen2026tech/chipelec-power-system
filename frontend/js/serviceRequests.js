@@ -4,7 +4,7 @@ let allServices = [];
 
 async function loadServices() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/services", {
+        const response = await fetch(window.API_BASE_URL + "/services", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -82,7 +82,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 
 async function loadDropdowns() {
     try {
-        const custResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
+        const custResponse = await fetch(window.API_BASE_URL + "/customers", {
             headers: { Authorization: "Bearer " + token }
         });
         const custResult = await custResponse.json();
@@ -150,7 +150,7 @@ async function saveService() {
     };
 
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/services", {
+        const response = await fetch(window.API_BASE_URL + "/services", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -226,7 +226,7 @@ async function updateService() {
     };
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/services/${editingService}`, {
+        const response = await fetch(`${window.API_BASE_URL}/services/${editingService}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -254,7 +254,7 @@ async function deleteService(id) {
     if (!confirm("Are you sure you want to delete this service request?")) return;
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/services/${id}`, {
+        const response = await fetch(`${window.API_BASE_URL}/services/${id}`, {
             method: "DELETE",
             headers: { Authorization: "Bearer " + token }
         });

@@ -4,7 +4,7 @@ let allCategories = [];
 
 async function loadCategories() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/categories", {
+        const response = await fetch(window.API_BASE_URL + "/categories", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -85,7 +85,7 @@ async function saveCategory() {
 
     const category = { category_name: name };
 
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/categories", {
+    const response = await fetch(window.API_BASE_URL + "/categories", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -119,7 +119,7 @@ async function updateCategory() {
         return;
     }
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/categories/${editingCategory}`, {
+    const response = await fetch(`${window.API_BASE_URL}/categories/${editingCategory}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -142,7 +142,7 @@ async function updateCategory() {
 async function deleteCategory(id) {
     if (!confirm("Delete this category? This action cannot be undone.")) return;
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/categories/${id}`, {
+    const response = await fetch(`${window.API_BASE_URL}/categories/${id}`, {
         method: "DELETE",
         headers: { Authorization: "Bearer " + token }
     });

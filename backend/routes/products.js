@@ -239,69 +239,74 @@ router.delete("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
-    // Get a dedicated connection from the pool
+    console.log(`\n========== DELETE PRODUCT REQUEST ==========`);
+    console.log(`Product ID received: ${id}`);
+    console.log(`Timestamp: ${new Date().toISOString()}`);
+
+    // Get a dedicated connection from the pool for transaction support
     db.getConnection((connectionError, connection) => {
 
         if (connectionError) {
-
-            console.error("DELETE PRODUCT - CONNECTION ERROR:", connectionError);
-
+            console.error("DELETE PRODUCT - CONNECTION ERROR:", {
+                code: connectionError.code,
+                errno: connectionError.errno,
+                message: connectionError.message
+            });
             return res.status(500).json({
                 success: false,
-                message: "Database connection failed"
+                message: "Database connection failed",
+                debug: { code: connectionError.code, message: connectionError.message }
             });
         }
+
+        console.log("✅ Database connection acquired");
 
         // Start transaction
         connection.beginTransaction((transactionError) => {
 
             if (transactionError) {
-
-                console.error("DELETE PRODUCT - TRANSACTION ERROR:", transactionError);
-
+                console.error("DELETE PRODUCT - TRANSACTION START ERROR:", transactionError);
                 connection.release();
-
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to start delete transaction"
+                    message: "Unable to start delete transaction",
+                    debug: { code: transactionError.code, message: transactionError.message }
                 });
             }
+
+            console.log("✅ Transaction started");
 
             // ==========================================
             // STEP 1: CHECK PRODUCT EXISTS
             // ==========================================
 
-            const checkProductSql = `
-                SELECT id
-                FROM products
-                WHERE id = ?
-            `;
-
             connection.query(
-                checkProductSql,
+                "SELECT id, product_name FROM products WHERE id = ?",
                 [id],
                 (checkError, products) => {
 
                     if (checkError) {
-
-                        console.error("CHECK PRODUCT ERROR:", checkError);
-
+                        console.error("STEP 1 - CHECK PRODUCT ERROR:", {
+                            code: checkError.code,
+                            errno: checkError.errno,
+                            sqlMessage: checkError.sqlMessage,
+                            message: checkError.message,
+                            sql: checkError.sql
+                        });
                         return connection.rollback(() => {
                             connection.release();
-
                             res.status(500).json({
                                 success: false,
-                                message: "Unable to check product"
+                                message: "Unable to check product",
+                                debug: { code: checkError.code, sqlMessage: checkError.sqlMessage }
                             });
                         });
                     }
 
-                    // Product doesn't exist
                     if (products.length === 0) {
-
+                        console.log(`STEP 1 - Product ID ${id} not found in database`);
                         return connection.rollback(() => {
                             connection.release();
-
                             res.status(404).json({
                                 success: false,
                                 message: "Product not found"
@@ -309,128 +314,261 @@ router.delete("/:id", authMiddleware, (req, res) => {
                         });
                     }
 
+                    console.log(`STEP 1 ✅ Product found: "${products[0].product_name}" (id=${id})`);
+
                     // ==========================================
                     // STEP 2: DELETE INVENTORY TRANSACTIONS
+                    // (Hard delete — these are stock movement logs)
                     // ==========================================
 
-                    const deleteInventorySql = `
-                        DELETE FROM inventory_transactions
-                        WHERE product_id = ?
-                    `;
-
                     connection.query(
-                        deleteInventorySql,
+                        "DELETE FROM inventory_transactions WHERE product_id = ?",
                         [id],
                         (inventoryError, inventoryResult) => {
 
                             if (inventoryError) {
-
-                                console.error(
-                                    "DELETE INVENTORY TRANSACTIONS ERROR:",
-                                    inventoryError
-                                );
-
+                                console.error("STEP 2 - DELETE inventory_transactions ERROR:", {
+                                    code: inventoryError.code,
+                                    errno: inventoryError.errno,
+                                    sqlMessage: inventoryError.sqlMessage,
+                                    message: inventoryError.message,
+                                    sql: inventoryError.sql
+                                });
                                 return connection.rollback(() => {
                                     connection.release();
-
                                     res.status(500).json({
                                         success: false,
-                                        message: "Unable to delete product inventory records"
+                                        message: "Unable to delete product inventory records",
+                                        debug: { code: inventoryError.code, sqlMessage: inventoryError.sqlMessage }
                                     });
                                 });
                             }
 
-                            console.log(
-                                "Inventory transactions deleted:",
-                                inventoryResult.affectedRows
-                            );
+                            console.log(`STEP 2 ✅ inventory_transactions deleted: ${inventoryResult.affectedRows} rows`);
 
                             // ==========================================
-                            // STEP 3: DELETE PRODUCT
+                            // STEP 3: NULL-OUT product_id IN sales
+                            // (Preserve historical sales records)
                             // ==========================================
-
-                            const deleteProductSql = `
-                                DELETE FROM products
-                                WHERE id = ?
-                            `;
 
                             connection.query(
-                                deleteProductSql,
+                                "UPDATE sales SET product_id = NULL WHERE product_id = ?",
                                 [id],
-                                (deleteError, deleteResult) => {
+                                (salesError, salesResult) => {
 
-                                    if (deleteError) {
-
-                                        console.error(
-                                            "DELETE PRODUCT ERROR:",
-                                            deleteError
-                                        );
-
+                                    if (salesError) {
+                                        console.error("STEP 3 - UPDATE sales ERROR:", {
+                                            code: salesError.code,
+                                            errno: salesError.errno,
+                                            sqlMessage: salesError.sqlMessage,
+                                            message: salesError.message,
+                                            sql: salesError.sql
+                                        });
                                         return connection.rollback(() => {
                                             connection.release();
-
                                             res.status(500).json({
                                                 success: false,
-                                                message: "Unable to delete product"
+                                                message: "Unable to de-link product from sales records",
+                                                debug: { code: salesError.code, sqlMessage: salesError.sqlMessage }
                                             });
                                         });
                                     }
 
-                                    // ==========================================
-                                    // STEP 4: VERIFY PRODUCT WAS DELETED
-                                    // ==========================================
-
-                                    if (deleteResult.affectedRows === 0) {
-
-                                        return connection.rollback(() => {
-                                            connection.release();
-
-                                            res.status(404).json({
-                                                success: false,
-                                                message: "Product not found"
-                                            });
-                                        });
-                                    }
+                                    console.log(`STEP 3 ✅ sales records de-linked: ${salesResult.affectedRows} rows`);
 
                                     // ==========================================
-                                    // STEP 5: COMMIT
+                                    // STEP 4: NULL-OUT product_id IN installations
+                                    // (Preserve customer installation history)
                                     // ==========================================
 
-                                    connection.commit((commitError) => {
+                                    connection.query(
+                                        "UPDATE installations SET product_id = NULL WHERE product_id = ?",
+                                        [id],
+                                        (installError, installResult) => {
 
-                                        if (commitError) {
+                                            if (installError) {
+                                                console.error("STEP 4 - UPDATE installations ERROR:", {
+                                                    code: installError.code,
+                                                    errno: installError.errno,
+                                                    sqlMessage: installError.sqlMessage,
+                                                    message: installError.message,
+                                                    sql: installError.sql
+                                                });
+                                                return connection.rollback(() => {
+                                                    connection.release();
+                                                    res.status(500).json({
+                                                        success: false,
+                                                        message: "Unable to de-link product from installation records",
+                                                        debug: { code: installError.code, sqlMessage: installError.sqlMessage }
+                                                    });
+                                                });
+                                            }
 
-                                            console.error(
-                                                "DELETE PRODUCT COMMIT ERROR:",
-                                                commitError
+                                            console.log(`STEP 4 ✅ installations de-linked: ${installResult.affectedRows} rows`);
+
+                                            // ==========================================
+                                            // STEP 5: NULL-OUT product_id IN maintenance
+                                            // (Preserve customer maintenance history)
+                                            // ==========================================
+
+                                            connection.query(
+                                                "UPDATE maintenance SET product_id = NULL WHERE product_id = ?",
+                                                [id],
+                                                (maintError, maintResult) => {
+
+                                                    if (maintError) {
+                                                        console.error("STEP 5 - UPDATE maintenance ERROR:", {
+                                                            code: maintError.code,
+                                                            errno: maintError.errno,
+                                                            sqlMessage: maintError.sqlMessage,
+                                                            message: maintError.message,
+                                                            sql: maintError.sql
+                                                        });
+                                                        return connection.rollback(() => {
+                                                            connection.release();
+                                                            res.status(500).json({
+                                                                success: false,
+                                                                message: "Unable to de-link product from maintenance records",
+                                                                debug: { code: maintError.code, sqlMessage: maintError.sqlMessage }
+                                                            });
+                                                        });
+                                                    }
+
+                                                    console.log(`STEP 5 ✅ maintenance records de-linked: ${maintResult.affectedRows} rows`);
+
+                                                    // ==========================================
+                                                    // STEP 6: NULL-OUT product_id IN purchase_orders
+                                                    // (Preserve procurement history)
+                                                    // ==========================================
+
+                                                    connection.query(
+                                                        "UPDATE purchase_orders SET product_id = NULL WHERE product_id = ?",
+                                                        [id],
+                                                        (poError, poResult) => {
+
+                                                            if (poError) {
+                                                                console.error("STEP 6 - UPDATE purchase_orders ERROR:", {
+                                                                    code: poError.code,
+                                                                    errno: poError.errno,
+                                                                    sqlMessage: poError.sqlMessage,
+                                                                    message: poError.message,
+                                                                    sql: poError.sql
+                                                                });
+                                                                return connection.rollback(() => {
+                                                                    connection.release();
+                                                                    res.status(500).json({
+                                                                        success: false,
+                                                                        message: "Unable to de-link product from purchase orders",
+                                                                        debug: { code: poError.code, sqlMessage: poError.sqlMessage }
+                                                                    });
+                                                                });
+                                                            }
+
+                                                            console.log(`STEP 6 ✅ purchase_orders de-linked: ${poResult.affectedRows} rows`);
+
+                                                            // ==========================================
+                                                            // STEP 7: DELETE THE PRODUCT
+                                                            // (All FK references cleared — safe to delete)
+                                                            // ==========================================
+
+                                                            connection.query(
+                                                                "DELETE FROM products WHERE id = ?",
+                                                                [id],
+                                                                (deleteError, deleteResult) => {
+
+                                                                    if (deleteError) {
+                                                                        console.error("STEP 7 - DELETE products ERROR:", {
+                                                                            code: deleteError.code,
+                                                                            errno: deleteError.errno,
+                                                                            sqlMessage: deleteError.sqlMessage,
+                                                                            message: deleteError.message,
+                                                                            sql: deleteError.sql
+                                                                        });
+                                                                        return connection.rollback(() => {
+                                                                            connection.release();
+                                                                            res.status(500).json({
+                                                                                success: false,
+                                                                                message: "Unable to delete product",
+                                                                                debug: {
+                                                                                    code: deleteError.code,
+                                                                                    errno: deleteError.errno,
+                                                                                    sqlMessage: deleteError.sqlMessage,
+                                                                                    message: deleteError.message
+                                                                                }
+                                                                            });
+                                                                        });
+                                                                    }
+
+                                                                    if (deleteResult.affectedRows === 0) {
+                                                                        console.log(`STEP 7 - Product ID ${id} not found at delete step`);
+                                                                        return connection.rollback(() => {
+                                                                            connection.release();
+                                                                            res.status(404).json({
+                                                                                success: false,
+                                                                                message: "Product not found"
+                                                                            });
+                                                                        });
+                                                                    }
+
+                                                                    console.log(`STEP 7 ✅ Product ID ${id} deleted from products table`);
+
+                                                                    // ==========================================
+                                                                    // STEP 8: COMMIT TRANSACTION
+                                                                    // ==========================================
+
+                                                                    connection.commit((commitError) => {
+
+                                                                        if (commitError) {
+                                                                            console.error("STEP 8 - COMMIT ERROR:", {
+                                                                                code: commitError.code,
+                                                                                message: commitError.message
+                                                                            });
+                                                                            return connection.rollback(() => {
+                                                                                connection.release();
+                                                                                res.status(500).json({
+                                                                                    success: false,
+                                                                                    message: "Unable to complete product deletion",
+                                                                                    debug: { code: commitError.code, message: commitError.message }
+                                                                                });
+                                                                            });
+                                                                        }
+
+                                                                        connection.release();
+
+                                                                        console.log(`\n✅✅ Product ${id} permanently deleted successfully`);
+                                                                        console.log(`   inventory_transactions removed : ${inventoryResult.affectedRows}`);
+                                                                        console.log(`   sales de-linked                : ${salesResult.affectedRows}`);
+                                                                        console.log(`   installations de-linked        : ${installResult.affectedRows}`);
+                                                                        console.log(`   maintenance de-linked          : ${maintResult.affectedRows}`);
+                                                                        console.log(`   purchase_orders de-linked      : ${poResult.affectedRows}`);
+                                                                        console.log(`============================================\n`);
+
+                                                                        return res.status(200).json({
+                                                                            success: true,
+                                                                            message: "Product deleted successfully",
+                                                                            deletedId: parseInt(id),
+                                                                            summary: {
+                                                                                inventoryTransactionsRemoved: inventoryResult.affectedRows,
+                                                                                salesDelinked: salesResult.affectedRows,
+                                                                                installationsDelinked: installResult.affectedRows,
+                                                                                maintenanceDelinked: maintResult.affectedRows,
+                                                                                purchaseOrdersDelinked: poResult.affectedRows
+                                                                            }
+                                                                        });
+
+                                                                    });
+
+                                                                }
+                                                            );
+
+                                                        }
+                                                    );
+
+                                                }
                                             );
 
-                                            return connection.rollback(() => {
-                                                connection.release();
-
-                                                res.status(500).json({
-                                                    success: false,
-                                                    message: "Unable to complete product deletion"
-                                                });
-                                            });
                                         }
-
-                                        console.log(
-                                            `✅ Product ${id} permanently deleted`
-                                        );
-
-                                        console.log(
-                                            `Inventory transactions removed: ${inventoryResult.affectedRows}`
-                                        );
-
-                                        connection.release();
-
-                                        return res.status(200).json({
-                                            success: true,
-                                            message: "Product deleted successfully"
-                                        });
-
-                                    });
+                                    );
 
                                 }
                             );

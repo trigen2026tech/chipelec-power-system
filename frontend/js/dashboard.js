@@ -5,7 +5,7 @@ async function loadDashboard() {
     try {
 
         const response = await fetch(
-            "https://chipelec-power-system-production.up.railway.app/api/dashboard",
+            window.API_BASE_URL + "/dashboard",
             {
                 headers: {
                     Authorization: "Bearer " + token

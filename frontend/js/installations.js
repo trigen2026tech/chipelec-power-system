@@ -4,7 +4,7 @@ let allInstallations = [];
 
 async function loadInstallations() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/installations", {
+        const response = await fetch(window.API_BASE_URL + "/installations", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -84,7 +84,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 
 async function loadDropdowns() {
     try {
-        const custResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/customers", {
+        const custResponse = await fetch(window.API_BASE_URL + "/customers", {
             headers: { Authorization: "Bearer " + token }
         });
         const custResult = await custResponse.json();
@@ -98,7 +98,7 @@ async function loadDropdowns() {
     } catch(e) { console.error(e); }
 
     try {
-        const prodResponse = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+        const prodResponse = await fetch(window.API_BASE_URL + "/products", {
             headers: { Authorization: "Bearer " + token }
         });
         const prodResult = await prodResponse.json();
@@ -166,7 +166,7 @@ async function saveInstallation() {
     };
 
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/installations", {
+        const response = await fetch(window.API_BASE_URL + "/installations", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -238,7 +238,7 @@ async function updateInstallation() {
     };
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/installations/${editingInstallation}`, {
+        const response = await fetch(`${window.API_BASE_URL}/installations/${editingInstallation}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -266,7 +266,7 @@ async function deleteInstallation(id) {
     if (!confirm("Are you sure you want to delete this installation record?")) return;
 
     try {
-        const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/installations/${id}`, {
+        const response = await fetch(`${window.API_BASE_URL}/installations/${id}`, {
             method: "DELETE",
             headers: { Authorization: "Bearer " + token }
         });

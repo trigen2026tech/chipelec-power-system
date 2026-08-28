@@ -4,7 +4,7 @@ let allProducts = []; // For search filtering
 
 async function loadProducts() {
     try {
-        const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+        const response = await fetch(window.API_BASE_URL + "/products", {
             headers: { Authorization: "Bearer " + token }
         });
 
@@ -80,7 +80,7 @@ document.getElementById('searchInput')?.addEventListener('input', function(e) {
 });
 
 async function loadBrands() {
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/brands", {
+    const response = await fetch(window.API_BASE_URL + "/brands", {
         headers: { Authorization: "Bearer " + token }
     });
     const result = await response.json();
@@ -92,7 +92,7 @@ async function loadBrands() {
 }
 
 async function loadCategories() {
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/categories", {
+    const response = await fetch(window.API_BASE_URL + "/categories", {
         headers: { Authorization: "Bearer " + token }
     });
     const result = await response.json();
@@ -131,7 +131,7 @@ async function addProduct() {
         category_id: categoryId
     };
 
-    const response = await fetch("https://chipelec-power-system-production.up.railway.app/api/products", {
+    const response = await fetch(window.API_BASE_URL + "/products", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -202,7 +202,7 @@ async function deleteProduct(id) {
     }
 
     try {
-        const url = `https://chipelec-power-system-production.up.railway.app/api/products/${id}`;
+        const url = `${window.API_BASE_URL}/products/${id}`;
 
         console.log("Deleting product:", {
             id: id,
@@ -289,7 +289,7 @@ async function editProduct(id) {
     editingProductId = id;
     document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square"></i> Edit Product';
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${id}`, {
+    const response = await fetch(`${window.API_BASE_URL}/products/${id}`, {
         headers: { Authorization: "Bearer " + token }
     });
 
@@ -354,7 +354,7 @@ async function updateProduct() {
         status: "Available"
     };
 
-    const response = await fetch(`https://chipelec-power-system-production.up.railway.app/api/products/${editingProductId}`, {
+    const response = await fetch(`${window.API_BASE_URL}/products/${editingProductId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
