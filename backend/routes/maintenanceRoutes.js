@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
-
+const authMiddleware = require("../middleware/authMiddleware");
 
 // ===========================
 // GET ALL MAINTENANCE
 // ===========================
-router.get("/", (req, res) => {
+router.get("/", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT
@@ -44,7 +44,7 @@ router.get("/", (req, res) => {
 // ===========================
 // ADD MAINTENANCE
 // ===========================
-router.post("/", (req, res) => {
+router.post("/", authMiddleware, (req, res) => {
 
     const {
         customer_id,
@@ -107,7 +107,7 @@ router.post("/", (req, res) => {
 // ===========================
 // GET SINGLE MAINTENANCE
 // ===========================
-router.get("/:id", (req, res) => {
+router.get("/:id", authMiddleware, (req, res) => {
 
     const sql = `
         SELECT *
@@ -144,7 +144,7 @@ router.get("/:id", (req, res) => {
 // ===========================
 // UPDATE MAINTENANCE
 // ===========================
-router.put("/:id", (req, res) => {
+router.put("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 
@@ -206,7 +206,7 @@ router.put("/:id", (req, res) => {
 // ===========================
 // DELETE MAINTENANCE
 // ===========================
-router.delete("/:id", (req, res) => {
+router.delete("/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
 

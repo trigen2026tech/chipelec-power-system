@@ -75,11 +75,13 @@ if (!isMatch) {
 
 });
 
+const authMiddleware = require("../middleware/authMiddleware");
+
 // ======================
 // UPDATE PROFILE
 // ======================
 
-router.put("/profile/:id", (req, res) => {
+router.put("/profile/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
     const { username, email } = req.body;
@@ -120,7 +122,7 @@ router.put("/profile/:id", (req, res) => {
 // CHANGE PASSWORD
 // ======================
 
-router.put("/change-password/:id", (req, res) => {
+router.put("/change-password/:id", authMiddleware, (req, res) => {
 
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
