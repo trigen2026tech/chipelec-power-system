@@ -1,4 +1,10 @@
 async function login() {
+    if (!window.API_BASE_URL) {
+        console.error("CRITICAL ERROR: window.API_BASE_URL is missing.");
+        document.getElementById("msg").innerHTML = '<div class="error-msg">Configuration Error: API URL not found.</div>';
+        return;
+    }
+
 
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;

@@ -1,5 +1,12 @@
 // Base URL for API requests
-const API_BASE_URL = "http://localhost:5000/api";
+const hostname = window.location.hostname;
+const API_BASE_URL = (hostname === "localhost" || hostname === "127.0.0.1") 
+    ? "http://localhost:5000/api" 
+    : "https://chipelec-power-system-production.up.railway.app/api";
+
+if (!API_BASE_URL || API_BASE_URL === "undefined") {
+    console.error("CRITICAL ERROR: API_BASE_URL is missing or undefined.");
+}
 
 // ======================
 // AUTH HELPERS
