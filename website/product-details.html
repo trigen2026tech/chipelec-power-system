@@ -127,9 +127,10 @@
                 ) {
                     imgUrl = imagePath;
                 } else {
-                    imgUrl = `${window.location.origin}/${imagePath.replace(/^\/+/, '')}`;
+                    imgUrl = API_BASE_URL.replace('/api', '') + '/uploads/' + imagePath;
                 }
             }
+
 
             // Stock / availability
             const stockQuantity = Number(p.stock_quantity || 0);

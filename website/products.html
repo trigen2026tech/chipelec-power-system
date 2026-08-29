@@ -162,7 +162,7 @@
                 }
 
                 products.forEach(p => {
-                    const imgUrl = p.image || '/products/default.jpeg';
+                    const imgUrl = p.image ? (API_BASE_URL.replace('/api', '') + '/uploads/' + p.image) : '/products/default.jpeg';
                     
                     const catLower = (p.category_name || '').toLowerCase();
                     const categoryBg = catLower === 'battery' ? '#FFFBEB' : (catLower === 'inverter' ? '#EFF6FF' : 'var(--bg-subtle-blue)');

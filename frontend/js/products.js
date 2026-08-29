@@ -41,10 +41,11 @@ function renderTable(data) {
     }
 
     data.forEach(product => {
+        const imgUrl = product.image ? (window.API_BASE_URL.replace('/api', '') + '/uploads/' + product.image) : '/products/no-image.png';
         table.innerHTML += `
         <tr>
             <td>
-                <img src="${product.image || '/products/no-image.png'}" alt="${product.product_name}" onerror="this.src='/products/no-image.png'">
+                <img src="${imgUrl}" alt="${product.product_name}" onerror="this.src='/products/no-image.png'">
             </td>
             <td style="font-weight: 500;">${product.product_name}</td>
             <td><span class="badge-status badge-info">${product.brand_name || '-'}</span></td>
@@ -144,6 +145,13 @@ async function addProduct() {
 
     if (result.success) {
         if(window.showToast) window.showToast('Product added successfully!');
+        
+        // Upload image if selected
+        const fileInput = document.getElementById("product_image");
+        if (fileInput.files.length > 0) {
+            await uploadProductImage(result.productId, fileInput.files[0]);
+        }
+        
         loadProducts();
         closeModal();
     } else {
@@ -178,6 +186,15 @@ function clearForm() {
     document.getElementById("description").value = "";
     document.getElementById("brand_id").selectedIndex = 0;
     document.getElementById("category_id").selectedIndex = 0;
+    
+    // Clear image
+    const imageInput = document.getElementById("product_image");
+    if (imageInput) imageInput.value = "";
+    const previewContainer = document.getElementById("imagePreviewContainer");
+    if (previewContainer) previewContainer.style.display = "none";
+    const previewImage = document.getElementById("imagePreview");
+    if (previewImage) previewImage.src = "";
+    
     editingProductId = null;
 }
 
@@ -367,6 +384,13 @@ async function updateProduct() {
 
     if (result.success) {
         if(window.showToast) window.showToast('Product updated successfully!');
+        
+        // Upload image if selected
+        const fileInput = document.getElementById("product_image");
+        if (fileInput.files.length > 0) {
+            await uploadProductImage(editingProductId, fileInput.files[0]);
+        }
+        
         editingProductId = null;
         closeModal();
         loadProducts();
@@ -374,3 +398,54 @@ async function updateProduct() {
         if(window.showToast) window.showToast(result.message, 'error');
     }
 }
+
+// ======================
+// IMAGE UPLOAD HELPER
+// ======================
+async function uploadProductImage(productId, file) {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const response = await fetch(`${window.API_BASE_URL}/products/upload/${productId}`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + token
+            },
+            body: formData
+        });
+        const result = await response.json();
+        if (!result.success) {
+            if(window.showToast) window.showToast('Failed to upload image: ' + result.message, 'error');
+            console.error("Image upload failed:", result);
+        }
+    } catch (err) {
+        console.error("Error uploading image:", err);
+        if(window.showToast) window.showToast('Error uploading image', 'error');
+    }
+}
+
+// ======================
+// IMAGE PREVIEW LISTENER
+// ======================
+document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById("product_image");
+    if (fileInput) {
+        fileInput.addEventListener("change", function() {
+            const previewContainer = document.getElementById("imagePreviewContainer");
+            const previewImage = document.getElementById("imagePreview");
+            
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = "block";
+                }
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                previewContainer.style.display = "none";
+                previewImage.src = "";
+            }
+        });
+    }
+});
