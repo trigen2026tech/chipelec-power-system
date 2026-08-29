@@ -162,7 +162,7 @@
                 }
 
                 products.forEach(p => {
-                    const imgUrl = p.image ? (API_BASE_URL.replace('/api', '') + '/uploads/' + p.image) : '/products/default.jpeg';
+                    const imgUrl = p.image ? (API_BASE_URL.replace('/api', '') + '/uploads/' + p.image) : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
                     
                     const catLower = (p.category_name || '').toLowerCase();
                     const categoryBg = catLower === 'battery' ? '#FFFBEB' : (catLower === 'inverter' ? '#EFF6FF' : 'var(--bg-subtle-blue)');
@@ -173,7 +173,7 @@
                     card.innerHTML = `
                         <div class="product-image-wrapper">
                             <span class="badge ${p.status === 'Active' ? 'badge-completed' : 'badge-default'}" style="position: absolute; top: 12px; right: 12px; z-index: 2;">${p.status === 'Active' ? 'In Stock' : p.status}</span>
-                            <img src="${imgUrl}" alt="${p.product_name}">
+                            <img src="${imgUrl}" alt="${p.product_name}" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';">
                         </div>
                         <div class="product-card-body">
                             <div class="d-flex justify-content-between align-items-center mb-3">
