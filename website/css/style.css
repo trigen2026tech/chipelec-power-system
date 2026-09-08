@@ -2107,3 +2107,272 @@ footer::before {
         font-size: 0.8rem;
     }
 }
+
+/* =========================================================
+   ABOUT PAGE
+   ========================================================= */
+
+.about-hero {
+    padding: 72px 0 68px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-color) 0%,
+            #172554 100%
+        );
+
+    color: #ffffff;
+
+    text-align: center;
+}
+
+.about-eyebrow {
+    display: inline-flex;
+
+    padding: 7px 14px;
+
+    margin-bottom: 16px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.1);
+
+    color: #ffffff;
+
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
+}
+
+.about-hero h1 {
+    margin: 0 0 18px;
+
+    color: #ffffff;
+
+    font-size: 3.2rem;
+    line-height: 1.12;
+
+    letter-spacing: -1px;
+}
+
+.about-hero p {
+    max-width: 650px;
+
+    margin: 0 auto;
+
+    color: #dbeafe;
+
+    font-size: 1.08rem;
+
+    line-height: 1.7;
+}
+
+
+/* ---------------------------------------------------------
+   ABOUT CONTENT
+   --------------------------------------------------------- */
+
+.about-content {
+    padding: 72px 0;
+
+    background: var(--bg-color);
+}
+
+.about-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 60px;
+
+    align-items: center;
+}
+
+
+/* ---------------------------------------------------------
+   ABOUT TEXT
+   --------------------------------------------------------- */
+
+.about-copy .section-eyebrow {
+    display: inline-block;
+
+    margin-bottom: 14px;
+
+    color: var(--accent-blue);
+
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.about-copy h2 {
+    max-width: 500px;
+
+    margin: 0 0 22px;
+
+    color: var(--primary-color);
+
+    font-size: 2.4rem;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.8px;
+}
+
+.about-copy p {
+    max-width: 600px;
+
+    margin: 0 0 16px;
+
+    color: var(--text-muted);
+
+    font-size: 1rem;
+
+    line-height: 1.75;
+}
+
+
+/* ---------------------------------------------------------
+   HIGHLIGHTS
+   --------------------------------------------------------- */
+
+.about-highlights {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin: 26px 0 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+.about-highlights li {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    color: var(--primary-color);
+
+    font-size: 0.96rem;
+
+    font-weight: 600;
+}
+
+.about-highlights li i {
+    color: var(--success-color);
+
+    font-size: 1rem;
+}
+
+
+/* ---------------------------------------------------------
+   ABOUT IMAGE
+   --------------------------------------------------------- */
+
+.about-image {
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border-color);
+
+    box-shadow: var(--shadow-md);
+}
+
+.about-image img {
+    width: 100%;
+
+    height: auto;
+
+    display: block;
+
+    object-fit: contain;
+}
+
+/* =========================================================
+   ABOUT PAGE - MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .about-hero {
+        padding: 52px 0 48px;
+    }
+
+    .about-hero h1 {
+        font-size: 2.35rem;
+
+        line-height: 1.12;
+
+        letter-spacing: -0.6px;
+    }
+
+    .about-hero p {
+        font-size: 1rem;
+
+        line-height: 1.65;
+    }
+
+
+    .about-content {
+        padding: 52px 0;
+    }
+
+    .about-grid {
+        grid-template-columns: 1fr;
+
+        gap: 36px;
+    }
+
+
+    .about-copy h2 {
+        font-size: 2rem;
+    }
+
+    .about-copy p {
+        font-size: 0.96rem;
+
+        line-height: 1.7;
+    }
+
+
+    .about-image {
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .about-hero {
+        padding: 44px 0 42px;
+    }
+
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+
+    .about-content {
+        padding: 44px 0;
+    }
+
+    .about-copy h2 {
+        font-size: 1.8rem;
+    }
+
+    .about-highlights {
+        gap: 10px;
+    }
+}
