@@ -1845,3 +1845,270 @@ footer::before {
         height: auto;
     }
 }
+/* =========================================================
+   CHIPELEC FOOTER
+   ========================================================= */
+
+.site-footer {
+    background: var(--primary-color);
+    color: #ffffff;
+
+    padding: 64px 0 0;
+
+    margin-top: 0;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER GRID
+   --------------------------------------------------------- */
+
+.site-footer .footer-grid {
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1fr
+        1fr
+        1.4fr;
+
+    gap: 48px;
+
+    padding-bottom: 48px;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER BRAND
+   --------------------------------------------------------- */
+
+.footer-logo {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 800;
+
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.footer-logo img {
+    width: 48px;
+    height: 38px;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+.footer-logo span {
+    color: #ffffff;
+}
+
+.footer-brand > p {
+    max-width: 330px;
+
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 0.95rem;
+
+    line-height: 1.7;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER HEADINGS
+   --------------------------------------------------------- */
+
+.site-footer .footer-col h3 {
+    margin: 0 0 20px;
+
+    color: #ffffff;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER LISTS
+   --------------------------------------------------------- */
+
+.site-footer .footer-col ul {
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+}
+
+.site-footer .footer-col li {
+    margin-bottom: 12px;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 0.92rem;
+
+    line-height: 1.6;
+}
+
+.site-footer .footer-col a {
+    color: rgba(255, 255, 255, 0.72);
+
+    transition:
+        color 0.2s ease,
+        padding-left 0.2s ease;
+}
+
+.site-footer .footer-col a:hover {
+    color: #ffffff;
+
+    padding-left: 4px;
+}
+
+
+/* ---------------------------------------------------------
+   CONTACT
+   --------------------------------------------------------- */
+
+.footer-contact li {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+}
+
+.footer-contact li i {
+    width: 18px;
+
+    margin-top: 4px;
+
+    color: var(--accent-blue);
+
+    flex-shrink: 0;
+}
+
+.footer-contact li span {
+    flex: 1;
+}
+
+
+/* ---------------------------------------------------------
+   FOOTER BOTTOM
+   --------------------------------------------------------- */
+
+.site-footer .footer-bottom {
+    min-height: 68px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-footer .footer-bottom p {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.6);
+
+    font-size: 0.85rem;
+}
+
+.site-footer .footer-tagline {
+    text-transform: capitalize;
+}
+/* =========================================================
+   FOOTER - MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .site-footer {
+        padding-top: 48px;
+    }
+
+    .site-footer .footer-grid {
+        grid-template-columns: 1fr;
+
+        gap: 34px;
+
+        padding-bottom: 36px;
+    }
+
+    .footer-logo {
+        font-size: 18px;
+
+        white-space: normal;
+    }
+
+    .footer-logo img {
+        width: 44px;
+        height: 36px;
+    }
+
+    .footer-brand > p {
+        max-width: 100%;
+
+        font-size: 0.94rem;
+    }
+
+    .site-footer .footer-col h3 {
+        margin-bottom: 14px;
+    }
+
+    .site-footer .footer-col li {
+        margin-bottom: 10px;
+    }
+
+    .site-footer .footer-bottom {
+        min-height: auto;
+
+        padding: 20px 0;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 6px;
+    }
+}
+@media (max-width: 480px) {
+
+    .site-footer {
+        padding-top: 42px;
+    }
+
+    .site-footer .footer-grid {
+        gap: 28px;
+    }
+
+    .footer-logo {
+        font-size: 17px;
+    }
+
+    .footer-brand > p {
+        font-size: 0.9rem;
+    }
+
+    .site-footer .footer-bottom p {
+        font-size: 0.8rem;
+    }
+}
