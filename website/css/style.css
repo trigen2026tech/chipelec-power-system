@@ -1850,11 +1850,9 @@ footer::before {
    ========================================================= */
 
 .site-footer {
-    background: var(--primary-color);
+     background: var(--primary-color);
     color: #ffffff;
-
-    padding: 64px 0 0;
-
+    padding: 42px 0 0;
     margin-top: 0;
 }
 
@@ -1871,10 +1869,8 @@ footer::before {
         1fr
         1fr
         1.4fr;
-
-    gap: 48px;
-
-    padding-bottom: 48px;
+    gap: 36px;
+    padding-bottom: 30px;
 }
 
 
@@ -2011,7 +2007,7 @@ footer::before {
    --------------------------------------------------------- */
 
 .site-footer .footer-bottom {
-    min-height: 68px;
+    min-height: 54px;
 
     display: flex;
 
@@ -2042,15 +2038,14 @@ footer::before {
 @media (max-width: 768px) {
 
     .site-footer {
-        padding-top: 48px;
+        padding-top: 36px;
     }
 
     .site-footer .footer-grid {
         grid-template-columns: 1fr;
 
-        gap: 34px;
-
-        padding-bottom: 36px;
+        gap: 26px;
+        padding-bottom: 26px;
     }
 
     .footer-logo {
