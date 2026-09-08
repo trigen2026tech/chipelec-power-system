@@ -3,128 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Products | CHIPELEC Power System</title>
-    <meta name="description" content="Explore our wide range of batteries and inverters.">
+    <meta name="description" content="Explore CHIPELEC batteries and inverters for reliable home and business power backup.">
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
-    <!-- Navbar (Same as index.html but active class handled by main.js) -->
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
+
+            <a href="index.html" class="navbar-brand">
+                <img src="images/chipelec-logo.png" alt="CHIPELEC Power Systems">
+                <span>CHIPELEC POWER SYSTEMS</span>
+            </a>
+
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="about.html">About</a>
-                <a href="products.html">Products</a>
+                <a href="products.html" class="active">Products</a>
                 <a href="services.html">Services</a>
                 <a href="contact.html">Contact</a>
-                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+                <a href="login.html" class="btn btn-outline">Login</a>
             </div>
+
             <div class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
             </div>
+
         </div>
     </nav>
 
-    <!-- Page Header -->
-    <header class="py-8 bg-gradient-navy text-center">
-        <div class="container animate-fade-in-up">
-            <h1 style="font-size: 3.2rem; margin-bottom: 16px;">Our Products</h1>
-            <p style="font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto;">High-performance energy solutions tailored to keep your life uninterrupted.</p>
+
+    <!-- Products Hero -->
+    <header class="products-hero">
+        <div class="container">
+
+            <div class="products-hero-content">
+
+                <span class="products-eyebrow">POWER SOLUTIONS</span>
+
+                <h1>
+                    Reliable Power.<br>
+                    Built for Your Needs.
+                </h1>
+
+                <p>
+                    Explore our range of batteries and inverters designed
+                    to provide dependable backup power for homes and businesses.
+                </p>
+
+            </div>
+
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="py-8 bg-light">
+
+    <!-- Products Main -->
+    <main class="products-section">
+
         <div class="container">
-            
-            <!-- Filters & Sorting -->
-            <div class="card mb-6 animate-fade-in-up" style="animation-delay: 0.1s; padding: var(--space-4);">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: center;">
-                    <div style="grid-column: 1 / -1; display: flex; gap: 16px; flex-wrap: wrap;">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search by product name, model, brand, category..." style="flex-grow: 1; min-width: 300px;">
-                        <select id="sortFilter" class="form-control" style="width: auto; min-width: 200px;">
-                            <option value="default">Sort By</option>
+
+            <!-- Filter Panel -->
+            <section class="products-filter-card">
+
+                <div class="products-filter-heading">
+
+                    <div>
+                        <span class="products-filter-eyebrow">FIND YOUR PRODUCT</span>
+                        <h2>Explore Our Products</h2>
+                    </div>
+
+                    <i class="fas fa-sliders"></i>
+
+                </div>
+
+
+                <!-- Search -->
+                <div class="products-search">
+
+                    <label for="searchInput">
+                        Search Products
+                    </label>
+
+                    <div class="products-search-input">
+
+                        <i class="fas fa-search"></i>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control"
+                            placeholder="Search by product name, model, brand or category..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Filters -->
+                <div class="products-filter-grid">
+
+                    <div class="products-filter-field">
+
+                        <label for="categoryFilter">
+                            Category
+                        </label>
+
+                        <select id="categoryFilter" class="form-control">
+
+                            <option value="">All Categories</option>
+                            <option value="Battery">Battery</option>
+                            <option value="Inverter">Inverter</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="products-filter-field">
+
+                        <label for="brandFilter">
+                            Brand
+                        </label>
+
+                        <select id="brandFilter" class="form-control">
+
+                            <option value="">All Brands</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="products-filter-field">
+
+                        <label for="priceFilter">
+                            Price Range
+                        </label>
+
+                        <select id="priceFilter" class="form-control">
+
+                            <option value="">Any Price</option>
+                            <option value="0-5000">Under ₹5,000</option>
+                            <option value="5000-15000">₹5,000 - ₹15,000</option>
+                            <option value="15000-30000">₹15,000 - ₹30,000</option>
+                            <option value="30000+">Above ₹30,000</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="products-filter-field">
+
+                        <label for="availabilityFilter">
+                            Availability
+                        </label>
+
+                        <select id="availabilityFilter" class="form-control">
+
+                            <option value="">All Products</option>
+                            <option value="Available">In Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="products-filter-field products-sort-field">
+
+                        <label for="sortFilter">
+                            Sort By
+                        </label>
+
+                        <select id="sortFilter" class="form-control">
+
+                            <option value="default">Recommended</option>
                             <option value="price-low">Price: Low to High</option>
                             <option value="price-high">Price: High to Low</option>
                             <option value="alpha">Alphabetical</option>
                             <option value="newest">Newest First</option>
+
                         </select>
+
                     </div>
-                    
-                    <select id="categoryFilter" class="form-control">
-                        <option value="">All Categories</option>
-                        <option value="Battery">Battery</option>
-                        <option value="Inverter">Inverter</option>
-                    </select>
-                    
-                    <select id="brandFilter" class="form-control">
-                        <option value="">All Brands</option>
-                    </select>
-                    
-                    <select id="priceFilter" class="form-control">
-                        <option value="">Any Price</option>
-                        <option value="0-5000">Under ₹5,000</option>
-                        <option value="5000-15000">₹5,000 - ₹15,000</option>
-                        <option value="15000-30000">₹15,000 - ₹30,000</option>
-                        <option value="30000+">Above ₹30,000</option>
-                    </select>
-                    
-                    <select id="availabilityFilter" class="form-control">
-                        <option value="">Availability (All)</option>
-                        <option value="Active">In Stock</option>
-                        <option value="Out of Stock">Out of Stock</option>
-                    </select>
+
                 </div>
+
+            </section>
+
+
+            <!-- Error -->
+            <div
+                id="errorMessage"
+                class="products-error"
+                style="display: none;"
+            >
+
+                <i class="fas fa-exclamation-triangle"></i>
+
+                <h3 id="errorText">
+                    Failed to load products.
+                </h3>
+
             </div>
 
-            <!-- Error/Empty State -->
-            <div id="errorMessage" class="text-center" style="display: none; padding: 40px; color: var(--danger-color);">
-                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                <h3 id="errorText">Failed to load products.</h3>
-            </div>
 
             <!-- Product Grid -->
-            <div class="product-grid" id="productGrid">
-                <!-- Skeletons -->
+            <section
+                class="product-grid products-grid-refined"
+                id="productGrid"
+            >
+
+                <!-- Loading skeletons -->
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
-            </div>
+
+            </section>
 
         </div>
+
     </main>
 
+
     <!-- Footer -->
-    <footer>
+    <footer class="site-footer">
+
         <div class="container">
+
             <div class="footer-grid">
+
                 <div class="footer-col">
-                    <h3 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">CHIPELEC<span style="color: var(--accent-blue);">.</span></h3>
-                    <p>Reliable Battery & Inverter Solutions for Homes & Businesses.</p>
+
+                    <a href="index.html" class="footer-brand">
+                        <img
+                            src="images/chipelec-logo.png"
+                            alt="CHIPELEC Power Systems"
+                        >
+                        <span>CHIPELEC POWER SYSTEMS</span>
+                    </a>
+
+                    <p class="footer-tagline">
+                        Reliable power solutions for homes and businesses.
+                    </p>
+
                 </div>
+
+
                 <div class="footer-col">
+
                     <h3>Quick Links</h3>
+
                     <ul>
+                        <li><a href="index.html">Home</a></li>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="products.html">Products</a></li>
                         <li><a href="services.html">Services</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
+
                 </div>
+
+
+                <div class="footer-col">
+
+                    <h3>Our Services</h3>
+
+                    <ul>
+                        <li><a href="installation.html">Installation</a></li>
+                        <li><a href="service-request.html">Maintenance & Repair</a></li>
+                        <li><a href="quotation.html">Expert Consultation</a></li>
+                    </ul>
+
+                </div>
+
+
+                <div class="footer-col">
+
+                    <h3>Contact</h3>
+
+                    <ul class="footer-contact-list">
+
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:+919840313242">
+                                +91 9840313242
+                            </a>
+                        </li>
+
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:support@chipelec.com">
+                                support@chipelec.com
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
             </div>
+
+
             <div class="footer-bottom">
-                <p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p>
+
+                <p>
+                    &copy; 2026 CHIPELEC Power System. All rights reserved.
+                </p>
+
             </div>
+
         </div>
+
     </footer>
+
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+
+
+    <!-- Products Functionality -->
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+
             const productGrid = document.getElementById('productGrid');
             const errorMessage = document.getElementById('errorMessage');
             const searchInput = document.getElementById('searchInput');
@@ -133,144 +343,466 @@
             const priceFilter = document.getElementById('priceFilter');
             const availabilityFilter = document.getElementById('availabilityFilter');
             const sortFilter = document.getElementById('sortFilter');
-            
+
             let allProducts = [];
 
-            // IMPORTANT: The backend /api/products requires authMiddleware!
-            // Wait, let's look closely at products.js. 
-            // router.get("/", authMiddleware, ...)
-            // Yes, GET / requires auth. We need to handle this. For the customer website, if it requires auth, we can only show mock data or an error if they are not logged in.
-            // But usually public products are public. Let's try fetching and fallback to mock if 401.
 
             async function fetchProducts() {
+
                 try {
-                    const products = await window.api.products.getAllProducts();
-                    return (products.data || []).filter(p => p.status !== 'Inactive');
+
+                    const products =
+                        await window.api.products.getAllProducts();
+
+                    return (products.data || [])
+                        .filter(p => p.status !== 'Inactive');
+
                 } catch (e) {
-                    console.error("API Error fetching products:", e);
+
+                    console.error(
+                        "API Error fetching products:",
+                        e
+                    );
+
                     errorMessage.style.display = 'block';
-                    document.getElementById('errorText').innerText = "Failed to load products from database.";
+
+                    document.getElementById('errorText').innerText =
+                        "Failed to load products from database.";
+
                     return [];
+
                 }
+
             }
+
 
             function renderProducts(products) {
+
                 productGrid.innerHTML = '';
-                if(products.length === 0) {
-                    productGrid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 40px;">No products found matching your criteria.</div>';
-                    return;
-                }
 
-                products.forEach(p => {
-                    let imgUrl = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
-                    if (p.image) {
-                        const imgStr = String(p.image).trim();
-                        if (imgStr.startsWith('http://') || imgStr.startsWith('https://')) {
-                            imgUrl = imgStr;
-                        } else if (imgStr.includes('/')) {
-                            imgUrl = imgStr.startsWith('/') ? imgStr : '/' + imgStr;
-                        } else {
-                            imgUrl = API_BASE_URL.replace('/api', '') + '/uploads/' + imgStr;
-                        }
-                    }
-                    
-                    const catLower = (p.category_name || '').toLowerCase();
-                    const categoryBg = catLower === 'battery' ? '#FFFBEB' : (catLower === 'inverter' ? '#EFF6FF' : 'var(--bg-subtle-blue)');
-                    const categoryColor = catLower === 'battery' ? 'var(--accent-color)' : (catLower === 'inverter' ? 'var(--accent-blue)' : 'var(--accent-blue)');
+                if (products.length === 0) {
 
-                    const card = document.createElement('div');
-                    card.className = 'product-card animate-fade-in-up';
-                    card.innerHTML = `
-                        <div class="product-image-wrapper">
-                            <span class="badge ${p.status === 'Active' ? 'badge-completed' : 'badge-default'}" style="position: absolute; top: 12px; right: 12px; z-index: 2;">${p.status === 'Active' ? 'In Stock' : p.status}</span>
-                            <img src="${imgUrl}" alt="${p.product_name}" onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';">
-                        </div>
-                        <div class="product-card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="product-category" style="background: ${categoryBg}; color: ${categoryColor}; margin: 0;">${p.category_name || 'Uncategorized'}</span>
-                                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">${p.brand_name || 'Generic'}</span>
+                    productGrid.innerHTML = `
+                        <div class="products-empty-state">
+                            <div class="products-empty-icon">
+                                <i class="fas fa-box-open"></i>
                             </div>
-                            <h3 class="product-title">${p.product_name}</h3>
-                            <p class="text-muted" style="margin-bottom: 4px; font-size: 14px;"><strong>Model:</strong> ${p.model_number || 'N/A'}</p>
-                            <p class="text-muted" style="margin-bottom: 16px; font-size: 14px;"><strong>Capacity:</strong> ${p.capacity || 'N/A'} | <strong>Warranty:</strong> ${p.warranty || 'N/A'}</p>
-                            
-                            <div class="product-price">₹${parseFloat(p.price || 0).toLocaleString()}</div>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                <a href="product-details.html?id=${p.id}" class="btn btn-secondary" style="padding: 10px; font-size: 14px;">Details</a>
-                                <a href="enquiry.html?product=${p.id}" class="btn btn-primary" style="padding: 10px; font-size: 14px;">Enquire</a>
-                            </div>
+
+                            <h3>No Products Found</h3>
+
+                            <p>
+                                No products match your current search or filters.
+                                Try adjusting your selection.
+                            </p>
                         </div>
                     `;
-                    productGrid.appendChild(card);
-                });
-            }
 
-            function populateBrands(products) {
-                const brands = [...new Set(products.map(p => p.brand_name).filter(Boolean))].sort();
-                brands.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b;
-                    opt.textContent = b;
-                    brandFilter.appendChild(opt);
-                });
-            }
+                    return;
 
-            function filterProducts() {
-                const search = searchInput.value.toLowerCase();
-                const category = categoryFilter.value;
-                const brand = brandFilter.value;
-                const priceRange = priceFilter.value;
-                const availability = availabilityFilter.value;
-
-                let filtered = allProducts.filter(p => {
-                    const matchesSearch = (p.product_name && p.product_name.toLowerCase().includes(search)) || 
-                                          (p.model_number && p.model_number.toLowerCase().includes(search)) ||
-                                          (p.brand_name && p.brand_name.toLowerCase().includes(search)) ||
-                                          (p.category_name && p.category_name.toLowerCase().includes(search));
-                    
-                    const matchesCat = category === "" || p.category_name === category;
-                    const matchesBrand = brand === "" || p.brand_name === brand;
-                    const matchesAvailability = availability === "" || p.status === availability;
-                    
-                    let matchesPrice = true;
-                    if(priceRange) {
-                        const price = parseFloat(p.price || 0);
-                        if(priceRange === '0-5000') matchesPrice = price < 5000;
-                        else if(priceRange === '5000-15000') matchesPrice = price >= 5000 && price <= 15000;
-                        else if(priceRange === '15000-30000') matchesPrice = price > 15000 && price <= 30000;
-                        else if(priceRange === '30000+') matchesPrice = price > 30000;
-                    }
-                    
-                    return matchesSearch && matchesCat && matchesBrand && matchesPrice && matchesAvailability;
-                });
-                
-                const sortVal = sortFilter.value;
-                if(sortVal === 'price-low') {
-                    filtered.sort((a, b) => parseFloat(a.price || 0) - parseFloat(b.price || 0));
-                } else if(sortVal === 'price-high') {
-                    filtered.sort((a, b) => parseFloat(b.price || 0) - parseFloat(a.price || 0));
-                } else if(sortVal === 'alpha') {
-                    filtered.sort((a, b) => (a.product_name || '').localeCompare(b.product_name || ''));
-                } else if(sortVal === 'newest') {
-                    filtered.sort((a, b) => b.id - a.id);
                 }
 
-                renderProducts(filtered);
+
+                products.forEach(p => {
+
+                    let imgUrl =
+                        'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
+
+                    if (p.image) {
+
+                        const imgStr =
+                            String(p.image).trim();
+
+                        if (
+                            imgStr.startsWith('http://') ||
+                            imgStr.startsWith('https://')
+                        ) {
+
+                            imgUrl = imgStr;
+
+                        } else if (imgStr.includes('/')) {
+
+                            imgUrl =
+                                imgStr.startsWith('/')
+                                    ? imgStr
+                                    : '/' + imgStr;
+
+                        } else {
+
+                            imgUrl =
+                                API_BASE_URL.replace('/api', '') +
+                                '/uploads/' +
+                                imgStr;
+
+                        }
+
+                    }
+
+
+                    const catLower =
+                        (p.category_name || '').toLowerCase();
+
+                    const categoryBg =
+                        catLower === 'battery'
+                            ? '#FFFBEB'
+                            : catLower === 'inverter'
+                                ? '#EFF6FF'
+                                : 'var(--bg-subtle-blue)';
+
+                    const categoryColor =
+                        catLower === 'battery'
+                            ? 'var(--accent-color)'
+                            : 'var(--accent-blue)';
+
+
+                    const isAvailable =
+                        p.status === 'Available';
+
+
+                    const card =
+                        document.createElement('article');
+
+                    card.className =
+                        'product-card animate-fade-in-up';
+
+
+                    card.innerHTML = `
+
+                        <div class="product-image-wrapper">
+
+                            <span
+                                class="product-stock-badge ${isAvailable ? 'in-stock' : 'out-of-stock'}"
+                            >
+                                <i class="fas ${isAvailable ? 'fa-check' : 'fa-circle-xmark'}"></i>
+                                ${isAvailable ? 'In Stock' : 'Out of Stock'}
+                            </span>
+
+                            <img
+                                src="${imgUrl}"
+                                alt="${p.product_name}"
+                                loading="lazy"
+                                onerror="this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22400%22%20style%3D%22background%3A%23f3f4f6%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2224%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';"
+                            >
+
+                        </div>
+
+
+                        <div class="product-card-body">
+
+                            <div class="product-card-top">
+
+                                <span
+                                    class="product-category"
+                                    style="background:${categoryBg}; color:${categoryColor};"
+                                >
+                                    ${p.category_name || 'Uncategorized'}
+                                </span>
+
+                                <span class="product-brand">
+                                    ${p.brand_name || 'Generic'}
+                                </span>
+
+                            </div>
+
+
+                            <h3 class="product-title">
+                                ${p.product_name}
+                            </h3>
+
+
+                            <div class="product-specs">
+
+                                <div class="product-spec">
+
+                                    <span>Model</span>
+
+                                    <strong>
+                                        ${p.model_number || 'N/A'}
+                                    </strong>
+
+                                </div>
+
+                                <div class="product-spec">
+
+                                    <span>Capacity</span>
+
+                                    <strong>
+                                        ${p.capacity || 'N/A'}
+                                    </strong>
+
+                                </div>
+
+                                <div class="product-spec">
+
+                                    <span>Warranty</span>
+
+                                    <strong>
+                                        ${p.warranty || 'N/A'}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="product-card-footer">
+
+                                <div class="product-price">
+                                    ₹${parseFloat(
+                                        p.price || 0
+                                    ).toLocaleString('en-IN')}
+                                </div>
+
+
+                                <div class="product-actions">
+
+                                    <a
+                                        href="product-details.html?id=${p.id}"
+                                        class="btn btn-secondary"
+                                    >
+                                        Details
+                                    </a>
+
+                                    <a
+                                        href="enquiry.html?product=${p.id}"
+                                        class="btn btn-primary"
+                                    >
+                                        Enquire
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                    productGrid.appendChild(card);
+
+                });
+
             }
 
-            // Init
-            allProducts = await fetchProducts();
-            populateBrands(allProducts);
-            filterProducts(); // Apply initial sort/filter
 
-            searchInput.addEventListener('input', filterProducts);
-            categoryFilter.addEventListener('change', filterProducts);
-            brandFilter.addEventListener('change', filterProducts);
-            priceFilter.addEventListener('change', filterProducts);
-            availabilityFilter.addEventListener('change', filterProducts);
-            sortFilter.addEventListener('change', filterProducts);
+            function populateBrands(products) {
+
+                const brands = [
+                    ...new Set(
+                        products
+                            .map(p => p.brand_name)
+                            .filter(Boolean)
+                    )
+                ].sort();
+
+                brands.forEach(b => {
+
+                    const opt =
+                        document.createElement('option');
+
+                    opt.value = b;
+                    opt.textContent = b;
+
+                    brandFilter.appendChild(opt);
+
+                });
+
+            }
+
+
+            function filterProducts() {
+
+                const search =
+                    searchInput.value.toLowerCase();
+
+                const category =
+                    categoryFilter.value;
+
+                const brand =
+                    brandFilter.value;
+
+                const priceRange =
+                    priceFilter.value;
+
+                const availability =
+                    availabilityFilter.value;
+
+
+                let filtered =
+                    allProducts.filter(p => {
+
+                        const matchesSearch =
+                            (p.product_name &&
+                                p.product_name
+                                    .toLowerCase()
+                                    .includes(search)) ||
+
+                            (p.model_number &&
+                                p.model_number
+                                    .toLowerCase()
+                                    .includes(search)) ||
+
+                            (p.brand_name &&
+                                p.brand_name
+                                    .toLowerCase()
+                                    .includes(search)) ||
+
+                            (p.category_name &&
+                                p.category_name
+                                    .toLowerCase()
+                                    .includes(search));
+
+
+                        const matchesCat =
+                            category === "" ||
+                            p.category_name === category;
+
+
+                        const matchesBrand =
+                            brand === "" ||
+                            p.brand_name === brand;
+
+
+                        const matchesAvailability =
+                            availability === "" ||
+                            p.status === availability;
+
+
+                        let matchesPrice = true;
+
+                        if (priceRange) {
+
+                            const price =
+                                parseFloat(p.price || 0);
+
+                            if (
+                                priceRange === '0-5000'
+                            ) {
+                                matchesPrice =
+                                    price < 5000;
+
+                            } else if (
+                                priceRange === '5000-15000'
+                            ) {
+                                matchesPrice =
+                                    price >= 5000 &&
+                                    price <= 15000;
+
+                            } else if (
+                                priceRange === '15000-30000'
+                            ) {
+                                matchesPrice =
+                                    price > 15000 &&
+                                    price <= 30000;
+
+                            } else if (
+                                priceRange === '30000+'
+                            ) {
+                                matchesPrice =
+                                    price > 30000;
+                            }
+
+                        }
+
+
+                        return (
+                            matchesSearch &&
+                            matchesCat &&
+                            matchesBrand &&
+                            matchesPrice &&
+                            matchesAvailability
+                        );
+
+                    });
+
+
+                const sortVal =
+                    sortFilter.value;
+
+
+                if (sortVal === 'price-low') {
+
+                    filtered.sort(
+                        (a, b) =>
+                            parseFloat(a.price || 0) -
+                            parseFloat(b.price || 0)
+                    );
+
+                } else if (sortVal === 'price-high') {
+
+                    filtered.sort(
+                        (a, b) =>
+                            parseFloat(b.price || 0) -
+                            parseFloat(a.price || 0)
+                    );
+
+                } else if (sortVal === 'alpha') {
+
+                    filtered.sort(
+                        (a, b) =>
+                            (a.product_name || '')
+                                .localeCompare(
+                                    b.product_name || ''
+                                )
+                    );
+
+                } else if (sortVal === 'newest') {
+
+                    filtered.sort(
+                        (a, b) => b.id - a.id
+                    );
+
+                }
+
+
+                renderProducts(filtered);
+
+            }
+
+
+            /* Initialize */
+
+            allProducts =
+                await fetchProducts();
+
+            populateBrands(allProducts);
+
+            filterProducts();
+
+
+            /* Filters */
+
+            searchInput.addEventListener(
+                'input',
+                filterProducts
+            );
+
+            categoryFilter.addEventListener(
+                'change',
+                filterProducts
+            );
+
+            brandFilter.addEventListener(
+                'change',
+                filterProducts
+            );
+
+            priceFilter.addEventListener(
+                'change',
+                filterProducts
+            );
+
+            availabilityFilter.addEventListener(
+                'change',
+                filterProducts
+            );
+
+            sortFilter.addEventListener(
+                'change',
+                filterProducts
+            );
+
         });
     </script>
+
 </body>
 </html>
