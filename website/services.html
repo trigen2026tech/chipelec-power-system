@@ -29,7 +29,7 @@
                 <span>CHIPELEC POWER SYSTEMS</span>
             </a>
 
-            <div class="nav-links" id="mobileNav">
+            <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="about.html">About</a>
                 <a href="products.html">Products</a>
@@ -38,14 +38,9 @@
                 <a href="login.html" class="btn btn-outline">Login</a>
             </div>
 
-            <button
-                type="button"
-                class="mobile-menu-btn"
-                id="mobileMenuBtn"
-                aria-label="Open menu"
-                aria-expanded="false">
-                ☰
-            </button>
+            <div class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
 
         </div>
     </nav>
@@ -195,7 +190,7 @@
             </div>
 
         </section>
-        
+
     </main>
 
 
@@ -359,57 +354,7 @@
          MOBILE NAVIGATION
          ===================================================== -->
 
-    <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const menuButton =
-                document.getElementById('mobileMenuBtn');
-
-            const nav =
-                document.getElementById('mobileNav');
-
-            if (!menuButton || !nav) {
-                return;
-            }
-
-            menuButton.addEventListener('click', function () {
-
-                const isOpen =
-                    nav.classList.toggle('active');
-
-                menuButton.setAttribute(
-                    'aria-expanded',
-                    isOpen
-                );
-
-                menuButton.innerHTML =
-                    isOpen ? '✕' : '☰';
-
-            });
-
-
-            nav.querySelectorAll('a').forEach(function (link) {
-
-                link.addEventListener('click', function () {
-
-                    nav.classList.remove('active');
-
-                    menuButton.setAttribute(
-                        'aria-expanded',
-                        'false'
-                    );
-
-                    menuButton.innerHTML = '☰';
-
-                });
-
-            });
-
-        });
-
-    </script>
-
+    
 
     <script src="js/main.js"></script>
 
