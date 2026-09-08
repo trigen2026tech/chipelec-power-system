@@ -1246,3 +1246,66 @@ footer::before {
         margin: 8px 0 0;
     }
 }
+
+/* =========================================================
+   HERO - MOBILE REFINEMENT
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .hero {
+        padding: 52px 0 56px;
+    }
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 36px;
+        text-align: left;
+    }
+
+    .hero-content h1 {
+        font-size: 2.7rem;
+        line-height: 1.08;
+        letter-spacing: -1px;
+        margin-bottom: 18px;
+    }
+
+    .hero-content p {
+        font-size: 1.05rem;
+        line-height: 1.65;
+        max-width: 100%;
+        margin-bottom: 28px;
+    }
+
+    .hero-image-wrapper {
+        min-height: auto;
+        width: 100%;
+    }
+
+    .hero-image-wrapper img {
+        width: min(100%, 360px);
+        max-height: 240px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .hero {
+        padding: 44px 0 48px;
+    }
+
+    .hero-content h1 {
+        font-size: 2.25rem;
+        line-height: 1.1;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    .hero-image-wrapper img {
+        width: min(100%, 320px);
+        max-height: 210px;
+    }
+}
