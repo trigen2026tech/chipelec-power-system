@@ -3,70 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Services | CHIPELEC Power System</title>
+    <meta name="description"
+        content="Professional battery and inverter installation, maintenance, repair and consultation services from CHIPELEC Power System.">
+
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
+
+    <!-- =====================================================
+         NAVBAR
+         ===================================================== -->
+
     <nav class="navbar">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a href="index.html" class="navbar-brand">CHIPELEC<span>.</span></a>
-            <div class="nav-links">
+        <div class="container">
+
+            <a href="index.html" class="navbar-brand">
+                <img src="images/chipelec-logo.png" alt="CHIPELEC Power Systems">
+                <span>CHIPELEC POWER SYSTEMS</span>
+            </a>
+
+            <div class="nav-links" id="mobileNav">
                 <a href="index.html">Home</a>
                 <a href="about.html">About</a>
                 <a href="products.html">Products</a>
                 <a href="services.html" class="active">Services</a>
                 <a href="contact.html">Contact</a>
-                <a href="login.html" class="btn btn-outline" style="padding: 8px 20px;">Login</a>
+                <a href="login.html" class="btn btn-outline">Login</a>
             </div>
-            <div class="mobile-menu-btn"><i class="fas fa-bars"></i></div>
+
+            <button
+                type="button"
+                class="mobile-menu-btn"
+                id="mobileMenuBtn"
+                aria-label="Open menu"
+                aria-expanded="false">
+                ☰
+            </button>
+
         </div>
     </nav>
 
-    <header class="py-5 text-center" style="background-color: var(--primary-color); color: white;">
+
+    <!-- =====================================================
+         SERVICES HERO
+         ===================================================== -->
+
+    <header class="services-hero">
+
         <div class="container">
-            <h1 style="color: white; font-size: 2.5rem;">Our Services</h1>
-            <p style="color: #e2e8f0; max-width: 600px; margin: 10px auto 0;">Comprehensive support to keep your systems running smoothly.</p>
+
+            <div class="services-hero-content">
+
+                <span class="services-eyebrow">
+                    PROFESSIONAL POWER SERVICES
+                </span>
+
+                <h1>
+                    Power Solutions.<br>
+                    Professional Service.
+                </h1>
+
+                <p>
+                    From installation to maintenance and expert consultation,
+                    CHIPELEC keeps your batteries and inverters performing
+                    reliably when you need them most.
+                </p>
+
+            </div>
+
         </div>
+
     </header>
 
-    <main class="py-5" style="background-color: var(--bg-color);">
-        <div class="container">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-                <div class="card p-4 text-center">
-                    <i class="fas fa-tools" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; display: block;"></i>
-                    <h3 class="card-title">Installation</h3>
-                    <p class="card-text">Professional installation of batteries and inverters at your premises by certified experts.</p>
-                    <a href="installation.html" class="btn btn-outline mt-3">Book Installation</a>
+
+    <!-- =====================================================
+         SERVICES
+         ===================================================== -->
+
+    <main>
+
+        <section class="services-section">
+
+            <div class="container">
+
+                <div class="section-heading text-center">
+
+                    <h2>How We Can Help</h2>
+
+                    <p>
+                        Complete support for your home and business power
+                        backup systems.
+                    </p>
+
                 </div>
-                <div class="card p-4 text-center">
-                    <i class="fas fa-wrench" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; display: block;"></i>
-                    <h3 class="card-title">Maintenance & Repair</h3>
-                    <p class="card-text">Routine check-ups and quick repairs to ensure optimal performance.</p>
-                    <a href="service-request.html" class="btn btn-outline mt-3">Raise Complaint</a>
+
+
+                <div class="services-grid">
+
+                    <!-- Installation -->
+                    <article class="service-card">
+
+                        <div class="service-icon">
+                            <i class="fas fa-screwdriver-wrench"></i>
+                        </div>
+
+                        <div class="service-card-content">
+
+                            <h3>Professional Installation</h3>
+
+                            <p>
+                                Safe and professional installation of batteries
+                                and inverters at your home or business by
+                                experienced technicians.
+                            </p>
+
+                            <a href="installation.html"
+                               class="service-link">
+                                Book Installation
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- Maintenance -->
+                    <article class="service-card">
+
+                        <div class="service-icon service-icon-warning">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+
+                        <div class="service-card-content">
+
+                            <h3>Maintenance & Repair</h3>
+
+                            <p>
+                                Regular maintenance, system check-ups and
+                                reliable repair services to keep your power
+                                backup system working efficiently.
+                            </p>
+
+                            <a href="service-request.html"
+                               class="service-link">
+                                Raise Service Request
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+                    <!-- Consultation -->
+                    <article class="service-card">
+
+                        <div class="service-icon service-icon-success">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+
+                        <div class="service-card-content">
+
+                            <h3>Expert Consultation</h3>
+
+                            <p>
+                                Get professional guidance and customized
+                                quotations based on your home's or
+                                business's power requirements.
+                            </p>
+
+                            <a href="quotation.html"
+                               class="service-link">
+                                Request Quotation
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                    </article>
+
                 </div>
-                <div class="card p-4 text-center">
-                    <i class="fas fa-file-invoice-dollar" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 20px; display: block;"></i>
-                    <h3 class="card-title">Consultation</h3>
-                    <p class="card-text">Get expert advice and customized quotations for your specific power needs.</p>
-                    <a href="quotation.html" class="btn btn-outline mt-3">Request Quotation</a>
-                </div>
+
             </div>
-        </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CALL TO ACTION
+             ================================================= -->
+
+        <section class="services-cta">
+
+            <div class="container">
+
+                <div class="services-cta-content">
+
+                    <div>
+
+                        <span class="services-eyebrow">
+                            NEED ASSISTANCE?
+                        </span>
+
+                        <h2>
+                            Keep Your Power System Running Reliably.
+                        </h2>
+
+                        <p>
+                            Our team is ready to help with installation,
+                            maintenance, repairs and power solution
+                            requirements.
+                        </p>
+
+                    </div>
+
+                    <div class="services-cta-actions">
+
+                        <a href="service-request.html"
+                           class="btn btn-primary">
+                            Request Service
+                        </a>
+
+                        <a href="contact.html"
+                           class="btn btn-secondary">
+                            Contact Us
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
     <footer>
+
         <div class="container">
+
             <div class="footer-grid">
-                <div class="footer-col"><h3>CHIPELEC.</h3></div>
+
+                <!-- Company -->
                 <div class="footer-col">
-                    <h3>Quick Links</h3>
-                    <ul><li><a href="about.html">About Us</a></li><li><a href="products.html">Products</a></li></ul>
+
+                    <h3>
+                        CHIPELEC POWER SYSTEMS
+                    </h3>
+
+                    <p>
+                        Reliable battery and inverter solutions for homes
+                        and businesses, backed by professional installation
+                        and dependable service.
+                    </p>
+
                 </div>
+
+
+                <!-- Quick Links -->
+                <div class="footer-col">
+
+                    <h3>Quick Links</h3>
+
+                    <ul>
+
+                        <li>
+                            <a href="about.html">About Us</a>
+                        </li>
+
+                        <li>
+                            <a href="products.html">Products</a>
+                        </li>
+
+                        <li>
+                            <a href="services.html">Services</a>
+                        </li>
+
+                        <li>
+                            <a href="contact.html">Contact</a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- Customer Service -->
+                <div class="footer-col">
+
+                    <h3>Customer Service</h3>
+
+                    <ul>
+
+                        <li>
+                            <a href="installation.html">
+                                Book Installation
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="service-request.html">
+                                Raise Service Request
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="quotation.html">
+                                Request Quotation
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="login.html">
+                                Customer Login
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- Contact -->
+                <div class="footer-col">
+
+                    <h3>Contact Us</h3>
+
+                    <ul>
+
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            17, Gandhi Rd, Kamarajar Nagar,
+                            NGO Colony, Choolaimedu,
+                            Chennai, Tamil Nadu 600094
+                        </li>
+
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            +91 98403 13242
+                        </li>
+
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            support@chipelec.com
+                        </li>
+
+                    </ul>
+
+                </div>
+
             </div>
-            <div class="footer-bottom"><p>&copy; 2026 CHIPELEC Power System. All rights reserved.</p></div>
+
+
+            <div class="footer-bottom">
+
+                <p>
+                    &copy; 2026 CHIPELEC Power System.
+                    All rights reserved.
+                </p>
+
+                <p>
+                    Powering A Brighter Tomorrow.
+                </p>
+
+            </div>
+
         </div>
+
     </footer>
+
+
+    <!-- =====================================================
+         MOBILE NAVIGATION
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const menuButton =
+                document.getElementById('mobileMenuBtn');
+
+            const nav =
+                document.getElementById('mobileNav');
+
+            if (!menuButton || !nav) {
+                return;
+            }
+
+            menuButton.addEventListener('click', function () {
+
+                const isOpen =
+                    nav.classList.toggle('active');
+
+                menuButton.setAttribute(
+                    'aria-expanded',
+                    isOpen
+                );
+
+                menuButton.innerHTML =
+                    isOpen ? '✕' : '☰';
+
+            });
+
+
+            nav.querySelectorAll('a').forEach(function (link) {
+
+                link.addEventListener('click', function () {
+
+                    nav.classList.remove('active');
+
+                    menuButton.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    menuButton.innerHTML = '☰';
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+
     <script src="js/main.js"></script>
+
 </body>
 </html>
